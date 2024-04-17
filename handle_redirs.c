@@ -1,0 +1,120 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   handle_redirs.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/04/16 16:52:51 by uahmed            #+#    #+#             */
+/*   Updated: 2024/04/16 16:52:52 by uahmed           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+#include "miniwell.h"
+
+
+int ft_input_redir(t_vec **redirect, t_redirect **fds,  char *filename)
+{
+    (*fds)->new_fd = STDIN_FILENO;
+    (*fds)->orig_fd = open(filename, O_RDONLY);
+    if ((*fds)->orig_fd == -1)
+    {
+	//TODO: strerror(errno) || bring pipex error writing here
+	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
+    }
+    if (!vec_push(*redirect, *fds))
+	return (0);
+    return (1);
+}
+
+int ft_output_redir(t_vec **redirect, t_redirect **fds,  char *filename)
+{
+    (*fds)->orig_fd = STDOUT_FILENO;
+    (*fds)->new_fd = open(filename, O_RDONLY | O_CREAT, 0644);
+    if ((*fds)->new_fd == -1)
+    {
+	//TODO: strerror(errno) || bring pipex error writing here
+	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
+    }
+    if (!vec_push(*redirect, *fds))
+	return (0);
+    return (1);
+}
+
+int ft_output_append(t_vec **redirect, t_redirect **fds,  char *filename)
+{
+    (*fds)->new_fd = STDOUT_FILENO;
+    (*fds)->orig_fd = open(filename, O_RDONLY | O_CREAT, 0644);
+    if ((*fds)->orig_fd == -1)
+    {
+	//TODO: strerror(errno) || bring pipex error writing here
+	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
+    }
+    if (!vec_push(*redirect, *fds))
+	return (0);
+    return (1);
+}
+
+int ft_here_doc(t_vec **redirect, t_redirect **fds,  char *eof)
+{
+    char *line;
+
+    (*fds)->new_fd = STDIN_FILENO;
+    (*fds)->orig_fd = open(".infile.txt", O_WRONLY | O_TRUNC | O_CREAT, 0666);
+    if ((*fds)->orig_fd == -1)
+    {
+	//TODO: strerror(errno) || bring pipex error writing here
+	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
+    }
+    line = get_next_line(0);
+    while (42)
+    {
+	if (((ft_strlen(line) - 1) == ft_strlen(eof) && !strncmp(line,
+				eof, strlen(eof))) || !line)
+		break ;
+	write((*fds)->orig_fd, line, ft_strlen(line));
+	line = get_next_line(0);
+    }
+    return (1);
+}
+
+int	ft_save_redirects(t_vec *redirect, const char *s, t_vars *vars)
+{
+    size_t end;
+    size_t ind;
+    char *file;
+    t_redirect *fds;
+
+    end = 0;
+    fds = (t_redirect *)malloc(sizeof(t_redirect));
+    if (!fds)
+	return (0); // WARNING: make sure to differentiate malloc fail or file open fail if needed be
+    vars->begin = 0;
+    if (!ft_index_after_spaces(vars))// NOTE: returns 0 when there's nothing after the redirect operator
+	return (0);
+    ft_strings_end(vars); // NOTE: Move vars->end to the space (if any) rght after the filename
+    file = ft_substr(s, vars->ind, end - vars->ind);
+    if (!ft_strncmp(s, "<<", 2))
+    {
+	if (!ft_here_doc(&redirect, &fds, file))
+	    return (0);
+    }
+    else if (!ft_strncmp(s, "<", 1))
+    {
+	if (!ft_input_redir(&redirect, &fds, file))
+	    return (0);
+    }
+    else if (!ft_strncmp(s, ">", 1))
+    {
+	if (!ft_output_redir(&redirect, &fds, file))
+	    return (0);
+    }
+    else if (!ft_strncmp(s, ">>", 2))
+    {
+	if (!ft_output_append(&redirect, &fds, file))
+	    return (0);
+    }
+    free(file);
+    vars->end += end;
+    return (1);
+}
+
