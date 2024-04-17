@@ -27,6 +27,8 @@ int main(void)
 	    free((char *)vars.input_line);
 	    continue ;
 	}
+	if (!vec_new(&pipes, 1, sizeof(t_input *)))
+	    continue ;
 	if (!ft_save_input(&pipes, &vars))
 	{
 	    free((char *)vars.input_line);

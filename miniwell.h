@@ -39,7 +39,6 @@ typedef struct s_pipes
 
 typedef struct s_input
 {
-	t_pipes *pipes;
 	t_vec *cmd;
 	t_vec *redirect;
 }	t_input;
@@ -54,7 +53,7 @@ void	ft_init_vars(t_vars *vars);
 int ft_syntax_error(t_vars *vars, size_t len);
 int ft_space_until_end(char *s);
 int ft_save_input(t_vec *pipes, t_vars *vars);
-int	ft_save_redirects(t_vec *redirect, char *s, t_vars *vars);
+int	ft_save_redirects(t_input *input, const char *s, t_vars *vars);
 void	ft_strings_end(t_vars *vars);
 int ft_index_after_spaces(t_vars *vars);
 

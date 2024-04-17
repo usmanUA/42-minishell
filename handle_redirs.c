@@ -10,9 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
+#include "vec/vec.h"
 
 
-int ft_input_redir(t_vec **redirect, t_redirect **fds,  char *filename)
+int ft_input_redir(t_vec *redirect, t_redirect **fds,  char *filename)
 {
     (*fds)->new_fd = STDIN_FILENO;
     (*fds)->orig_fd = open(filename, O_RDONLY);
@@ -21,12 +22,12 @@ int ft_input_redir(t_vec **redirect, t_redirect **fds,  char *filename)
 	//TODO: strerror(errno) || bring pipex error writing here
 	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
-    if (!vec_push(*redirect, *fds))
+    if (!vec_push(redirect, *fds))
 	return (0);
     return (1);
 }
 
-int ft_output_redir(t_vec **redirect, t_redirect **fds,  char *filename)
+int ft_output_redir(t_vec *redirect, t_redirect **fds,  char *filename)
 {
     (*fds)->orig_fd = STDOUT_FILENO;
     (*fds)->new_fd = open(filename, O_RDONLY | O_CREAT, 0644);
@@ -35,12 +36,12 @@ int ft_output_redir(t_vec **redirect, t_redirect **fds,  char *filename)
 	//TODO: strerror(errno) || bring pipex error writing here
 	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
-    if (!vec_push(*redirect, *fds))
+    if (!vec_push(redirect, *fds))
 	return (0);
     return (1);
 }
 
-int ft_output_append(t_vec **redirect, t_redirect **fds,  char *filename)
+int ft_output_append(t_vec *redirect, t_redirect **fds,  char *filename)
 {
     (*fds)->new_fd = STDOUT_FILENO;
     (*fds)->orig_fd = open(filename, O_RDONLY | O_CREAT, 0644);
@@ -49,12 +50,12 @@ int ft_output_append(t_vec **redirect, t_redirect **fds,  char *filename)
 	//TODO: strerror(errno) || bring pipex error writing here
 	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
-    if (!vec_push(*redirect, *fds))
+    if (!vec_push(redirect, *fds))
 	return (0);
     return (1);
 }
 
-int ft_here_doc(t_vec **redirect, t_redirect **fds,  char *eof)
+int ft_here_doc(t_vec *redirect, t_redirect **fds,  char *eof)
 {
     char *line;
 
@@ -77,14 +78,17 @@ int ft_here_doc(t_vec **redirect, t_redirect **fds,  char *eof)
     return (1);
 }
 
-int	ft_save_redirects(t_vec *redirect, const char *s, t_vars *vars)
+int	ft_save_redirects(t_input *input, const char *s, t_vars *vars)
 {
     size_t end;
     size_t ind;
     char *file;
+    t_vec redirect;
     t_redirect *fds;
 
     end = 0;
+    if (!vec_new(&redirect, 2, sizeof(t_redirect *)))// NOTE: Initialize a vector and allocate some mem for fds
+	return (0);
     fds = (t_redirect *)malloc(sizeof(t_redirect));
     if (!fds)
 	return (0); // WARNING: make sure to differentiate malloc fail or file open fail if needed be
@@ -113,6 +117,9 @@ int	ft_save_redirects(t_vec *redirect, const char *s, t_vars *vars)
 	if (!ft_output_append(&redirect, &fds, file))
 	    return (0);
     }
+    if (!vec_push(&redirect, fds))
+	return (0);
+    input->redirect = &redirect;
     free(file);
     vars->end += end;
     return (1);

@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 #include "libft/libft.h"
 #include "miniwell.h"
+#include "vec/vec.h"
+#include <stdlib.h>
 
 void	ft_init_vars(t_vars *vars)
 {
@@ -83,25 +85,32 @@ void	ft_shift_pointer(t_vars *vars)
     }
 }
 
-int ft_save_input(t_vec *pipes, t_vars *vars)
+int ft_save_cmd(t_input *input, char *s, t_vars *vars)
 {
     t_vec cmd;
-    t_vec redirect;
-    char *str;
 
     if (!vec_new(&cmd, 2, sizeof(char *))) // NOTE: Initialize a vector and allocate some mem for command
 	return (0);
-    if (!vec_new(&redirect, 2, sizeof(t_redirect *)))// NOTE: Initialize a vector and allocate some mem for fds
-	return (0);
+    return (1);
+}
+
+int ft_save_input(t_vec *pipes, t_vars *vars)
+{
+    t_input *input;
+    char *str;
+
     while (++vars->ind < vars->len) // NOTE: loop over the whole user input line
     {
 	if (!ft_index_after_spaces(vars)) // NOTE: skip spaces, returns the index of the string or 0 if the whole line is spaces and now word/string 
 	    break;
 	ft_strings_end(vars); // NOTE: index of the string before the next space or null-terminator starts
 	str = ft_substr(&vars->input_line[vars->ind], vars->ind, vars->end - vars->ind); // NOTE: malloc that string in heap and point str to it
+	input = malloc(sizeof(t_input *));
+	if (!input)
+	    return (0);
 	if (vars->begin && ft_redirect_operator(str)) // NOTE: check if the first string is one of the redir operators
 	{
-	    if (!ft_save_redirects(&redirect, str, vars)) // NOTE: open files and save their fds to vec. operators are followed by files 
+	    if (!ft_save_redirects(input, str, vars)) // NOTE: open files and save their fds to vec. operators are followed by files 
 		return (0);
 	}
 	else if (!ft_strncmp(str, "|", 1))
@@ -109,11 +118,13 @@ int ft_save_input(t_vec *pipes, t_vars *vars)
 	    if (ft_syntax_error(vars, vars->len - vars->end)) // NOTE: if there's syntax error after the |
 		ft_shift_pointer(vars); // NOTE: move to the end or to the next |
 	    vars->begin = 1;
+	    if (!vec_push(pipes, input))
+		return (0);
 	}
 	else
-	    vec_push(&cmd, str); // NOTE: if its command or its option, save to the vec.
+	    ft_save_cmd(input, str, vars); // NOTE: if its command or its option, save to the vec.
+	if (!vec_push(pipes, input))
+	    return (0);
     }
-    input->cmd = &cmd;
-    input->redirect = &redirect;
     return (1);
 }
