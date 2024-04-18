@@ -27,14 +27,14 @@ int main(void)
 	    free((char *)vars.input_line);
 	    continue ;
 	}
-	if (!vec_new(&pipes, 1, sizeof(t_input *)))
+	if (!vec_new(&pipes, 1, sizeof(t_input *))) //NOTE: maybe add a counter for tot num of pipes to t_input?
 	    continue ;
 	if (!ft_save_input(&pipes, &vars))
 	{
 	    free((char *)vars.input_line);
-	    exit(1);
+	    continue ;
 	}
-	free((char *)vars.input_line);
+	free((char *)vars.input_line); //NOTE: everything saved to vector pipes and not input_line can be freed 
 	vars.input_line = NULL;
 	// TODO: everything is parsed, do:
 	// 1. command validation (write errors if there are errors related to the invalid command)

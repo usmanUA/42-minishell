@@ -29,6 +29,7 @@ typedef struct s_vars
 	size_t	len;
 	size_t end;
 	int	begin;
+	int	stop;
 }	t_vars;
 
 typedef struct s_pipes
@@ -53,8 +54,10 @@ void	ft_init_vars(t_vars *vars);
 int ft_syntax_error(t_vars *vars, size_t len);
 int ft_space_until_end(char *s);
 int ft_save_input(t_vec *pipes, t_vars *vars);
-int	ft_save_redirects(t_input *input, const char *s, t_vars *vars);
-void	ft_strings_end(t_vars *vars);
-int ft_index_after_spaces(t_vars *vars);
+int	ft_handle_redirects(t_input *input, const char *s, t_vars *vars);
+char *ft_next_string(t_vars *vars, int op);
+void	ft_shift_pointer(t_vars *vars);
+void	ft_next_pipe_null(t_vars *vars);
+int ft_special_char(char s);
 
 #endif

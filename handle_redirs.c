@@ -15,6 +15,7 @@
 
 int ft_input_redir(t_vec *redirect, t_redirect **fds,  char *filename)
 {
+    // NOTE: UPDATES fds based on the possible input redirection
     (*fds)->new_fd = STDIN_FILENO;
     (*fds)->orig_fd = open(filename, O_RDONLY);
     if ((*fds)->orig_fd == -1)
@@ -29,6 +30,7 @@ int ft_input_redir(t_vec *redirect, t_redirect **fds,  char *filename)
 
 int ft_output_redir(t_vec *redirect, t_redirect **fds,  char *filename)
 {
+    // NOTE: UPDATES fds based on the possible output redirection
     (*fds)->orig_fd = STDOUT_FILENO;
     (*fds)->new_fd = open(filename, O_RDONLY | O_CREAT, 0644);
     if ((*fds)->new_fd == -1)
@@ -43,6 +45,7 @@ int ft_output_redir(t_vec *redirect, t_redirect **fds,  char *filename)
 
 int ft_output_append(t_vec *redirect, t_redirect **fds,  char *filename)
 {
+    // NOTE: UPDATES fds based on the possible output append redirection
     (*fds)->new_fd = STDOUT_FILENO;
     (*fds)->orig_fd = open(filename, O_RDONLY | O_CREAT, 0644);
     if ((*fds)->orig_fd == -1)
@@ -57,6 +60,7 @@ int ft_output_append(t_vec *redirect, t_redirect **fds,  char *filename)
 
 int ft_here_doc(t_vec *redirect, t_redirect **fds,  char *eof)
 {
+    // NOTE:UPDATES the fds and reads STDIN and saves the input to hidden file .here_doc 
     char *line;
 
     (*fds)->new_fd = STDIN_FILENO;
@@ -78,25 +82,24 @@ int ft_here_doc(t_vec *redirect, t_redirect **fds,  char *eof)
     return (1);
 }
 
-int	ft_save_redirects(t_input *input, const char *s, t_vars *vars)
+int	ft_handle_redirects(t_input *input, const char *s, t_vars *vars)
 {
-    size_t end;
+    // NOTE: checks the string right after the redirect operator is not an invalid operator and if so returns 1
+    // OTHERWISE tries to open the files and save their file descriptors and moves the pointer to the next string after filename
     size_t ind;
     char *file;
     t_vec redirect;
     t_redirect *fds;
 
-    end = 0;
     if (!vec_new(&redirect, 2, sizeof(t_redirect *)))// NOTE: Initialize a vector and allocate some mem for fds
 	return (0);
     fds = (t_redirect *)malloc(sizeof(t_redirect));
     if (!fds)
 	return (0); // WARNING: make sure to differentiate malloc fail or file open fail if needed be
     vars->begin = 0;
-    if (!ft_index_after_spaces(vars))// NOTE: returns 0 when there's nothing after the redirect operator
+    file = ft_next_string(vars);
+    if (!file)// NOTE: returns 0 when there's nothing after the redirect operator (end of user input)
 	return (0);
-    ft_strings_end(vars); // NOTE: Move vars->end to the space (if any) rght after the filename
-    file = ft_substr(s, vars->ind, end - vars->ind);
     if (!ft_strncmp(s, "<<", 2))
     {
 	if (!ft_here_doc(&redirect, &fds, file))
@@ -121,7 +124,6 @@ int	ft_save_redirects(t_input *input, const char *s, t_vars *vars)
 	return (0);
     input->redirect = &redirect;
     free(file);
-    vars->end += end;
     return (1);
 }
 
