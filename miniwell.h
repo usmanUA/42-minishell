@@ -21,6 +21,13 @@
 #include <sys/_types/_size_t.h>
 # include "get_next_line/get_next_line.h"
 
+typedef enum s_constants
+{
+	COMMAND = 0,
+	REDIRECT = 1,
+	FD = 2,
+	FILENAME = 3,
+}	t_constants;
  
 typedef struct s_vars
 {
@@ -28,8 +35,7 @@ typedef struct s_vars
 	size_t	ind;
 	size_t	len;
 	size_t end;
-	int	begin;
-	int	stop;
+	int fd;
 }	t_vars;
 
 typedef struct s_pipes
@@ -51,13 +57,17 @@ typedef struct s_redirect
 }	t_redirect;
 
 void	ft_init_vars(t_vars *vars);
-int ft_syntax_error(t_vars *vars, size_t len);
+int ft_syntax_error(t_vars *vars);
 int ft_space_until_end(char *s);
 int ft_save_input(t_vec *pipes, t_vars *vars);
-int	ft_handle_redirects(t_input *input, const char *s, t_vars *vars);
+int	ft_handle_redirects(t_input *input, char *s, char *fd, t_vars *vars);
 char *ft_next_string(t_vars *vars, int op);
 void	ft_shift_pointer(t_vars *vars);
 void	ft_next_pipe_null(t_vars *vars);
 int ft_special_char(char s);
+int ft_operator_first(t_input *input, t_vars *vars);
+int ft_command_first(t_input *input, char *s, t_vars *vars);
+int ft_save_cmd(t_input *input, char *s, t_vars *vars);
+int ft_token_error(char c);
 
 #endif

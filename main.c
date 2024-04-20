@@ -22,19 +22,19 @@ int main(void)
 	ft_init_vars(&vars);
 	vars.input_line = readline("MiniWell😎:V0.1$ ");
 	add_history(vars.input_line);
-	if (ft_syntax_error(&vars, 0))
+	if (ft_syntax_error(&vars))
 	{
 	    free((char *)vars.input_line);
 	    continue ;
 	}
-	if (!vec_new(&pipes, 1, sizeof(t_input *))) //NOTE: maybe add a counter for tot num of pipes to t_input?
+	if (!vec_new(&pipes, 1, sizeof(t_input *))) 
 	    continue ;
 	if (!ft_save_input(&pipes, &vars))
 	{
 	    free((char *)vars.input_line);
 	    continue ;
 	}
-	free((char *)vars.input_line); //NOTE: everything saved to vector pipes and not input_line can be freed 
+	free((char *)vars.input_line); // NOTE: everything saved to vector pipes 
 	vars.input_line = NULL;
 	// TODO: everything is parsed, do:
 	// 1. command validation (write errors if there are errors related to the invalid command)

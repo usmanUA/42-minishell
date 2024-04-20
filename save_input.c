@@ -9,6 +9,7 @@
 /*   Updated: 2024/04/16 13:55:05 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include "libft/libft.h"
 #include "miniwell.h"
 
 void	ft_init_vars(t_vars *vars)
@@ -16,9 +17,8 @@ void	ft_init_vars(t_vars *vars)
     // NOTE: Initialize vars struct
     vars->ind = -1;
     vars->end = 0;
-    vars->begin = 1;
-    vars->stop = 0;
     vars->len = 0;
+    vars->fd = 0;
     vars->input_line = NULL;
 }
 
@@ -45,12 +45,17 @@ static void	ft_strings_end(t_vars *vars, int operator)
 
     quote = 0;
     ind = 0;
-    if (operator)
+    if (operator == REDIRECT)
     {
-	while (vars->input_line[vars->ind + ind] == '<' || vars->input_line[vars->ind + ind] == '>')
+	while (vars->input_line[vars->ind+ind]=='<' || vars->input_line[vars->ind+ind]=='>')
 	    ind++;
     }
-    else
+    else if (operator == FD)
+    {
+	while (ft_isdigit(vars->input_line[vars->ind+ind]))
+	    ind++;
+    }
+    else if (operator == COMMAND)
     {
 	if (vars->input_line[vars->ind] == '\'' || vars->input_line[vars->ind] == '\"')
 	    quote = 1;
@@ -66,7 +71,7 @@ static void	ft_strings_end(t_vars *vars, int operator)
 	    ++ind;
 	}
     }
-    vars->end = vars->ind + ind;
+    vars->end = vars->ind + ind; // NOTE: END updates here
 }
 
 
@@ -75,13 +80,15 @@ static int ft_index_after_spaces(t_vars *vars)
     // NOTE: SKIPS all the spaces and moves the pointer to the non-space character 
     // if there's no non-space character after the space/spaces returns false
     int ind;
+    int end;
 
     ind = 0;
+    end = vars->end;
     if (ft_space_until_end(&vars->input_line[vars->end]))
 	return (0);
     while (ft_isspace(vars->input_line[vars->end+ind]))
 	ind++;
-    vars->ind = vars->end + ind;
+    vars->ind = vars->end + ind; // NOTE: index updates here
     return (1);
 }
 
@@ -97,11 +104,15 @@ static int ft_index_after_spaces(t_vars *vars)
 void	ft_shift_pointer(t_vars *vars)
 {
     // NOTE: moves the pointer either to the next | or null-terminator whatever comes first in the char *
-    while (vars->end < vars->len)
+    vars->ind = vars->end;
+    while (vars->ind < vars->len)
     {
-	if (vars->input_line[vars->end] == '|' || vars->input_line[vars->end] == '\0') // NOTE: if encounters | or '\0' stops.
+	if (vars->input_line[vars->ind] == '|') // NOTE: if encounters | stops.
+	{
+	    vars->ind++;
 	    return ;
-	vars->end++;
+	}
+	vars->ind++;
     }
 }
 
@@ -110,10 +121,10 @@ char *ft_next_string(t_vars *vars, int op)
     // NOTE: returns the next string 
     char *s;
 
-    if (!ft_index_after_spaces(vars)) // NOTE: skip spaces, returns the index of the string or 0 if the whole line is spaces and now word/string 
-	return (NULL);
-    ft_strings_end(vars, op); // NOTE: vars->end updated here, it now points to the cahracter followed by the word we're hunting here 
-    s = ft_substr(&vars->input_line[vars->ind], vars->ind, vars->end - vars->ind); // NOTE: malloc that string in heap and point str to it
+    if (!ft_index_after_spaces(vars)) // NOTE: skip spaces, vars->ind->string or 0 if all spaces 
+	 return (NULL);
+    ft_strings_end(vars, op); // NOTE: vars->end now points to the end of string
+    s = ft_substr(vars->input_line, vars->ind, vars->end - vars->ind); // NOTE: malloc that string in heap and point str to it
     if (!s)
 	return (NULL);
     return (s);
@@ -124,29 +135,45 @@ void	ft_next_pipe_null(t_vars *vars)
 
 }
 
+int ft_redirection(t_vars *vars)
+{
+    // NOTE: checks the operator first case
+    int ind;
+
+    ind = vars->ind;
+    if (vars->input_line[ind] == '<' || vars->input_line[ind] == '>')
+	return (1);
+    while (ft_isdigit(vars->input_line[ind]))
+	ind++;
+    if (vars->input_line[ind] == '<' || vars->input_line[ind] == '>')
+    {
+	vars->fd = 1;
+	return (1);
+    }
+    return (0);
+}
+
 int ft_save_input(t_vec *pipes, t_vars *vars)
 {
     // NOTE: PARSE EVERYTHING
     t_input *input;
     char *str;
 
+    ft_index_after_spaces(vars); 
     while (++vars->ind < vars->len) // NOTE: loop over the whole user input line
     {
 	input = malloc(sizeof(t_input));
 	if (!input)
 	    return (0);
-	if (vars->input_line[vars->ind] == '<' || vars->input_line[vars->ind] == '>')
+	if (ft_redirection(vars))
 	{
-	    str = ft_next_string(vars, 1); // NOTE: Malloced str, vars->ind points to the start of str and vars->end points to the character next to the last character of str
-	    if (!str)
-		break ;
-	    if (!ft_after_operator(input, str, vars))
+	    if (!ft_operator_first(input, vars))
 		continue ;
 	}
-	else if (!ft_redirect_operator(str, vars->end - vars->ind))
+	else 
 	{
-	 //    if (!ft_after_command(input, str, vars))
-		// continue ;
+	    if (!ft_command_first(input, str, vars))
+		continue ;
 	}
 	free(str);
 	// Take pipe thing to operator and command thing

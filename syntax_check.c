@@ -9,11 +9,9 @@
 /*   Updated: 2024/04/16 13:50:18 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft/libft.h"
 #include "miniwell.h"
-#include <sys/_types/_size_t.h>
 
-static int ft_token_error(char c)
+int ft_token_error(char c)
 {
     printf("bash: syntax error near unexpected token  '%c'\n",c); 
     return (1);
@@ -31,10 +29,12 @@ int ft_special_char(char s)
 
 static int ft_prohibited_chars(t_vars *vars)
 {
-    // NOTE: loops over the user innput and checks for prohibited special characters and returns 1 if true 
+    // NOTE: loops over the user input and checks for prohibited special characters and returns 1 if true 
     int ind;
     
     ind = -1;
+    if (vars->input_line[0] == '|')
+	return (1);
     while (++ind < vars->len)
     {
 	if (ft_special_char(vars->input_line[ind]))
@@ -83,25 +83,32 @@ static int ft_unclosed_quote(t_vars *vars)
     return (0);
 }
 
-int ft_syntax_error(t_vars *vars, size_t len)
+int ft_pipe_follows_redirect(t_vars *vars)
+{
+    int ind;
+
+    ind = -1;
+    while (++ind < vars->len)
+    {
+	
+    }
+    return (1);
+}
+
+int ft_syntax_error(t_vars *vars)
 {
     // NOTE: writes the errors message and returns 1 when there's error message
     // Errors: 1. if one of the operators come in the beginning or there's an unclosed quotation mark
     //	       2. OR if all the characters are spaces
     //	 TODO: RETURN EXIT STATUS IF THERE's SYNTAX ERROR
-    int ind;
-
-    ind = vars->end;
-    if (!len)
-    {
-	vars->len = ft_strlen(vars->input_line);
-	len = vars->len; 
-    }
+    vars->len = ft_strlen(vars->input_line);
     if (ft_space_until_end(vars->input_line))
 	return (1);
     if (ft_prohibited_chars(vars))
 	return (1);
     if (ft_unclosed_quote(vars))
+	return (1);
+    if (ft_pipe_follows_redirect(vars))
 	return (1);
     return (0);
 }
