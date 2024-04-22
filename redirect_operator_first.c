@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
+#include <stdlib.h>
 
 int ft_operator_first(t_input *input, t_vars *vars)
 {
@@ -29,24 +30,30 @@ int ft_operator_first(t_input *input, t_vars *vars)
 	return (0); ; // NOTE: if malloc fails (am I handling it in a correct way?)
     if (ft_special_char(vars->input_line[vars->end]))
     {
-	ft_shift_pointer(vars); // NOTE: to \0 or the character followed by |
-	free(fd);
-	free(s);
+	ft_shift_pointer(vars); // NOTE: points to \0 or the character followed by |
 	ft_token_error(vars->input_line[vars->end]);
 	vars->end = vars->ind;
-	return (0); // TODO: return exit status
+	free(s);
+	free(fd);
+	return (0);
     }
-    if (!ft_handle_redirects(input, s, fd, vars)) // NOTE: open files and saves their fds to vec. operators are followed by files 
+    if (!ft_handle_redirects(input, s, fd, vars))// NOTE: open files and saves their fds to vec.
     {
-	// WARN: input not pushed here after saving redirect
-	ft_shift_pointer(vars); // NOTE: to \0 or the character followed by |
-	free(fd);
 	free(s);
-	ft_token_error(vars->input_line[vars->end]);
-	vars->end = vars->ind;
-	return (0); // TODO: return exit status
+	free(fd);
+	return (0);
     }
     free(s);
-    free(fd);
-    return (1);
+    s = ft_next_string(vars, COMMAND);
+    if (!s)
+	return (0);
+    if (!ft_save_cmd(input, s, vars))
+    {
+	free(s);
+	s = ft_next_string(vars, COMMAND);
+	if (!s)
+	    return (0);
+	// WARN: input not pushed here after saving redirect
+    }
+    return (0);// TODO: return exit status
 }

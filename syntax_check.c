@@ -97,7 +97,7 @@ int ft_pipe_follows_redirect(t_vars *vars)
 
 int ft_syntax_error(t_vars *vars)
 {
-    // NOTE: writes the errors message and returns 1 when there's error message
+    // NOTE: writes the errors message and returns 1 when there's error 
     // Errors: 1. if one of the operators come in the beginning or there's an unclosed quotation mark
     //	       2. OR if all the characters are spaces
     //	 TODO: RETURN EXIT STATUS IF THERE's SYNTAX ERROR

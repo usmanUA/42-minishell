@@ -16,7 +16,7 @@ int ft_save_cmd(t_input *input, char *s, t_vars *vars)
     // NOTE: PARSE command and its options if there are any
     t_vec cmd;
 
-    if (!vec_new(&cmd, 2, sizeof(char *))) // NOTE: Initialize a vector and allocate some mem for command
+    if (!vec_new(&cmd, 2, sizeof(char *))) // NOTE: Initialize a vec and allocate some mem for command
 	return (0);
     return (1);
 }
