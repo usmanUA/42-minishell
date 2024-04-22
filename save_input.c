@@ -19,6 +19,8 @@ void	ft_init_vars(t_vars *vars)
     vars->end = 0;
     vars->len = 0;
     vars->fd = 0;
+    vars->s_quote = 0;
+    vars->d_quote = 0;
     vars->input_line = NULL;
 }
 

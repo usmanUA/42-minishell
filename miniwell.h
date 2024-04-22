@@ -36,6 +36,8 @@ typedef struct s_vars
 	size_t	len;
 	size_t end;
 	int fd;
+	int s_quote;
+	int d_quote;
 }	t_vars;
 
 typedef struct s_pipes
