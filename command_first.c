@@ -10,60 +10,82 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
+#include <stdlib.h>
 
-int ft_quote_unclosed(t_vars *vars)
-{
-    if (vars->input_line[vars->ind] == '\"' && vars->input_line[vars->ind+1] != '\"')
-    {
-	// TODO: start saving command until closing "
-    }
-    else if (vars->input_line[vars->ind] == '\'' && vars->input_line[vars->ind+1] != '\'')
-    {
-	// TODO: start saving command until closing "
-    }
-    return (0); 
-}
-
-int	ft_skipped(t_vars *vars, char quo)
+int	ft_not_skipped(t_vars *vars, char quo)
 {
     if (vars->input_line[++vars->ind] != quo)
-	return (0);
+	return (1);
     ++vars->ind;
-    return (1);
+    return (0);
 }
+
 void	ft_skip_quotes(t_vars *vars)
 {
     while (42)
     {
 	if (vars->input_line[vars->ind] == '\"')
 	{
-	    if (!ft_skipped(vars, '\"'))
+	    if (ft_not_skipped(vars, '\"'))
+	    {
+		vars->d_quote = 1;
 		return ;
+	    }
 	}
-	if (vars->input_line[vars->ind] == '\'')
+	else if (vars->input_line[vars->ind] == '\'')
 	{
-	    if (!ft_skipped(vars, '\''))
+	    if (ft_not_skipped(vars, '\''))
+	    {
+		vars->s_quote = 1;
 		return ;
+	    }
 	}
+	else
+	    break ;
     }
 }
 
-""'"""""""""""'cat"''''''''  "'' main.c
 int ft_save_cmd(t_input *input, char *s, t_vars *vars)
 {
     // NOTE: PARSE command and its options if there are any
     t_vec cmd;
+    char *temp;
 
     if (!vec_new(&cmd, 2, sizeof(char *))) // NOTE: Initialize a vec and allocate some mem for command
 	return (0);
     if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
 	ft_skip_quotes(vars);
+    s = ft_next_string(vars, 0);
+    if (!s)
+	return (0);
+    vars->ind = vars->end+1;
+    while (vars->qontinue)
+    {
+	temp = s;
+	if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
+	    ft_skip_quotes(vars);
+	s = ft_strjoin(s, ft_next_string(vars, COMMAND)); // TODO: check for malloc fail
+	free(temp);
+	vars->ind = vars->end;
+    }
+    if (!vec_push(&cmd, s))
+	return (0);
+    input->cmd = &cmd;
     return (1);
 }
 
-int ft_after_command(t_input *input, char *s, t_vars *vars)
+// NOTE: in the while loop above:
+// we got 13", then cat and then 8'2spcs which makes s = 13"cat8'2spcs\0
+// now vars->ind --> beginning of 8' and vars->end --> " before 2'
+// TODO: I now need to make vars->ind = vars->end+1 only in cases when end points to the closing quote
+"""""""""""""'cat"''''''''  "'' main.c
+""'"""""""""""'cat"''''''''  "'' main.c
+int ft_command_first(t_input *input, t_vars *vars)
 {
+    char *s;
+
     ft_save_cmd(input, s, vars); // NOTE: if its command or its option, save to the vec.
+    free(s);
     s = ft_next_string(vars, 0);
     if (!s)
 	return (0);

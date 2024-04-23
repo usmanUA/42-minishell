@@ -12,6 +12,9 @@
 #include "miniwell.h"
 #include <stdlib.h>
 
+// WARN: 0<"here" test cat
+// bash: here: No such file or directory
+
 int ft_operator_first(t_input *input, t_vars *vars)
 {
     // NOTE: PARSE everthing coming after the redirect operator.
@@ -25,6 +28,7 @@ int ft_operator_first(t_input *input, t_vars *vars)
 	if (!fd)
 	    return (0);
     }
+    vars->ind = vars->end;
     s = ft_next_string(vars, REDIRECT); // NOTE: str in heap, vars->ind points ->(opertr)<-vars->end 
     if (!s)
 	return (0); ; // NOTE: if malloc fails (am I handling it in a correct way?)
@@ -47,7 +51,8 @@ int ft_operator_first(t_input *input, t_vars *vars)
     s = ft_next_string(vars, COMMAND);
     if (!s)
 	return (0);
-    if (!ft_save_cmd(input, s, vars))
+    vars->ind = vars->end;
+    if (!ft_save_cmd(input, char *s, vars))
     {
 	free(s);
 	s = ft_next_string(vars, COMMAND);

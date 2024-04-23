@@ -36,6 +36,7 @@ typedef struct s_vars
 	size_t	len;
 	size_t end;
 	int fd;
+	int qontinue;
 	int s_quote;
 	int d_quote;
 }	t_vars;
@@ -68,7 +69,7 @@ void	ft_shift_pointer(t_vars *vars);
 void	ft_next_pipe_null(t_vars *vars);
 int ft_special_char(char s);
 int ft_operator_first(t_input *input, t_vars *vars);
-int ft_command_first(t_input *input, char *s, t_vars *vars);
+int ft_command_first(t_input *input, t_vars *vars);
 int ft_save_cmd(t_input *input, char *s, t_vars *vars);
 int ft_token_error(char c);
 
