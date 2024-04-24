@@ -22,6 +22,8 @@ void	ft_init_vars(t_vars *vars)
     vars->qontinue = 0;
     vars->s_quote = 0;
     vars->d_quote = 0;
+    vars->increment = 0;
+    vars->stop = 0;
     vars->input_line = NULL;
 }
 
@@ -79,6 +81,7 @@ static void ft_commands_end(t_vars *vars, int quote, int *ind)
 	    vars->qontinue = 1;
 	vars->s_quote = 0;
 	vars->d_quote = 0;
+	vars->increment = 1;
 	return ;
     }
     while (ft_not_space_quote(vars->input_line[vars->ind + *ind], quote))

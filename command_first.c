@@ -9,6 +9,7 @@
 /*   Updated: 2024/04/18 14:54:22 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include "libft/libft.h"
 #include "miniwell.h"
 #include <stdlib.h>
 
@@ -17,6 +18,8 @@ int	ft_not_skipped(t_vars *vars, char quo)
     if (vars->input_line[++vars->ind] != quo)
 	return (1);
     ++vars->ind;
+    if (ft_isspace(vars->input_line[vars->ind]))
+	vars->stop = 1;
     return (0);
 }
 
@@ -58,15 +61,22 @@ int ft_save_cmd(t_input *input, char *s, t_vars *vars)
     s = ft_next_string(vars, 0);
     if (!s)
 	return (0);
-    vars->ind = vars->end+1;
+    vars->ind = vars->end+1; // WARN: adding 1 here works for all cases?
     while (vars->qontinue)
     {
+// PERF: ""'"""""""""""'cat"''''''''  "'' main.c
 	temp = s;
 	if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
 	    ft_skip_quotes(vars);
+	// WARN: make sure the stop thing (space after quotes end case) works 
+	if (vars->stop)
+	    break ;
 	s = ft_strjoin(s, ft_next_string(vars, COMMAND)); // TODO: check for malloc fail
-	free(temp);
+	free(temp); // NOTE: s is coming as an arg, so the first free call might not work
 	vars->ind = vars->end;
+	if (vars->increment)
+	    vars->ind++; 
+	vars->increment = 0;
     }
     if (!vec_push(&cmd, s))
 	return (0);
@@ -78,8 +88,7 @@ int ft_save_cmd(t_input *input, char *s, t_vars *vars)
 // we got 13", then cat and then 8'2spcs which makes s = 13"cat8'2spcs\0
 // now vars->ind --> beginning of 8' and vars->end --> " before 2'
 // TODO: I now need to make vars->ind = vars->end+1 only in cases when end points to the closing quote
-"""""""""""""'cat"''''''''  "'' main.c
-""'"""""""""""'cat"''''''''  "'' main.c
+// """""""""""""'cat"''''''''  "'' main.c
 int ft_command_first(t_input *input, t_vars *vars)
 {
     char *s;

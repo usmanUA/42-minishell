@@ -39,6 +39,8 @@ typedef struct s_vars
 	int qontinue;
 	int s_quote;
 	int d_quote;
+	int increment;
+	int stop;
 }	t_vars;
 
 typedef struct s_pipes
