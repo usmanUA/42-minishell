@@ -9,9 +9,7 @@
 /*   Updated: 2024/04/18 14:54:22 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft/libft.h"
 #include "miniwell.h"
-#include <stdlib.h>
 
 int	ft_not_skipped(t_vars *vars, char quo)
 {
@@ -48,20 +46,21 @@ void	ft_skip_quotes(t_vars *vars)
     }
 }
 
-int ft_save_cmd(t_input *input, char *s, t_vars *vars)
+int ft_save_cmd(t_vec *cmd, t_vars *vars)
 {
     // NOTE: PARSE command and its options if there are any
-    t_vec cmd;
+    char *s;
     char *temp;
 
-    if (!vec_new(&cmd, 2, sizeof(char *))) // NOTE: Initialize a vec and allocate some mem for command
-	return (0);
     if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
 	ft_skip_quotes(vars);
     s = ft_next_string(vars, 0);
     if (!s)
 	return (0);
-    vars->ind = vars->end+1; // WARN: adding 1 here works for all cases?
+    vars->ind = vars->end;
+    if (vars->increment)// WARN: adding 1 here works for all cases?
+	vars->ind++;
+    vars->increment = 0;
     while (vars->qontinue)
     {
 // PERF: ""'"""""""""""'cat"''''''''  "'' main.c
@@ -72,32 +71,64 @@ int ft_save_cmd(t_input *input, char *s, t_vars *vars)
 	if (vars->stop)
 	    break ;
 	s = ft_strjoin(s, ft_next_string(vars, COMMAND)); // TODO: check for malloc fail
-	free(temp); // NOTE: s is coming as an arg, so the first free call might not work
+	free(temp);
 	vars->ind = vars->end;
 	if (vars->increment)
 	    vars->ind++; 
 	vars->increment = 0;
     }
-    if (!vec_push(&cmd, s))
+    if (!vec_push(cmd, s))
+    {
+	free(s);
 	return (0);
-    input->cmd = &cmd;
+    }
+    free(s);
     return (1);
 }
 
-// NOTE: in the while loop above:
-// we got 13", then cat and then 8'2spcs which makes s = 13"cat8'2spcs\0
-// now vars->ind --> beginning of 8' and vars->end --> " before 2'
-// TODO: I now need to make vars->ind = vars->end+1 only in cases when end points to the closing quote
+int ft_follow_first_command_operator(t_vec *cmd, t_vec *redirect, t_vars *vars)
+{
+    while (42)
+    {
+	if (ft_redirection(vars))
+	{
+	    if (!ft_handle_redirects(redirect, vars)) // TODO: look for error handling 
+		return (0); 
+	}
+	else if (vars->input_line[vars->ind] && vars->input_line[vars->ind] != '|')
+	{
+	    if (!ft_save_cmd(cmd, vars)) // TODO: look for error handling 
+		return (0);
+	}
+	else
+	    break ;
+    }
+    if (vars->input_line[vars->ind] != '|')
+	vars->ind++;
+    return (1);
+}
 // """""""""""""'cat"''''''''  "'' main.c
 int ft_command_first(t_input *input, t_vars *vars)
 {
-    char *s;
+    // NOTE: FIRST saves the command and then moves till the end
+    t_vec cmd;
+    t_vec redirect;
 
-    ft_save_cmd(input, s, vars); // NOTE: if its command or its option, save to the vec.
-    free(s);
-    s = ft_next_string(vars, 0);
-    if (!s)
+    if (!vec_new(&cmd, 2, sizeof(char *))) // NOTE: Initialize a vec and allocate some mem for command
+	return (0); // NOTE: malloc fail
+    if (!ft_save_cmd(&cmd, vars)) // NOTE: if its command or its option, save to the vec.
+	return (0); // NOTE: only malloc fail?
+    if (!ft_index_after_spaces(vars))
+	return (0); // NOTE: nothing else than whitespaces till the end of line
+    // NOTE: NOW: expect either options or redirect operators
+    if (!vec_new(&redirect, 1, sizeof(t_redirect *)))
 	return (0);
+    if (!ft_follow_first_command_operator(&cmd, &redirect, vars))
+	return (0); // TODO: look for error handling 
+    // NOTE: saving address (in stack mem)
+    // It can be malloc if needed be
+    input->cmd = &cmd;
+    input->redirect = &redirect;
     return (1);
 }
 

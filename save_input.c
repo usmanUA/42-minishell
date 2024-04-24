@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 #include "libft/libft.h"
 #include "miniwell.h"
+#include "vec/vec.h"
 
 void	ft_init_vars(t_vars *vars)
 {
@@ -39,7 +40,7 @@ static size_t	ft_user_ends(char *s)
     return (1);
 }
 
-static int ft_index_after_spaces(t_vars *vars)
+int ft_index_after_spaces(t_vars *vars)
 {
     // NOTE: SKIPS all the spaces and moves the pointer to the non-space character 
     // if there's no non-space character after the space/spaces returns false
@@ -54,78 +55,6 @@ static int ft_index_after_spaces(t_vars *vars)
 	ind++;
     vars->ind = vars->end + ind; // NOTE: index updates here
     return (1);
-}
-
-static int  ft_not_space_quote(char c, int quote)
-{
-    if (quote == 0)
-    {
-	if (c == '\0' || ft_isspace(c))
-	    return (0);
-	return (1);
-    }
-    if (c != '\0' && !ft_isspace(c) && c != '\'' && c != '\"')// WARN: LOOK BACK
-	return (1);
-    return (0);
-}
-
-static void ft_commands_end(t_vars *vars, int quote, int *ind)
-{
-    if (vars->d_quote || vars->s_quote)
-    {
-	if (vars->s_quote)
-	    quote = '\'';
-	while (vars->input_line[vars->ind + *ind] && vars->input_line[vars->ind + *ind] != quote)
-	    (*ind)++;
-	if (!ft_isspace(vars->input_line[vars->ind + (*ind+1)]))
-	    vars->qontinue = 1;
-	vars->s_quote = 0;
-	vars->d_quote = 0;
-	vars->increment = 1;
-	return ;
-    }
-    while (ft_not_space_quote(vars->input_line[vars->ind + *ind], quote))
-	(*ind)++;
-    if (!ft_not_space_quote(vars->input_line[vars->ind + *ind], 0))
-	vars->qontinue = 0;
-
-}
-static void	ft_strings_end(t_vars *vars, int operator)
-{
-    // NOTE: finds the index for the end of the current string and update the var vars->end 
-    // if there's operator then finds the index of next character followed by the operator
-    // TODO: HANDLE QUOTATIONS as we should remove some of the QUOTATIONS based on the bash logic
-    // WARN: THIS FUNCTION is IMPORTANT as there needs to do the above TODO.
-    int ind;
-
-    ind = 0;
-    if (operator == REDIRECT)
-    {
-	while (vars->input_line[vars->ind+ind]=='<' || vars->input_line[vars->ind+ind]=='>')
-	    ind++;
-    }
-    else if (operator == FD)
-    {
-	while (ft_isdigit(vars->input_line[vars->ind+ind]))
-	    ind++;
-    }
-    else if (operator == COMMAND)
-	ft_commands_end(vars, '\"', &ind);
-    vars->end = vars->ind + ind; // NOTE: END updates here
-}
-
-char *ft_next_string(t_vars *vars, int op)
-{
-    // NOTE: returns the next string 
-    char *s;
-
-    if (!ft_index_after_spaces(vars)) // NOTE: skip spaces, vars->ind->string or 0 if all spaces 
-	 return (NULL);
-    ft_strings_end(vars, op); // NOTE: vars->end now points to the end of string
-    s = ft_substr(vars->input_line, vars->ind, vars->end - vars->ind); // NOTE: malloc that string in heap and point str to it
-    if (!s)
-	return (NULL);
-    return (s);
 }
 
 
@@ -156,7 +85,7 @@ void	ft_shift_pointer(t_vars *vars)
 
 int ft_redirection(t_vars *vars)
 {
-    // NOTE: checks the operator first case
+    // NOTE: checks the operator-first case
     int ind;
 
     ind = vars->ind;
@@ -180,32 +109,21 @@ int ft_save_input(t_vec *pipes, t_vars *vars)
     ft_index_after_spaces(vars); 
     while (++vars->ind < vars->len) // NOTE: loop over the whole user input line
     {
-	input = malloc(sizeof(t_input));
+	input = malloc(sizeof(t_input)); // NOTE: executed in the very beg. or the beg. of every pipe (|) if any
 	if (!input)
 	    return (0);
 	if (ft_redirection(vars))
 	{
-	    if (!ft_operator_first(input, vars))
+	    if (!ft_operator_first(input, vars)) // TODO: look for error handling 
 		continue ;
 	}
 	else 
 	{
-	    if (!ft_command_first(input, vars))
+	    if (!ft_command_first(input, vars)) // TODO: look for error handling 
 		continue ;
 	}
-	// Take pipe thing to operator and command thing
-	// if (!ft_strncmp(str, "|", 1))
-	// {
-	//     if (ft_syntax_error(vars, vars->len - vars->end)) // NOTE: if there's syntax error after the |
-	// 	ft_shift_pointer(vars); // NOTE: move to the end or to the next |
-	//     vars->begin = 1;
-	//     if (!vec_push(pipes, input)) // WARNING: pushing the input (input->redirect & input->cmd) here, is it valid?
-	// 	return (0);
-	//     free(str);
-	//     str = ft_next_string(vars);
-	//     if (!str)
-	// 	break ;
-	// }
+	if (!vec_push(pipes, input))
+	    return (0); // NOTE: malloc fail
     }
     return (1);
 }

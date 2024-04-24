@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include <stdlib.h>
 
 // WARN: 0<"here" test cat
 // bash: here: No such file or directory
@@ -18,47 +17,18 @@
 int ft_operator_first(t_input *input, t_vars *vars)
 {
     // NOTE: PARSE everthing coming after the redirect operator.
-    // FOLLOWS operator_first PATTERN
-    char *s;
-    char *fd;
+    // FOLLOWS operator-first PATTERN
+    t_vec cmd;
+    t_vec redirect;
 
-    if (vars->fd)
-    {
-	fd = ft_next_string(vars, FD); // NOTE: str in heap, vars->ind points ->(opertr)<-vars->end 
-	if (!fd)
-	    return (0);
-    }
+    // NOTE: init a vec redirect and cmd every time a new pair starts
+    if (!vec_new(&redirect, 1, sizeof(t_redirect *)))
+	return (0); // NOTE: malloc fail
+    if (!ft_handle_redirects(&redirect, vars))// NOTE: open files and saves their fds to vec.
+	return (0); // WARN: its either malloc or file opening error, handle accordingly
     vars->ind = vars->end;
-    s = ft_next_string(vars, REDIRECT); // NOTE: str in heap, vars->ind points ->(opertr)<-vars->end 
-    if (!s)
-	return (0); ; // NOTE: if malloc fails (am I handling it in a correct way?)
-    if (ft_special_char(vars->input_line[vars->end]))
-    {
-	ft_shift_pointer(vars); // NOTE: points to \0 or the character followed by |
-	ft_token_error(vars->input_line[vars->end]);
-	vars->end = vars->ind;
-	free(s);
-	free(fd);
-	return (0);
-    }
-    if (!ft_handle_redirects(input, s, fd, vars))// NOTE: open files and saves their fds to vec.
-    {
-	free(s);
-	free(fd);
-	return (0);
-    }
-    free(s);
-    s = ft_next_string(vars, COMMAND);
-    if (!s)
-	return (0);
-    vars->ind = vars->end;
-    if (!ft_save_cmd(input, char *s, vars))
-    {
-	free(s);
-	s = ft_next_string(vars, COMMAND);
-	if (!s)
-	    return (0);
-	// WARN: input not pushed here after saving redirect
-    }
-    return (0);// TODO: return exit status
+    // TODO: Bring a while loop here
+    if (!ft_follow_first_command_operator(&cmd, &redirect, vars))
+	return (0); // TODO: look for error handling 
+    return (1);
 }
