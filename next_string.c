@@ -76,12 +76,11 @@ char *ft_next_string(t_vars *vars, int op)
     // NOTE: returns the next string 
     char *s;
 
-    if (!ft_index_after_spaces(vars)) // NOTE: skip spaces, vars->ind->string or 0 if all spaces 
-	 return (NULL);
     ft_strings_end(vars, op); // NOTE: vars->end now points to the end of string
     s = ft_substr(vars->input_line, vars->ind, vars->end - vars->ind); // NOTE: malloc that string in heap and point str to it
     if (!s)
-	return (NULL);
+	return (NULL); // WARN: malloc fail
+
     return (s);
 }
 

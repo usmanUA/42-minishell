@@ -17,6 +17,7 @@
 #include "unistd.h"
 #include "string.h"
 #include "stdbool.h"
+#include "../libft/libft.h"
 
 typedef struct s_vec
 {

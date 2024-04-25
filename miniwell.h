@@ -15,6 +15,7 @@
 #include "vec/vec.h"
 #include "libft/libft.h"
 #include <stdio.h>
+#include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <readline/readline.h>
@@ -66,9 +67,10 @@ int ft_special_char(char s);
 int ft_operator_first(t_input *input, t_vars *vars);
 int ft_command_first(t_input *input, t_vars *vars);
 int ft_save_cmd(t_vec *cmd, t_vars *vars);
-int ft_token_error(char c);
-int ft_index_after_spaces(t_vars *vars);
+int ft_token_error(char c, int sgle);
+void ft_index_after_spaces(t_vars *vars);
 int ft_redirection(t_vars *vars);
 int ft_follow_first_command_operator(t_vec *cmd, t_vec *redirect, t_vars *vars);
+void	ft_free_vec(t_vec *pipes);
 
 #endif

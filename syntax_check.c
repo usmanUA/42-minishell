@@ -11,8 +11,10 @@
 /* ************************************************************************** */
 #include "miniwell.h"
 
-int ft_token_error(char c)
+int ft_token_error(char c, int sgle)
 {
+    if (sgle)
+	c = '\'';
     printf("bash: syntax error near unexpected token  '%c'\n",c); 
     return (1);
 }
@@ -38,7 +40,7 @@ static int ft_prohibited_chars(t_vars *vars)
     while (++ind < vars->len)
     {
 	if (ft_special_char(vars->input_line[ind]))
-	    return (ft_token_error(vars->input_line[ind]));
+	    return (ft_token_error(vars->input_line[ind], 0));
     }
     return (0);
 }
@@ -57,7 +59,7 @@ int ft_space_until_end(char *s)
 	if (!ft_isspace(s[ind])) //WARN: make sure should it be all whitespace chars or just ' ' (single space)
 	    return (0);
     }
-    return (1);
+    return (ind);
 }
 
 static int ft_unclosed_quote(t_vars *vars)
@@ -71,15 +73,31 @@ static int ft_unclosed_quote(t_vars *vars)
     dble = 0;
     while (++ind < vars->len)
     {
-	if (vars->input_line[ind] == '\"')
-	    dble++;
-	else if (vars->input_line[ind] == '\'')
-	    sgle++;
+	if (vars->input_line[ind] == '\"' || vars->input_line[ind] == '\'')
+	{
+	    if (vars->input_line[ind] == '\"' && vars->input_line[ind+1] != '\"')
+	    {
+		dble++;
+		while (vars->input_line[ind+1] && vars->input_line[ind+1] != '\"')
+		    ind++;
+		if (vars->input_line[ind] == '\"')
+		    dble--;
+	    }
+    // NOTE: ""'"""""""""""'cat"''''''''  "'' main.c 
+	    else if (vars->input_line[ind] == '\'' && vars->input_line[ind+1] != '\'')
+	    {
+		sgle++;
+		while (vars->input_line[ind+1] && vars->input_line[ind+1] != '\'')
+		    ind++;
+		if (vars->input_line[++ind] == '\'')
+		    sgle--;
+	    }
+	    else
+		ind += 1;
+	}
     }
-    if (sgle%2 == 1)
-	return (ft_token_error('\''));
-    if (dble%2 == 1)
-	return (ft_token_error('\"'));
+    if (sgle || dble)
+	return (ft_token_error('\"', sgle));
     return (0);
 }
 
@@ -107,8 +125,6 @@ int ft_syntax_error(t_vars *vars)
     if (ft_prohibited_chars(vars))
 	return (1);
     if (ft_unclosed_quote(vars))
-	return (1);
-    if (ft_pipe_follows_redirect(vars))
 	return (1);
     return (0);
 }

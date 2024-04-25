@@ -25,7 +25,7 @@ int vec_push(t_vec *dst, void *src)
 	if (!vec_resize(dst, dst->len * 2))
 	    return (0);
     }
-    memcpy(&dst->mem[dst->len * dst->size], src, dst->size);
+    ft_memcpy(&dst->mem[dst->len * dst->size], src, dst->size);
     dst->len++;
     return (1);
 }

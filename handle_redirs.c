@@ -12,6 +12,8 @@
 #include "libft/libft.h"
 #include "miniwell.h"
 #include "vec/vec.h"
+#include <stdlib.h>
+#include <sys/fcntl.h>
 
 int ft_input_redir(t_redirect *fds,  char *filename, char *fd)
 {
@@ -34,7 +36,7 @@ int ft_output_redir(t_redirect *fds,  char *filename, char *fd)
     fds->orig_fd = STDOUT_FILENO;
     if (fd)
 	fds->orig_fd = ft_atoi(fd);
-    fds->new_fd = open(filename, O_RDONLY | O_CREAT, 0644);
+    fds->new_fd = open(filename, O_RDONLY | O_CREAT | O_TRUNC, 0644);
     if (fds->new_fd == -1)
     {
 	//TODO: strerror(errno) || bring pipex error writing here
@@ -49,8 +51,8 @@ int ft_output_append(t_redirect *fds,  char *filename, char *fd)
     fds->orig_fd = STDOUT_FILENO;
     if (fd)
 	fds->orig_fd = ft_atoi(fd);
-    fds->new_fd = open(filename, O_RDONLY | O_CREAT, 0644);
-    if (fds->orig_fd == -1)
+    fds->new_fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (fds->new_fd == -1)
     {
 	//TODO: strerror(errno) || bring pipex error writing here
 	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
@@ -66,8 +68,8 @@ int ft_here_doc(t_redirect *fds,  char *eof, char *fd)
     fds->orig_fd = STDIN_FILENO;
     if (fd)
 	fds->orig_fd = ft_atoi(fd);
-    fds->new_fd = open(".infile.txt", O_WRONLY | O_TRUNC | O_CREAT, 0666);
-    if (fds->orig_fd == -1)
+    fds->new_fd = open(".infile.txt", O_WRONLY | O_APPEND | O_CREAT, 0666);
+    if (fds->new_fd == -1)
     {
 	//TODO: strerror(errno) || bring pipex error writing here
 	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
@@ -78,7 +80,7 @@ int ft_here_doc(t_redirect *fds,  char *eof, char *fd)
 	if (((ft_strlen(line) - 1) == ft_strlen(eof) && !strncmp(line,
 				eof, strlen(eof))) || !line)
 		break ;
-	write(fds->orig_fd, line, ft_strlen(line));
+	write(fds->new_fd, line, ft_strlen(line));
 	line = get_next_line(0);
     }
     return (1);
@@ -103,12 +105,16 @@ int	ft_handle_redirects(t_vec *redirect, t_vars *vars)
     vars->ind = vars->end;
     s = ft_next_string(vars, REDIRECT); // NOTE: str in heap, vars->ind points ->opertr)<-vars->end 
     if (!s)
+    {
+	if (fd)
+	    free(fd);
 	return (0); ; // NOTE: malloc fails (am I handling it in a correct way?)
+    }
     // TODO: check the cases -> 0;, 0| (cases where fd is followed by special chars other than redirects)
     if (ft_special_char(vars->input_line[vars->end]))
     {
 	ft_shift_pointer(vars); // NOTE: vars->ind points to either \0 or the character followed by |
-	ft_token_error(vars->input_line[vars->end]);
+	ft_token_error(vars->input_line[vars->end], 0);
 	vars->end = vars->ind;// NOTE: vars->end points to either \0 or the character followed by |
 	free(s);
 	free(fd);
@@ -116,10 +122,24 @@ int	ft_handle_redirects(t_vec *redirect, t_vars *vars)
     }
     file = ft_next_string(vars, FILENAME);
     if (!file)
+    {
+	if (s)	
+	    free(s);
+	if (fd)
+	    free(fd);
 	return (0); // NOTE: malloc fail
+    }
     fds = (t_redirect *)malloc(sizeof(t_redirect));
     if (!fds)
+    {
+	if (s)	
+	    free(s);
+	if (fd)
+	    free(fd);
+	if (file)
+	    free(file);
 	return (0);  // NOTE: malloc fail
+    }
     // WARNING: make sure to differentiate malloc fail or file open fail if needed be
     if (!ft_strncmp(s, "<<", 2))
     {
@@ -143,7 +163,12 @@ int	ft_handle_redirects(t_vec *redirect, t_vars *vars)
     }
     if (!vec_push(redirect, fds))
 	return (0); // NOTE: malloc fail
-    free(file);
+    if (file)
+	free(file);
+    if (s)
+	free(s);
+    if (fd)
+	free(fd);
     return (1);
 }
 

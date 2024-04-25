@@ -12,11 +12,12 @@
 #include "libft/libft.h"
 #include "miniwell.h"
 #include "vec/vec.h"
+#include <stdio.h>
 
 void	ft_init_vars(t_vars *vars)
 {
     // NOTE: Initialize vars struct
-    vars->ind = -1;
+    vars->ind = 0;
     vars->end = 0;
     vars->len = 0;
     vars->fd = 0;
@@ -40,21 +41,13 @@ static size_t	ft_user_ends(char *s)
     return (1);
 }
 
-int ft_index_after_spaces(t_vars *vars)
+void ft_index_after_spaces(t_vars *vars)
 {
     // NOTE: SKIPS all the spaces and moves the pointer to the non-space character 
-    // if there's no non-space character after the space/spaces returns false
-    int ind;
-    int end;
-
-    ind = 0;
-    end = vars->end;
-    if (ft_space_until_end(&vars->input_line[vars->end]))
-	return (0);
-    while (ft_isspace(vars->input_line[vars->end+ind]))
-	ind++;
-    vars->ind = vars->end + ind; // NOTE: index updates here
-    return (1);
+    while (vars->input_line[vars->end] && ft_isspace(vars->input_line[vars->end]))
+	vars->end++;
+    vars->ind = vars->end; // NOTE: index updates here
+    //                    '\0'
 }
 
 
@@ -107,7 +100,7 @@ int ft_save_input(t_vec *pipes, t_vars *vars)
     t_input *input;
 
     ft_index_after_spaces(vars); 
-    while (++vars->ind < vars->len) // NOTE: loop over the whole user input line
+    while (vars->input_line[vars->ind] != '\0') // NOTE: loop over the whole user input line
     {
 	input = malloc(sizeof(t_input)); // NOTE: executed in the very beg. or the beg. of every pipe (|) if any
 	if (!input)

@@ -18,17 +18,25 @@ int ft_operator_first(t_input *input, t_vars *vars)
 {
     // NOTE: PARSE everthing coming after the redirect operator.
     // FOLLOWS operator-first PATTERN
-    t_vec cmd;
-    t_vec redirect;
+    t_vec *cmd;
+    t_vec *redirect;
 
     // NOTE: init a vec redirect and cmd every time a new pair starts
-    if (!vec_new(&redirect, 1, sizeof(t_redirect *)))
+    cmd = (t_vec *)malloc(sizeof(t_vec));
+    if (!cmd)
+	return (0);
+    redirect = (t_vec *)malloc(sizeof(t_vec));
+    if (!redirect)
+	return (0);
+    if (!vec_new(redirect, 1, sizeof(t_redirect *)))
 	return (0); // NOTE: malloc fail
-    if (!ft_handle_redirects(&redirect, vars))// NOTE: open files and saves their fds to vec.
+    if (!ft_handle_redirects(redirect, vars))// NOTE: open files and saves their fds to vec.
 	return (0); // WARN: its either malloc or file opening error, handle accordingly
     vars->ind = vars->end;
     // TODO: Bring a while loop here
-    if (!ft_follow_first_command_operator(&cmd, &redirect, vars))
+    if (!ft_follow_first_command_operator(cmd, redirect, vars))
 	return (0); // TODO: look for error handling 
+    input->cmd = cmd;
+    input->redirect = redirect;
     return (1);
 }
