@@ -10,10 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include "vec/vec.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 int	ft_not_skipped(t_vars *vars, char quo)
 {
@@ -59,7 +55,6 @@ int ft_save_cmd(t_vec *cmd, t_vars *vars)
     if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
 	ft_skip_quotes(vars);
     s = ft_next_string(vars, COMMAND);
-    printf("%s\n", s);
     if (!s)
 	return (0); // NOTE: Either malloc fail or all spaces until '\0'
     vars->ind = vars->end;
@@ -90,6 +85,7 @@ int ft_save_cmd(t_vec *cmd, t_vars *vars)
 	    vars->ind++; 
 	vars->increment = 0;
     }
+    printf("%s\n", s);
     if (!vec_push(cmd, s))
     {
 	free(s);
@@ -119,10 +115,13 @@ int ft_follow_first_command_operator(t_vec *cmd, t_vec *redirect, t_vars *vars)
 	}
     }
     if (vars->input_line[vars->ind] == '|')
-	vars->ind++;
+    {
+	vars->end++;
+	ft_index_after_spaces(vars);
+    }
     return (1);
 }
-// """""""""""""'cat"''''''''  "'' main.c
+
 int ft_command_first(t_input *input, t_vars *vars)
 {
     // NOTE: FIRST saves the command and then moves till the end

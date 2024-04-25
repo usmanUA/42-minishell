@@ -26,12 +26,15 @@ void	ft_print_vecs(t_vec *pipes)
     t_redirect *fds;
 
     ind = -1;
+    printf("pipes: len: %zu, alloc_mem: %zu, size: %zu\n", pipes->len, pipes->mem_alloc, pipes->size);
     while (++ind < pipes->len)	
     {
 	input = (t_input *)&pipes->mem[ind*pipes->size];
 	cmd = input->cmd;
+	printf("cmd: len: %zu, alloc_mem: %zu, size: %zu\n", cmd->len, cmd->mem_alloc, cmd->size);
 //	printf("%p\n", cmd);
 	redirect = input->redirect;
+//	printf("redirect: len: %zu, alloc_mem: %zu, size: %zu\n", redirect->len, redirect->mem_alloc, redirect->size);
 	// FIXIT: FIX the WARNING for redirect
 	// NOTE: redirect got vec_new(redirect, 2, sizeof(t_redirect *)) but not vec_push(redirect, t_redirect *fds)
 //	printf("%p\n", redirect); // WARNING: The address of redirect is different than malloced in ft_command_first()

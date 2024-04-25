@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
+#include <stdio.h>
 
 int ft_token_error(char c, int sgle)
 {
@@ -22,7 +23,7 @@ int ft_token_error(char c, int sgle)
 int ft_special_char(char s)
 {
     // NOTE: checks for prohibited special characters and returns 1 if true 
-    if (s == '(' || s == ')' || s == '|')
+    if (s == '(' || s == ')') 
 	return (1);
     if (s == '&' || s == ';' || s == '\\')
 	return (1);
@@ -62,6 +63,28 @@ int ft_space_until_end(char *s)
     return (ind);
 }
 
+static void ft_handle_quotes(char *input, int *ind, int *sgle, int *dble)
+{
+    if (input[*ind] == '\"' && input[*ind+1] != '\"')
+    {
+	(*dble)++;
+	while (input[*ind+1] && input[*ind+1] != '\"')
+	    (*ind)++;
+	if (input[++(*ind)] == '\"')
+	    (*dble)--;
+    }
+    else if (input[*ind] == '\'' && input[(*ind)+1] != '\'')
+    {
+	(*sgle)++;
+	while (input[(*ind)+1] && input[(*ind)+1] != '\'')
+	    (*ind)++;
+	if (input[++(*ind)] == '\'')
+	    (*sgle)--;
+    }
+    else
+	(*ind)++;
+}
+
 static int ft_unclosed_quote(t_vars *vars)
 {
     int ind;
@@ -74,43 +97,11 @@ static int ft_unclosed_quote(t_vars *vars)
     while (++ind < vars->len)
     {
 	if (vars->input_line[ind] == '\"' || vars->input_line[ind] == '\'')
-	{
-	    if (vars->input_line[ind] == '\"' && vars->input_line[ind+1] != '\"')
-	    {
-		dble++;
-		while (vars->input_line[ind+1] && vars->input_line[ind+1] != '\"')
-		    ind++;
-		if (vars->input_line[ind] == '\"')
-		    dble--;
-	    }
-    // NOTE: ""'"""""""""""'cat"''''''''  "'' main.c 
-	    else if (vars->input_line[ind] == '\'' && vars->input_line[ind+1] != '\'')
-	    {
-		sgle++;
-		while (vars->input_line[ind+1] && vars->input_line[ind+1] != '\'')
-		    ind++;
-		if (vars->input_line[++ind] == '\'')
-		    sgle--;
-	    }
-	    else
-		ind += 1;
-	}
+	    ft_handle_quotes(vars->input_line, &ind, &sgle, &dble);
     }
     if (sgle || dble)
 	return (ft_token_error('\"', sgle));
     return (0);
-}
-
-int ft_pipe_follows_redirect(t_vars *vars)
-{
-    int ind;
-
-    ind = -1;
-    while (++ind < vars->len)
-    {
-	
-    }
-    return (1);
 }
 
 int ft_syntax_error(t_vars *vars)
