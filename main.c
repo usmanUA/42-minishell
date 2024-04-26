@@ -40,7 +40,7 @@ void	ft_print_vecs(t_vec *pipes)
 //	printf("%p\n", redirect); // WARNING: The address of redirect is different than malloced in ft_command_first()
 //	printf("red->len %zu\n", redirect->len);
 	i = -1;
-	// WARNING: DOES not print if the string is longer than let's say 10 chars
+	// WARNING: DOES not print if the string is longer than let's say 8 chars
 	while (++i < cmd->len)
 	    printf("cmd and args: %s\n", (char *)vec_get(cmd, i));
 	j = -1;
@@ -61,7 +61,7 @@ int main(void)
     while (42)
     {
 	ft_init_vars(&vars);
-	vars.input_line = readline("MiniWell😎:V0.1$ ");
+	vars.input_line = readline("\x1b[32mMiniWell\x1b[0m😎:\x1b[31mV0.1\x1b[0m$ ");
 	if (!vars.input_line)
 	    continue ; // NOTE: malloc fail, error message | code?
 	add_history(vars.input_line);
@@ -86,6 +86,6 @@ int main(void)
 	// NOTE: FREE everything
 	ft_print_vecs(&pipes);
 	//write(1, "here\n", 5);
-/* 	ft_free_vec(&pipes);	 */
+/* 	ft_free_vec(&pipes); */
     }
 }

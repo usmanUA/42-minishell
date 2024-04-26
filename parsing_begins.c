@@ -13,6 +13,7 @@
 #include "miniwell.h"
 #include "vec/vec.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void	ft_init_vars(t_vars *vars)
 {
@@ -29,18 +30,6 @@ void	ft_init_vars(t_vars *vars)
     vars->input_line = NULL;
 }
 
-static size_t	ft_user_ends(char *s)
-{
-    // NOTE: NOT used function
-    while (*s)
-    {
-	if (!ft_isspace(*s))
-	    return (0);
-	s++;
-    }
-    return (1);
-}
-
 void ft_index_after_spaces(t_vars *vars)
 {
     // NOTE: SKIPS all the spaces and moves the pointer to the non-space character 
@@ -49,16 +38,6 @@ void ft_index_after_spaces(t_vars *vars)
     vars->ind = vars->end; // NOTE: index updates here
     //                    '\0'
 }
-
-
-// static int ft_redirect_operator(char c)
-// {
-//     // NOTE: returns true if the current string is one of the redirect operators
-// 	return (1);
-//     if (!ft_strncmp(c, "<<", 2) || !ft_strncmp(c, ">>", 2))
-// 	return (1);
-//     return (0);
-// }
 
 void	ft_shift_pointer(t_vars *vars)
 {
@@ -74,7 +53,6 @@ void	ft_shift_pointer(t_vars *vars)
 	vars->ind++;
     }
 }
-
 
 int ft_redirection(t_vars *vars)
 {
@@ -94,29 +72,115 @@ int ft_redirection(t_vars *vars)
     return (0);
 }
 
-int ft_parse_command_line(t_input *input, t_vars *vars)
+static int ft_init_fd_vecs(t_vec **in_orig_fd, t_vec **in_new_fd, t_vec **out_orig_fd, t_vec **out_new_fd)
 {
-    // NOTE: PARSES the WHOLE command line into two following vectors
+    *in_orig_fd = (t_vec *)malloc(sizeof(t_vec)); 
+    if (!in_orig_fd)
+	return (0);
+    if (!vec_new(*in_orig_fd, 1, sizeof(int)))
+	return (0);
+    *in_new_fd = (t_vec *)malloc(sizeof(t_vec)); 
+    if (!in_new_fd)
+	return (0);
+    if (!vec_new(*in_new_fd, 1, sizeof(int)))
+	return (0);
+    *out_orig_fd = (t_vec *)malloc(sizeof(t_vec)); 
+    if (!out_orig_fd)
+	return (0);
+    *out_new_fd = (t_vec *)malloc(sizeof(t_vec)); 
+    if (!out_new_fd)
+	return (0);
+    return (1);
+}
+
+static int ft_parsing_action(t_vec *cmd, t_redirect *redirect, t_vars *vars)
+{
+    // NOTE: Loops until either '\0' or '|'
+    // parses everything in between
+    // moves the pointer next to '|' if encountered
+    char c;
+    t_vec *in_orig_fd;
+    t_vec *in_new_fd;
+    t_vec *out_orig_fd;
+    t_vec *out_new_fd;
+
+    if (!ft_init_fd_vecs(&in_orig_fd, &in_new_fd, &out_orig_fd, &out_new_fd))
+	return (0);
+    redirect->in_orig_fd = in_orig_fd;
+    redirect->in_new_fd = in_new_fd;
+    redirect->out_orig_fd = out_orig_fd;
+    redirect->out_new_fd = out_new_fd;
+    c = vars->input_line[vars->ind]; 
+    while (c != '\0' && c != '|')
+    {
+	if (ft_redirection(vars))
+	{
+	    if (!ft_handle_redirects(redirect, vars)) // TODO: look for error handling 
+	    {
+		free(in_orig_fd);
+		vec_free(in_orig_fd);
+		free(in_new_fd);
+		vec_free(in_new_fd);
+		free(out_orig_fd);
+		vec_free(out_orig_fd);
+		free(out_new_fd);
+		vec_free(out_new_fd);
+		return (0);
+	    }
+	}
+	else if (c != '\0' && c != '|')
+	{
+	    if (!ft_save_cmd(cmd, vars)) // TODO: look for error handling 
+	    {
+		free(in_orig_fd);
+		vec_free(in_orig_fd);
+		free(in_new_fd);
+		vec_free(in_new_fd);
+		free(out_orig_fd);
+		vec_free(out_orig_fd);
+		free(out_new_fd);
+		vec_free(out_new_fd);
+		return (0);
+	    }
+	}
+	ft_index_after_spaces(vars);
+	c = vars->input_line[vars->ind]; 
+    }
+    if (vars->input_line[vars->ind] == '|')
+    {
+	vars->end++;
+	ft_index_after_spaces(vars);
+    }
+    return (1);
+}
+
+static int ft_parse_command_line(t_input *input, t_vars *vars)
+{
+    // NOTE: PARSES the WHOLE command line into the following two vectors
     t_vec *cmd;
-    t_vec *redirect;
+    t_redirect *redirect;
 
     cmd = (t_vec *)malloc(sizeof(t_vec));
     if (!cmd)
 	return (0);
-    redirect = (t_vec *)malloc(sizeof(t_vec));
+    redirect = (t_redirect *)malloc(sizeof(t_redirect));
     if (!redirect)
 	return (0);
-    if (!vec_new(cmd, 2, sizeof(char *))) // NOTE: Initialize a vec and allocate some mem for command
+    if (!vec_new(cmd, 2, sizeof(char *))) // NOTE: Init a vec and allocate some mem for command
 	return (0); // NOTE: malloc fail
-    if (!vec_new(redirect, 2, sizeof(t_redirect *))) // NOTE: Init a vec and alloc. some mem for redir.
-	return (0);
     if (!ft_parsing_action(cmd, redirect, vars)) // TODO: Handle errors correctly
+    {
+	free(cmd);
+	vec_free(cmd);
+	free(redirect);
 	return (0);
-    // NOTE: saving addresses of cmd, redirect to input
+    }
+    // NOTE: saving addresses of cmd and redirect to input
     input->cmd = cmd;
     input->redirect = redirect;
     return (1);
 }
+
 int ft_save_input(t_vec *pipes, t_vars *vars)
 {
     // NOTE: PARSE EVERYTHING

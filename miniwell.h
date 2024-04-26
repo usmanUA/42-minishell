@@ -21,7 +21,14 @@
 #include <readline/readline.h>
 # include "get_next_line/get_next_line.h"
 
-typedef enum s_constants
+typedef enum s_flags
+{
+	NOFLAG = 0,
+	REDIR = 1,
+	PIPE = 2,
+}	t_flags;
+
+typedef enum s_consants
 {
 	COMMAND = 0,
 	REDIRECT = 1,
@@ -43,34 +50,39 @@ typedef struct s_vars
 	int stop;
 }	t_vars;
 
+typedef struct s_redirect
+{
+	t_vec *in_orig_fd;
+	t_vec *in_new_fd;
+	t_vec *out_orig_fd;
+	t_vec *out_new_fd;
+}	t_redirect;
+
 typedef struct s_input
 {
 	t_vec *cmd;
-	t_vec *redirect;
+	t_redirect *redirect;
 }	t_input;
 
-typedef struct s_redirect
-{
-	int orig_fd;
-	int new_fd;
-}	t_redirect;
 
 void	ft_init_vars(t_vars *vars);
 int ft_syntax_error(t_vars *vars);
-int ft_space_until_end(char *s);
+int ft_space_until_end(t_vars *vars);
 int ft_save_input(t_vec *pipes, t_vars *vars);
-int	ft_handle_redirects(t_vec *redirect, t_vars *vars);
+int	ft_handle_redirects(t_redirect *redirect, t_vars *vars);
 char *ft_next_string(t_vars *vars, int op);
 void	ft_shift_pointer(t_vars *vars);
 void	ft_next_pipe_null(t_vars *vars);
-int ft_special_char(char s);
 int ft_operator_first(t_input *input, t_vars *vars);
 int ft_command_first(t_input *input, t_vars *vars);
+int ft_save_cmd_filename(t_vars *vars, char **s);
 int ft_save_cmd(t_vec *cmd, t_vars *vars);
 int ft_token_error(char c, int sgle);
 void ft_index_after_spaces(t_vars *vars);
 int ft_redirection(t_vars *vars);
 void	ft_free_vec(t_vec *pipes);
-int ft_parsing_action(t_vec *cmd, t_vec *redirect, t_vars *vars);
+
+void	ft_filerror(int errnu, char *filename, int infile, int write);
+void	ft_cmd_error(char *cmd, int permission, int file_exist);
 
 #endif

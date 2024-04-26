@@ -71,7 +71,7 @@ static void	ft_strings_end(t_vars *vars, int operator)
 	while (ft_isdigit(vars->input_line[vars->ind+ind]))
 	    ind++;
     }
-    else if (operator == COMMAND)
+    else if (operator == COMMAND || operator == FILENAME)
 	ft_commands_end(vars, '\"', &ind);
     vars->end = vars->ind + ind; // NOTE: END updates here
 }
