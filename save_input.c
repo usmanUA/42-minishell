@@ -94,6 +94,29 @@ int ft_redirection(t_vars *vars)
     return (0);
 }
 
+int ft_parse_command_line(t_input *input, t_vars *vars)
+{
+    // NOTE: PARSES the WHOLE command line into two following vectors
+    t_vec *cmd;
+    t_vec *redirect;
+
+    cmd = (t_vec *)malloc(sizeof(t_vec));
+    if (!cmd)
+	return (0);
+    redirect = (t_vec *)malloc(sizeof(t_vec));
+    if (!redirect)
+	return (0);
+    if (!vec_new(cmd, 2, sizeof(char *))) // NOTE: Initialize a vec and allocate some mem for command
+	return (0); // NOTE: malloc fail
+    if (!vec_new(redirect, 2, sizeof(t_redirect *))) // NOTE: Init a vec and alloc. some mem for redir.
+	return (0);
+    if (!ft_parsing_action(cmd, redirect, vars)) // TODO: Handle errors correctly
+	return (0);
+    // NOTE: saving addresses of cmd, redirect to input
+    input->cmd = cmd;
+    input->redirect = redirect;
+    return (1);
+}
 int ft_save_input(t_vec *pipes, t_vars *vars)
 {
     // NOTE: PARSE EVERYTHING
@@ -105,16 +128,8 @@ int ft_save_input(t_vec *pipes, t_vars *vars)
 	input = malloc(sizeof(t_input)); // NOTE: executed in the very beg. or the beg. of every pipe (|) if any
 	if (!input)
 	    return (0);
-	if (ft_redirection(vars))
-	{
-	    if (!ft_operator_first(input, vars)) // TODO: look for error handling 
-		continue ;
-	}
-	else 
-	{
-	    if (!ft_command_first(input, vars)) // TODO: look for error handling 
-		continue ;
-	}
+	if (!ft_parse_command_line(input, vars)) // TODO: Handle errors correctly
+	    return (0); // WARN: Handle malloc
 	if (!vec_push(pipes, input))
 	    return (0); // NOTE: malloc fail
     }

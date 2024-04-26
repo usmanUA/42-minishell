@@ -57,9 +57,9 @@ int ft_save_cmd(t_vec *cmd, t_vars *vars)
     s = ft_next_string(vars, COMMAND);
     if (!s)
 	return (0); // NOTE: Either malloc fail or all spaces until '\0'
-    vars->ind = vars->end;
     if (vars->increment)// WARN: adding 1 here works for all cases?
-	vars->ind++;
+	vars->end++;
+    vars->ind = vars->end;
     vars->increment = 0;
     while (vars->qontinue)
     {
@@ -80,9 +80,9 @@ int ft_save_cmd(t_vec *cmd, t_vars *vars)
 	    return (0);
 	}
 	free(temp);
-	vars->ind = vars->end;
 	if (vars->increment)
-	    vars->ind++; 
+	    vars->end++; 
+	vars->ind = vars->end;
 	vars->increment = 0;
     }
     printf("%s\n", s);
@@ -94,15 +94,16 @@ int ft_save_cmd(t_vec *cmd, t_vars *vars)
     return (1);
 }
 
-int ft_follow_first_command_operator(t_vec *cmd, t_vec *redirect, t_vars *vars)
+int ft_parsing_action(t_vec *cmd, t_vec *redirect, t_vars *vars)
 {
+    // NOTE: Loops until either '\0' or '|'
+    // parses everything in between
+    // moves the pointer next to '|' if encountered
     char c;
 
     c = vars->input_line[vars->ind]; 
     while (c != '\0' && c != '|')
     {
-	ft_index_after_spaces(vars);
-	c = vars->input_line[vars->ind]; 
 	if (ft_redirection(vars))
 	{
 	    if (!ft_handle_redirects(redirect, vars)) // TODO: look for error handling 
@@ -113,40 +114,14 @@ int ft_follow_first_command_operator(t_vec *cmd, t_vec *redirect, t_vars *vars)
 	    if (!ft_save_cmd(cmd, vars)) // TODO: look for error handling 
 		return (0);
 	}
+	ft_index_after_spaces(vars);
+	c = vars->input_line[vars->ind]; 
     }
     if (vars->input_line[vars->ind] == '|')
     {
 	vars->end++;
 	ft_index_after_spaces(vars);
     }
-    return (1);
-}
-
-int ft_command_first(t_input *input, t_vars *vars)
-{
-    // NOTE: FIRST saves the command and then moves till the end
-    t_vec *cmd;
-    t_vec *redirect;
-
-    cmd = (t_vec *)malloc(sizeof(t_vec));
-    if (!cmd)
-	return (0);
-    redirect = (t_vec *)malloc(sizeof(t_vec));
-    if (!redirect)
-	return (0);
-    if (!vec_new(cmd, 2, sizeof(char *))) // NOTE: Initialize a vec and allocate some mem for command
-	return (0); // NOTE: malloc fail
-    if (!ft_save_cmd(cmd, vars)) // NOTE: if its command or its option, save to the vec.
-	return (0); // NOTE: only malloc fail?
-    // NOTE: NOW: expect either options or redirect operators
-    if (!vec_new(redirect, 2, sizeof(t_redirect *)))
-	return (0);
-    if (!ft_follow_first_command_operator(cmd, redirect, vars))
-	return (0); // TODO: look for error handling 
-    // NOTE: saving address (in stack mem)
-    // It can be malloc if needed be
-    input->cmd = cmd;
-    input->redirect = redirect;
     return (1);
 }
 

@@ -9,6 +9,7 @@
 /*   Updated: 2024/04/24 09:40:14 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include "libft/libft.h"
 #include "miniwell.h"
 
 static int  ft_not_space_nor_quote(char c, int quote)
@@ -59,7 +60,11 @@ static void	ft_strings_end(t_vars *vars, int operator)
     if (operator == REDIRECT)
     {
 	while (vars->input_line[vars->ind+ind]=='<' || vars->input_line[vars->ind+ind]=='>')
+	{
 	    ind++;
+	    if (ind == 2)
+		break ;
+	}
     }
     else if (operator == FD)
     {

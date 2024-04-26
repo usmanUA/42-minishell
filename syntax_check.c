@@ -113,6 +113,7 @@ int ft_syntax_error(t_vars *vars)
     vars->len = ft_strlen(vars->input_line);
     if (ft_space_until_end(vars->input_line))
 	return (1);
+    // TODO: handle | errors too
     if (ft_prohibited_chars(vars))
 	return (1);
     if (ft_unclosed_quote(vars))
