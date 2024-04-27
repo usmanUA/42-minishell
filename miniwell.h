@@ -36,6 +36,21 @@ typedef enum s_consants
 	FILENAME = 3,
 }	t_constants;
  
+typedef enum s_redir_types
+{
+	INFILE = 0,
+	OUTFILE = 1,
+	APPEND = 2,
+	HERE_DOC = 3,
+}	t_redir_types;
+
+typedef struct s_redir_count
+{
+	int in_redir;
+	int out_redir;
+	int append;
+}	t_redir_count;
+
 typedef struct s_vars
 {
 	char *input_line;
@@ -48,28 +63,28 @@ typedef struct s_vars
 	int d_quote;
 	int increment;
 	int stop;
+	int file_error;
+	t_redir_count *redir_count;
 }	t_vars;
-
-typedef struct s_redirect
-{
-	t_vec *in_orig_fd;
-	t_vec *in_new_fd;
-	t_vec *out_orig_fd;
-	t_vec *out_new_fd;
-}	t_redirect;
 
 typedef struct s_input
 {
 	t_vec *cmd;
-	t_redirect *redirect;
+	t_vec *new_fds;
+	t_vec *orig_fds;
 }	t_input;
 
+typedef struct s_redirect
+{
+	t_vec *new_fds;
+	t_vec *orig_fds;
+}	t_redirect;
 
 void	ft_init_vars(t_vars *vars);
 int ft_syntax_error(t_vars *vars);
 int ft_space_until_end(t_vars *vars);
 int ft_save_input(t_vec *pipes, t_vars *vars);
-int	ft_handle_redirects(t_redirect *redirect, t_vars *vars);
+int	ft_handle_redirects(t_vec *new_fds, t_vec *orig_fds, t_vars *vars);
 char *ft_next_string(t_vars *vars, int op);
 void	ft_shift_pointer(t_vars *vars);
 void	ft_next_pipe_null(t_vars *vars);

@@ -10,25 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include <stdlib.h>
 
 static void	ft_free_redirect(t_vec *redirect)
 {
-    t_redirect *fds;
     int ind;
 
     ind = -1;
     if (redirect)
     {
 	while (++ind < redirect->len)
-	{
-	    fds = (t_redirect *)&redirect->mem[ind*redirect->size];
-	    if (fds)
-	    {
-		close(fds->new_fd);
-		free(fds);
-	    }
-	}
+	    close(redirect->mem[ind * redirect->size]);
 	vec_free(redirect);
 	free(redirect);
     }
@@ -44,7 +35,7 @@ static void	ft_free_cmd(t_vec *cmd)
     {
 	while (++ind < cmd->len)
 	{
-	    str = (char *)&cmd->mem[ind*cmd->len];
+	    str = *(char **)&cmd->mem[ind*cmd->len];
 	    if (str)
 		free(str);
 	}
@@ -61,7 +52,8 @@ static void	ft_free_input(void *inpt)
     if (input)
     {
 	ft_free_cmd(input->cmd);
-	ft_free_redirect(input->redirect);
+	ft_free_redirect(input->new_fds);
+	ft_free_redirect(input->orig_fds);
 	free(input);
     }
 }

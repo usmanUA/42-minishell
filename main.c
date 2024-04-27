@@ -10,10 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include "vec/vec.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 void	ft_print_vecs(t_vec *pipes)
 {
@@ -23,7 +19,6 @@ void	ft_print_vecs(t_vec *pipes)
     t_input *input;
     t_vec *cmd;
     t_vec *redirect;
-    t_redirect *fds;
 
     ind = -1;
     printf("pipes: len: %zu, alloc_mem: %zu, size: %zu\n", pipes->len, pipes->mem_alloc, pipes->size);
@@ -32,17 +27,10 @@ void	ft_print_vecs(t_vec *pipes)
 	input = (t_input *)&pipes->mem[ind*pipes->size];
 	cmd = input->cmd;
 	printf("cmd: len: %zu, alloc_mem: %zu, size: %zu\n", cmd->len, cmd->mem_alloc, cmd->size);
-//	printf("%p\n", cmd);
-	redirect = input->redirect;
-//	printf("redirect: len: %zu, alloc_mem: %zu, size: %zu\n", redirect->len, redirect->mem_alloc, redirect->size);
-	// FIXIT: FIX the WARNING for redirect
-	// NOTE: redirect got vec_new(redirect, 2, sizeof(t_redirect *)) but not vec_push(redirect, t_redirect *fds)
-//	printf("%p\n", redirect); // WARNING: The address of redirect is different than malloced in ft_command_first()
-//	printf("red->len %zu\n", redirect->len);
 	i = -1;
 	// WARNING: DOES not print if the string is longer than let's say 8 chars
 	while (++i < cmd->len)
-	    printf("cmd and args: %s\n", (char *)vec_get(cmd, i));
+	    printf("cmd and args: %s\n", *(char **)vec_get(cmd, i));
 	j = -1;
 	/* write(1, "here\n", 5); */
 	// while (++j < redirect->len)

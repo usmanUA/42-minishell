@@ -9,9 +9,7 @@
 /*   Updated: 2024/04/16 13:50:18 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft/libft.h"
 #include "miniwell.h"
-#include <stdio.h>
 
     // TODO: check the cases -> 0;, 0| (cases where fd is followed by special chars other than redirects)
 int ft_token_error(char c, int sgle)

@@ -95,7 +95,7 @@ int ft_save_cmd(t_vec *cmd, t_vars *vars)
 	ft_skip_quotes(vars);
     if (!ft_save_cmd_filename(vars, &s))
 	return (0);
-    if (!vec_push(cmd, s))
+    if (!vec_push(cmd, &s))
     {
 	free(s);
 	return (0);
