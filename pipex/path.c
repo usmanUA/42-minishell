@@ -59,25 +59,6 @@ void	ft_make_command(t_pipex *ppx)
 	ft_cmd_error(ppx->cmd_args[ppx->idx][0], 1, 1);
 }
 
-char	*ft_join_path(char *path, t_pipex *ppx)
-{
-	char	*path_to_cmd;
-	char	*cmd_path;
-
-	path_to_cmd = ft_strjoin(path, "/");
-	if (!path_to_cmd)
-		ft_exit_error(ppx, 1, EXIT_FAILURE, 0);
-	cmd_path = ft_strjoin(path_to_cmd, ppx->cmd_args[ppx->idx][0]);
-	if (!cmd_path)
-	{
-		free(path_to_cmd);
-		ft_exit_error(ppx, 1, EXIT_FAILURE, 0);
-	}
-	if (path_to_cmd)
-		free(path_to_cmd);
-	return (cmd_path);
-}
-
 void	ft_handle_absolute(t_pipex *ppx)
 {
 	int	fd;

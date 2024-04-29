@@ -13,7 +13,7 @@
 
 void vec_free(t_vec *vec)
 {
-    if (!vec || !vec->mem_alloc)
+    if (!vec || vec->mem_alloc == 0)
 	return ;
     free(vec->mem);
     vec->mem = NULL;

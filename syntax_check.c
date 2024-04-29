@@ -41,7 +41,7 @@ static int ft_redirect_operator(char *s, int *ind)
 {
     if (!ft_strncmp(&s[*ind], "<<", 2) || !ft_strncmp(&s[*ind], ">>", 2))
     {
-	++(*ind);
+	*ind += 2;
 	return (1);
     }
     else if (!ft_strncmp(&s[*ind], "<", 1) || !ft_strncmp(&s[*ind], ">", 1))

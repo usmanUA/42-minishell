@@ -75,12 +75,3 @@ void	ft_cmd_error(char *cmd, int permission, int file_exist)
 // 	}
 // 	exit(status);
 // }
-//
-// int	ft_notwrite_cmderror(t_pipex *ppx)
-// {
-// 	if (!ppx->idx && ppx->fdin_failed)
-// 		return (1);
-// 	if (ppx->idx == ppx->tot_cmds - 1 && ppx->fdout_failed)
-// 		return (1);
-// 	return (0);
-// }

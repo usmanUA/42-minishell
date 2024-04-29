@@ -73,10 +73,12 @@ int ft_save_cmd_filename(t_vars *vars, char **s)
 	*s = ft_strjoin(*s, ft_next_string(vars, COMMAND));
 	if (!*s)
 	{
-	    free(temp);
+	    if (temp)
+		free(temp);
 	    return (0);
 	}
-	free(temp);
+	if (temp)
+	    free(temp);
 	if (vars->increment)
 	    vars->end++; 
 	vars->ind = vars->end;
@@ -97,7 +99,8 @@ int ft_save_cmd(t_vec *cmd, t_vars *vars)
 	return (0);
     if (!vec_push(cmd, &s))
     {
-	free(s);
+	if (s)
+	    free(s);
 	return (0);
     }
     return (1);

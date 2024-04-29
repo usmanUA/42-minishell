@@ -18,10 +18,9 @@
 
 typedef struct s_var
 {
-	char			**str;
+	char			**rstr;
 	size_t			ind;
 	size_t			word_l;
-	int				flag;
 }					t_var;
 
 typedef struct s_list
@@ -35,7 +34,7 @@ char				*ft_strnstr(const char *big, const char *little,
 int					ft_atoi(const char *str);
 void				ft_striteri(char *s, void (*f)(unsigned int, char *));
 char				*ft_itoa(int n);
-char				**ft_split(char const *s, char *set, char c, int flag);
+char	**ft_split(char const *s, char c);
 void				ft_bzero(void *s, size_t n);
 void				*ft_calloc(size_t nmemb, size_t size);
 int					ft_isalnum(int c);
