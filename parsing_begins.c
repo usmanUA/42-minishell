@@ -13,6 +13,7 @@
 #include "vec/vec.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 void	ft_init_vars(t_vars *vars)
 {
@@ -74,7 +75,7 @@ int ft_redirection(t_vars *vars)
     return (0);
 }
 
-static int ft_parsing_action(t_vec *cmd, t_vars *vars)
+static int ft_parsing_action(t_input **input, t_vec *cmd, t_vars *vars)
 {
     // NOTE: Loops until either '\0' or '|'
     // parses everything in between
@@ -86,7 +87,7 @@ static int ft_parsing_action(t_vec *cmd, t_vars *vars)
     {
 	if (ft_redirection(vars))
 	{
-	    if (!ft_handle_redirects(vars)) // TODO: look for error handling 
+	    if (!ft_handle_redirects(input, vars)) // TODO: look for error handling 
 		return (0);
 	}
 	else if (c != '\0' && c != '|')
@@ -105,56 +106,30 @@ static int ft_parsing_action(t_vec *cmd, t_vars *vars)
     return (1);
 }
 
-int ft_init_vecs(t_vars *vars)
-{
-    t_vec *new_fds;
-    t_vec *orig_fds;
-    int	*file_flag;
-    t_redirect *redirect;
-
-    redirect = (t_redirect *)malloc(sizeof(t_redirect)); 
-    if (!redirect)
-	return (0);
-    new_fds = (t_vec *)malloc(sizeof(t_vec));
-    if (!new_fds)
-	return (0);
-    orig_fds = (t_vec *)malloc(sizeof(t_vec));
-    if (!orig_fds)
-	return (0);
-    file_flag = (int *)malloc(sizeof(int));
-    if (!file_flag)
-	return (0);
-    *file_flag = GREEN;
-    if (!vec_new(new_fds, 2, sizeof(int))) // NOTE: Init a vec and allocate some mem for command
-	return (0); // NOTE: malloc fail
-    if (!vec_new(orig_fds, 2, sizeof(int))) // NOTE: Init a vec and allocate some mem for command
-	return (0); // NOTE: malloc fail
-    redirect->new_fds = new_fds;
-    redirect->orig_fds = orig_fds;
-    redirect->file_flag = file_flag;
-    vars->redirect = redirect;
-    return (1);
-}
-
-static int ft_parse_command_line(t_input *input, t_vars *vars)
+static int ft_parse_command_line(t_input **input, t_vars *vars)
 {
     // NOTE: PARSES the WHOLE command line into the following two vectors
+    int *file_flag;
     t_vec *cmd;
+    char *null;
 
+    null = NULL;
     cmd = (t_vec *)malloc(sizeof(t_vec));
     if (!cmd)
 	return (0);
     if (!vec_new(cmd, 2, sizeof(char **))) // NOTE: Init a vec and allocate some mem for command
 	return (0); // NOTE: malloc fail
-    if (!ft_init_vecs(vars))
+    file_flag = (int *)malloc(sizeof(int));
+    if (!file_flag)
 	return (0);
-    if (!ft_parsing_action(cmd, vars)) // TODO: Handle errors correctly
+    *file_flag = GREEN;
+    (*input)->file_flag = file_flag;
+    if (!ft_parsing_action(input, cmd, vars)) // TODO: Handle errors correctly
 	return (0);
+    if (!vec_push(cmd, &null))
+	return (0); // NOTE: malloc fail
     // NOTE: saving addresses of cmd and redirect to input
-    input->cmd = cmd;
-    input->new_fds = vars->redirect->new_fds;
-    input->orig_fds = vars->redirect->orig_fds;
-    input->file_flag = vars->redirect->file_flag;
+    (*input)->cmd = cmd;
     return (1);
 }
 
@@ -217,7 +192,9 @@ int ft_save_input(t_vec *pipes, t_vars *vars)
 	input = malloc(sizeof(t_input)); // NOTE: executed in the very beg. or the beg. of every pipe (|) if any
 	if (!input)
 	    return (0);
-	if (!ft_parse_command_line(input, vars)) // TODO: Handle errors correctly
+	input->new_fds = NULL;
+	input->orig_fds = NULL;
+	if (!ft_parse_command_line(&input, vars)) // TODO: Handle errors correctly
 	    return (0); // WARN: Handle malloc
 	if (!vec_push(pipes, &input))
 	    return (0); // NOTE: malloc fail

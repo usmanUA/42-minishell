@@ -50,7 +50,7 @@ typedef struct s_redirect
 {
 	t_vec *new_fds;
 	t_vec *orig_fds;
-	int *file_flag;
+	int **file_flag;
 }	t_redirect;
 
 typedef struct s_redir_count
@@ -91,11 +91,32 @@ typedef struct s_input
 	int *file_flag;
 }	t_input;
 
+typedef struct s_pipex
+{
+	int		idx;
+	int		status;
+	t_vec		*pids;
+	int		*fds;
+}			t_pipex;
+
+typedef struct envp_list
+{
+    char                *env_name;
+    char                *env_value;
+    struct envp_list    *next;
+} t_envp;
+
+typedef struct s_shell
+{
+    char    **envp;
+    t_envp    *envp_linkedlist;
+} t_shell;
+
 void	ft_init_vars(t_vars *vars);
 int ft_syntax_error(t_vars *vars);
 int ft_space_until_end(t_vars *vars);
 int ft_save_input(t_vec *pipes, t_vars *vars);
-int	ft_handle_redirects(t_vars *vars);
+int	ft_handle_redirects(t_input **input, t_vars *vars);
 char *ft_next_string(t_vars *vars, int op);
 void	ft_shift_pointer(t_vars *vars);
 void	ft_next_pipe_null(t_vars *vars);
@@ -112,5 +133,7 @@ void	ft_filerror(int errnu, char *filename, int infile, int write);
 void	ft_cmd_error(char *cmd, int permission, int file_exist);
 
 void	ft_print_vecs(t_vec *pipes);
+
+int	ft_validate_commands(t_input *input, t_info *info, char **envp);
 
 #endif

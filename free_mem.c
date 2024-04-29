@@ -9,20 +9,22 @@
 /*   Updated: 2024/04/25 10:09:02 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft/libft.h"
 #include "miniwell.h"
-#include "vec/vec.h"
-#include <stdlib.h>
 
 static void	ft_free_redirect(t_vec *redirect)
 {
     int ind;
+    int	fd;
 
     ind = -1;
     if (redirect)
     {
 	while (++ind < redirect->len)
-	    close(redirect->mem[ind * redirect->size]);
+	{
+	    fd = redirect->mem[ind * redirect->size];
+	    if (fd > 2)
+		close(fd);
+	}
 	vec_free(redirect);
 	free(redirect);
     }
@@ -55,8 +57,10 @@ static void	ft_free_input(void **inpt)
     if (input)
     {
 	ft_free_cmd(input->cmd);
-	ft_free_redirect(input->new_fds);
-	ft_free_redirect(input->orig_fds);
+	if (input->new_fds)
+		ft_free_redirect(input->new_fds);
+	if (input->new_fds)
+	    ft_free_redirect(input->orig_fds);
 	free(input->file_flag);
 	free(input);
     }
@@ -69,5 +73,4 @@ void	ft_free_vec(t_vec *pipes, t_vars *vars)
     while (++ind < pipes->len)
 	ft_free_input(vec_get(pipes, ind));
     vec_free(pipes);
-    free(vars->redirect);
 }

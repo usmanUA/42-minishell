@@ -1,5 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   validate_commands.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/04/29 14:15:13 by uahmed            #+#    #+#             */
+/*   Updated: 2024/04/29 14:15:24 by uahmed           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #include "miniwell.h"
-#include "vec/vec.h"
 
 char	*ft_join_path(char *path, t_info *info, char *command)
 {
@@ -51,7 +61,7 @@ void	ft_handle_absolute(char *command, t_info *info)
 		{
 			close(fd);
 			ft_cmd_error(command, 2, 1);
-			// TODO: return relevant exit status as it is a directory 
+			// TODO: return relevant exit status 126
 		}
 		else if (access(command, X_OK) == -1)
 		{
@@ -118,7 +128,7 @@ int	ft_validate_commands(t_input *input, t_info *info, char **envp)
 		return (1);
 	paths = ft_split(ft_give_path(envp), ':');
 	if (!paths)
-		return (0);
+		return (0); // TODO: check malloc error handling
 	command = *(char **)vec_get(input->cmd, 0);
 	if (ft_ispresent(command, '/'))
 		ft_handle_absolute(command, info);

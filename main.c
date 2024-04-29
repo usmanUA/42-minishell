@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
+#include "vec/vec.h"
+#include <stdio.h>
 
 int ft_valid_user_input(t_vars *vars, t_vec *pipes)
 {
@@ -28,10 +30,13 @@ int ft_valid_user_input(t_vars *vars, t_vec *pipes)
     return (1);
 }
 
-int main(void)
+int main(int argc, char **argv, char **envp)
 {
     t_vec   pipes;
     t_vars	vars;
+    char **s;
+    int ind;
+    t_input *input;
 
     while (42)
     {
@@ -49,8 +54,13 @@ int main(void)
 	// 3. free input.cmd and input.redirect vectors
 	// NOTE: Of course there's a lot missing which I did not add to TODO list
 	// NOTE: FREE everything
-	write(1, "here\n", 5);
 	ft_print_vecs(&pipes);
+	input = *(t_input **)vec_get(&pipes, 0);
+	s = (char **)vec_get(input->cmd, 0);
+	printf("sizeof s: %zu\n", input->cmd->len);
+	ind = -1;
+	while (s[++ind])
+	    printf("arg: %s\n", s[ind]);
 	ft_free_vec(&pipes, &vars); 
     }
 }

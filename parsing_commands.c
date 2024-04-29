@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include "vec/vec.h"
 
 int	ft_not_skipped(t_vars *vars, char quo)
 {

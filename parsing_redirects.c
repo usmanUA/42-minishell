@@ -12,6 +12,27 @@
 #include "miniwell.h"
 #include "vec/vec.h"
 
+int ft_init_vecs(t_redirect *redirect, t_input **input, t_vars *vars)
+{
+    t_vec *new_fds;
+    t_vec *orig_fds;
+
+    new_fds = (t_vec *)malloc(sizeof(t_vec));
+    if (!new_fds)
+	return (0);
+    orig_fds = (t_vec *)malloc(sizeof(t_vec));
+    if (!orig_fds)
+	return (0);
+    if (!vec_new(new_fds, 2, sizeof(int))) // NOTE: Init a vec and allocate some mem for command
+	return (0); // NOTE: malloc fail
+    if (!vec_new(orig_fds, 2, sizeof(int))) // NOTE: Init a vec and allocate some mem for command
+	return (0); // NOTE: malloc fail
+    redirect->new_fds = new_fds;
+    redirect->orig_fds = orig_fds;
+    redirect->file_flag = &(*input)->file_flag;
+    return (1);
+}
+
 // TODO: check if decrementing redir_count with correct logic
 int ft_input_redir(t_redirect *redirect,  char *filename, char **fd, t_vars *vars)
 {
@@ -26,9 +47,9 @@ int ft_input_redir(t_redirect *redirect,  char *filename, char **fd, t_vars *var
     if (file_fd == -1)
     {
 	ft_filerror(errno, filename, 1, 1);	
-	*redirect->file_flag = RED;
+	**redirect->file_flag = RED;
 	free(*fd);
-	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
+	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
     if (redir_pair  == 1 && ((vars->fd && ft_atoi(*fd) == 0) || vars->fd == 0))
     {
@@ -68,9 +89,9 @@ int ft_output_redir(t_redirect *redirect,  char *filename, char **fd, t_vars *va
     if (file_fd == -1)
     {
 	ft_filerror(errno, filename, 0, 0);	
-	*redirect->file_flag = RED;
+	**redirect->file_flag = RED;
 	free(*fd);
-	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
+	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
     if (redir_pair  == 1 && ((vars->fd && (redir_fd == 1 || redir_fd == 2)) || vars->fd == 0))
     {
@@ -112,9 +133,9 @@ int ft_output_append(t_redirect *redirect,  char *filename, char **fd, t_vars *v
     if (file_fd == -1)
     {
 	ft_filerror(errno, filename, 0, 0);	
-	*redirect->file_flag = RED;
+	**redirect->file_flag = RED;
 	free(*fd);
-	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
+	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
     if (vars->redir_count->out_redir == 0)
     {
@@ -158,7 +179,7 @@ int ft_here_doc(t_redirect *redirect,  char *eof, char **fd, t_vars *vars)
     {
 	ft_filerror(errno, ".infile.txt", 0, 0);	
 	free(*fd);
-	return (0); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
+	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
     line = get_next_line(0);
     while (42)
@@ -190,17 +211,20 @@ int ft_here_doc(t_redirect *redirect,  char *eof, char **fd, t_vars *vars)
     return (1);
 }
 
-int	ft_handle_redirects(t_vars *vars)
+int	ft_handle_redirects(t_input **input, t_vars *vars)
 {
     // NOTE: checks the string right after the redirect operator is not an invalid operator and if so returns 1
     // OTHERWISE tries to open the files and save their file descriptors and moves the pointer to the next string after filename
     char *redir;
     char *fd;
     char *file;
+    t_redirect redirect;
 
     file = NULL;
     fd = NULL;
     file = NULL;
+    if (!ft_init_vecs(&redirect, input, vars))
+	return (0);
     if (vars->fd)
     {
 	fd = ft_next_string(vars, FD); // NOTE: str in heap, vars->ind points ->FD)<-vars->end 
@@ -218,28 +242,30 @@ int	ft_handle_redirects(t_vars *vars)
     // WARNING: make sure to differentiate malloc fail or file open fail if needed be
     if (!ft_strncmp(redir, "<<", 2))
     {
-	if (!ft_here_doc(vars->redirect, file, &fd, vars))
+	if (!ft_here_doc(&redirect, file, &fd, vars))
 	    return (0); // NOTE: could be malloc error or file opening error
     }
     else if (!ft_strncmp(redir, ">>", 2))
     {
-	if (!ft_output_append(vars->redirect, file, &fd, vars))
+	if (!ft_output_append(&redirect, file, &fd, vars))
 	    return (0); // NOTE: could be malloc error or file opening error
     }
     else if (!ft_strncmp(redir, "<", 1))
     {
-	if (!ft_input_redir(vars->redirect, file, &fd, vars))
+	if (!ft_input_redir(&redirect, file, &fd, vars))
 	    return (0); // NOTE: could be malloc error or file opening error
     }
     else if (!ft_strncmp(redir, ">", 1))
     {
-	if (!ft_output_redir(vars->redirect, file, &fd, vars))
+	if (!ft_output_redir(&redirect, file, &fd, vars))
 	    return (0); // NOTE: could be malloc error or file opening error
     }
     if (file)
 	free(file);
     if (redir)
 	free(redir);
+    (*input)->new_fds = redirect.new_fds;
+    (*input)->orig_fds = redirect.orig_fds;
    return (1);
 }
 

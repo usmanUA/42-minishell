@@ -9,22 +9,30 @@
 /*   Updated: 2024/04/24 09:40:14 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft/libft.h"
 #include "miniwell.h"
 
-static int  ft_not_space_nor_quote(char c, int quote)
+static void  ft_commands_end_index(t_vars *vars, int *ind)
 {
-    if (quote == 0)
+    // NOTE: finds the index where the command ends 
+    // updates vars->qontinue based on the presence/absence of quotes right next to where command ends
+    char c;
+    int	qontinue;
+    
+    qontinue = 0;
+    c = vars->input_line[vars->ind + *ind];
+    while (c != '\0')
     {
-	if (c == '\0' || ft_isspace(c))
-	    return (0);
-	return (1);
+	if (c == '\'' || c == '\"')
+	{
+	    qontinue = 1;
+	    break ;
+	}
+	else if (ft_isspace(c) || c == '<' || c == '>') // NOTE: do we need to check for redirect operators?
+	    break ;
+	(*ind)++;
+	c = vars->input_line[vars->ind + *ind];
     }
-    if (c == '<' || c == '>')
-	return (0);
-    if (c != '\0' && !ft_isspace(c) && c != '\'' && c != '\"')// WARN: LOOK BACK
-	return (1);
-    return (0);
+    vars->qontinue = qontinue;
 }
 
 static void ft_commands_end(t_vars *vars, int quote, int *ind)
@@ -44,11 +52,7 @@ static void ft_commands_end(t_vars *vars, int quote, int *ind)
 	vars->increment = 1;
 	return ;
     }
-    while (ft_not_space_nor_quote(vars->input_line[vars->ind + *ind], quote))
-	(*ind)++;
-    if (!ft_not_space_nor_quote(vars->input_line[vars->ind + *ind], 0))
-	vars->qontinue = 0;
-
+    ft_commands_end_index(vars, ind);
 }
 static void	ft_strings_end(t_vars *vars, int operator)
 {
