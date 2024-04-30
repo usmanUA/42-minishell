@@ -14,16 +14,16 @@
 int vec_insert(t_vec *dst, void *src, size_t index)
 {
     if (!dst || !src || index > dst->len)
-	return (-1);
+	return (0);
     if (index == dst->len)
 	return (vec_push(dst, src));
     if (dst->len * dst->size >= dst->mem_alloc)
     {
 	if (vec_resize(dst, (dst->mem_alloc * 2)/dst->size) < 0)
-	    return (-1);
+	    return (0);
     }
-    memmove(vec_get(dst, index+1), vec_get(dst, index), (dst->len-index) * dst->size);
-    memcpy(vec_get(dst, index), src, dst->size);
+    ft_memmove(vec_get(dst, index+1), vec_get(dst, index), (dst->len-index) * dst->size);
+    ft_memcpy(vec_get(dst, index), src, dst->size);
     dst->len++;
     return (1);
 }

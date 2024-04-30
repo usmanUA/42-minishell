@@ -14,13 +14,13 @@
 int vec_remove(t_vec *src, size_t index)
 {
     if (!src || index > src->len)
-	return (-1);
+	return (0);
     if (index == src->len)
     {
 	src->len--;
 	return (1);
     }
-    memmove(vec_get(src, index), &src->mem[(index+1) * src->size], (src->len - index) * src->size); 
+    ft_memmove(vec_get(src, index), &src->mem[(index+1) * src->size], (src->len - index) * src->size); 
     src->len--;
     return (1);
 }

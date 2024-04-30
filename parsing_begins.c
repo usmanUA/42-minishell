@@ -10,10 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include "vec/vec.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 void	ft_init_vars(t_vars *vars)
 {
@@ -150,7 +146,7 @@ void ft_count_redirs(t_vars *vars, t_redir_count *redir_count)
 	else if (!ft_strncmp(&vars->input_line[ind], ">>", 2))
 	{
 	    ind += 2;
-	    redir_count->append++;
+	    redir_count->out_redir++;
 	}
 	else if (!ft_strncmp(&vars->input_line[ind], "<", 1))
 	{
@@ -170,7 +166,6 @@ void ft_count_redirs(t_vars *vars, t_redir_count *redir_count)
 
 void	ft_zero_redirects(t_redir_count *redir_count)
 {
-    redir_count->append = 0;
     redir_count->out_redir = 0;
     redir_count->in_redir = 0;
 }
@@ -187,13 +182,13 @@ int ft_save_input(t_vec *pipes, t_vars *vars)
     while (vars->input_line[vars->ind] != '\0') // NOTE: loop over the whole user input line
     {
 	ft_count_redirs(vars, &redir_count);
-	printf("in_redirs: %d, out_redits: %d, append: %d\n", redir_count.in_redir, redir_count.out_redir, redir_count.append);
 	vars->redir_count = &redir_count;
 	input = malloc(sizeof(t_input)); // NOTE: executed in the very beg. or the beg. of every pipe (|) if any
 	if (!input)
 	    return (0);
 	input->new_fds = NULL;
 	input->orig_fds = NULL;
+	input->fds_info = NULL;
 	if (!ft_parse_command_line(&input, vars)) // TODO: Handle errors correctly
 	    return (0); // WARN: Handle malloc
 	if (!vec_push(pipes, &input))

@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 #include "miniwell.h"
 #include "vec/vec.h"
-#include <stdio.h>
+#include <unistd.h>
 
 int ft_valid_user_input(t_vars *vars, t_vec *pipes)
 {
@@ -30,37 +30,38 @@ int ft_valid_user_input(t_vars *vars, t_vec *pipes)
     return (1);
 }
 
-int main(int argc, char **argv, char **envp)
+void	ft_init_shell(t_shell *shell, char **envp)
 {
     t_vec   pipes;
-    t_vars	vars;
-    char **s;
-    int ind;
-    t_input *input;
+    t_vec   info;
+    t_vars  vars;
 
+    shell->pipes = pipes;
+    shell->info = info;
+    shell->vars = vars;
+    shell->envp = envp;
+}
+
+int main(int argc, char **argv, char **envp)
+{
+    t_shell shell;
+
+    ft_init_shell(&shell, envp);
     while (42)
     {
-	if (!ft_valid_user_input(&vars, &pipes))
+	if (!ft_valid_user_input(&shell.vars, &shell.pipes))
 	    continue ;
-	if (!ft_save_input(&pipes, &vars))
+	if (!ft_save_input(&shell.pipes, &shell.vars))
 	{
-	    free((char *)vars.input_line);
+	    free((char *)shell.vars.input_line);
 	    continue ; // NOTE: [malloc fail, what else fails there?], error message | code?
 	}
-	free((char *)vars.input_line); // NOTE: everything saved to vector pipes 
-	// TODO: everything is parsed, do:
-	// 1. command validation (write errors if there are errors related to the invalid command)
-	// 2. if valid command and file, execute command
-	// 3. free input.cmd and input.redirect vectors
-	// NOTE: Of course there's a lot missing which I did not add to TODO list
+	free((char *)shell.vars.input_line); // NOTE: everything saved to vector pipes 
+	// TODO: everything is parsed, do:wq
+	// Of course there's a lot missing which I did not add to TODO list
 	// NOTE: FREE everything
-	ft_print_vecs(&pipes);
-	input = *(t_input **)vec_get(&pipes, 0);
-	s = (char **)vec_get(input->cmd, 0);
-	printf("sizeof s: %zu\n", input->cmd->len);
-	ind = -1;
-	while (s[++ind])
-	    printf("arg: %s\n", s[ind]);
-	ft_free_vec(&pipes, &vars); 
+/* 	ft_print_vecs(&pipes); */
+	ft_validate_execute(&shell);
+	ft_free_vec(&shell.pipes, &shell.vars); 
     }
 }

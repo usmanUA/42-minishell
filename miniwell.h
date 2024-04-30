@@ -50,14 +50,15 @@ typedef struct s_redirect
 {
 	t_vec *new_fds;
 	t_vec *orig_fds;
+	t_vec *fds_info;
 	int **file_flag;
 }	t_redirect;
 
 typedef struct s_redir_count
 {
 	int in_redir;
+	int err_redir;
 	int out_redir;
-	int append;
 }	t_redir_count;
 
 typedef struct s_info
@@ -88,6 +89,7 @@ typedef struct s_input
 	t_vec *cmd;
 	t_vec *new_fds;
 	t_vec *orig_fds;
+	t_vec *fds_info;
 	int *file_flag;
 }	t_input;
 
@@ -108,8 +110,12 @@ typedef struct envp_list
 
 typedef struct s_shell
 {
-    char    **envp;
-    t_envp    *envp_linkedlist;
+	char    **envp;
+	t_envp    *envp_linkedlist;
+	t_vec	pipes;
+	t_vec	info;
+	t_vars	vars;
+
 } t_shell;
 
 void	ft_init_vars(t_vars *vars);
@@ -134,6 +140,9 @@ void	ft_cmd_error(char *cmd, int permission, int file_exist);
 
 void	ft_print_vecs(t_vec *pipes);
 
-int	ft_validate_commands(t_input *input, t_info *info, char **envp);
+void	ft_validate_commands(t_shell *shell, int index);
+
+void    ft_validate_execute(t_shell *shell);
+int	ft_execute(t_vec *pipes);
 
 #endif
