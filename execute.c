@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
+#include <unistd.h>
 
 int	ft_status(int status)
 {
@@ -20,7 +21,7 @@ int	ft_status(int status)
 	return (1);
 }
 
-void	ft_io_redirections(t_input *input, int *read_from_pipe, int *write_to_pipe)
+void	ft_io_redirections(t_input *input, int *read_from_pipe, int *output_to_pipe, int *err_to_pipe)
 {
 	int	ind;
 	int	orig_fd;
@@ -41,8 +42,14 @@ void	ft_io_redirections(t_input *input, int *read_from_pipe, int *write_to_pipe)
 		}
 		else if (fds_info == STDOUT_FILENO)
 		{
-			if (write_to_pipe && orig_fd == STDOUT_FILENO)
-				*write_to_pipe = NO;
+			if (output_to_pipe && orig_fd == STDOUT_FILENO)
+				*output_to_pipe = NO;
+			dup2(*(int *)vec_get(input->new_fds, ind), orig_fd);
+		}
+		else if (fds_info == STDERR_FILENO)
+		{
+			if (err_to_pipe && orig_fd == STDERR_FILENO)
+				*err_to_pipe = NO;
 			dup2(*(int *)vec_get(input->new_fds, ind), orig_fd);
 		}
 	}
@@ -51,12 +58,14 @@ void	ft_io_redirections(t_input *input, int *read_from_pipe, int *write_to_pipe)
 static void	ft_child(t_input *input, t_pipex *pipex, int *fds, char **envp)
 {
 	int	read_from_pipe;
-	int	write_to_pipe;
+	int	output_to_pipe;
+	int	err_to_pipe;
 	char	**args;
 
 	read_from_pipe = YES;
-	write_to_pipe = YES;
-	ft_io_redirections(input, &read_from_pipe, &write_to_pipe);
+	output_to_pipe = YES;
+	err_to_pipe = YES;
+	ft_io_redirections(input, &read_from_pipe, &output_to_pipe, &err_to_pipe);
 	if (pipex->infile != -42)
 	{
 		if (read_from_pipe == YES)
@@ -64,8 +73,10 @@ static void	ft_child(t_input *input, t_pipex *pipex, int *fds, char **envp)
 		close(pipex->infile);
 	}
 	close(fds[0]);
-	if (write_to_pipe == YES)
+	if (output_to_pipe == YES)
 		dup2(fds[1], STDOUT_FILENO);
+	if (err_to_pipe == YES)
+		dup2(fds[1], STDERR_FILENO);
 	close(fds[1]);
 	args = (char **)vec_get(input->cmd, 0);
 	execve(args[0], args, envp);
@@ -81,7 +92,7 @@ static void	ft_last_child(t_input *input, t_pipex *pipex, char **envp)
 	int	read_from_pipe;
 	
 	read_from_pipe = YES;
-	ft_io_redirections(input, &read_from_pipe, NULL);
+	ft_io_redirections(input, &read_from_pipe, NULL, NULL);
 	if (pipex->infile != -42)
 	{
 		if (read_from_pipe == YES)

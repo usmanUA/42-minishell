@@ -10,9 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include "vec/vec.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include <unistd.h>
 
 char	*ft_join_path(char *path, char *command)
 {
@@ -52,41 +50,57 @@ char	*ft_give_path(char **envp)
 	return (&path[5]);
 }
 
-void	ft_handle_absolute(char *command, t_vec *info)
+static	int	ft_check_command(char *command, int check_dir)
+{
+	int	fd;
+
+	fd = -2;
+	if (!access(command, F_OK))
+	{
+		if (check_dir == YES)
+		{
+			fd = open(command, O_DIRECTORY);
+			if (fd != -1)
+			{
+				close(fd);
+				ft_cmd_error(command, 2, 1); // NOTE: is a directory
+				// TODO: return relevant exit status 126
+				return (0);
+			}
+			close(fd);
+		}
+		if (access(command, X_OK) == -1)
+		{
+			ft_cmd_error(command, 0, 1);
+			// TODO: command no permission, 
+			// return 126 exit status
+			return (INVALID);
+		}
+	}
+	else
+		return (INVALID);
+	return (VALID);
+}
+
+int	ft_handle_absolute(char *command, t_vec *info)
 {
 	int	fd;
 	int	cmd_flag;
 
 	fd = -2;
 	cmd_flag = RED;
-	if (!access(command, F_OK))
-	{
-		fd = open(command, O_DIRECTORY);
-		if (fd != -1)
-		{
-			close(fd);
-			ft_cmd_error(command, 2, 1); // NOTE: is a directory
-			// TODO: return relevant exit status 126
-		}
-		else if (access(command, X_OK) == -1)
-		{
-			ft_cmd_error(command, 0, 1);
-			// TODO: command no permission, 
-			// return 126 exit status
-		}
-		else
-			cmd_flag = GREEN;
-			// TODO: command is OK, continue executing
-	}
+	if (ft_check_command(command, YES) == VALID)
+		cmd_flag = GREEN;
 	// NOTE: if absolute command (given) does not exist
 	if (cmd_flag == RED)
 		ft_cmd_error(command, 0, 0); // TODO: define MACROS for const. values
 	// TODO: return exit status 127
 	if (!vec_push(info, &cmd_flag))
-		return; // NOTE: malloc fail
+		return (MALLOC_FAIL); // NOTE: malloc fail
+	return (MALLOC_SUCCESS);
 }
 
-void	ft_handle_relative(t_vec *cmd, t_vec *info, char **paths)
+int	ft_handle_relative(t_vec *cmd, t_vec *info, char **paths)
 {
 	char	*cmd_path;
 	char	*command;
@@ -99,32 +113,28 @@ void	ft_handle_relative(t_vec *cmd, t_vec *info, char **paths)
 	while (paths[++i])
 	{
 		cmd_path = ft_join_path(paths[i], command);
-		if (!access(cmd_path, F_OK))
+		if (!cmd_path)
+			return (MALLOC_FAIL);
+		if (ft_check_command(cmd_path, NO) == VALID)
 		{
-			if (access(cmd_path, X_OK) == -1)
-			{
-				ft_cmd_error(command, 0, 1);
-				// TODO: return exit status 126	
-			}
-			else
-			{
-				// TODO: look for handling ft_memmove and ft_memcpy failures 
-				// WARN: make sure you're doing correctly
-				vec_insert(cmd, &cmd_path, 0); // NOTE: make sure the address of cmd_path goes along
-				vec_remove(cmd, 1); // NOTE: overwrites the address of command (overwritten address is the pointer to the address of command) 
-				free(command); // NOTE: free the command (command is the pointer to the first char of malloced string)
-				cmd_flag = GREEN;
-			}	
-			break;
+			// TODO: look for handling ft_memmove and ft_memcpy failures 
+			// WARN: make sure you're doing correctly
+			vec_insert(cmd, &cmd_path, 0); // NOTE: make sure the address of cmd_path goes along
+			vec_remove(cmd, 1); // NOTE: overwrites the address of command (overwritten address is the pointer to the address of command) 
+			free(command); // NOTE: free the command (command is the pointer to the first char of malloced string)
+			cmd_flag = GREEN;
+			break ;
 		}
-		free(cmd_path);
+		else
+			free(cmd_path);
 	}
 	// NOTE: if it gets here it means command does not exits
 	// TODO: return exit status 127
 	if (cmd_flag == RED)
 		ft_cmd_error(command, 1, 1);
 	if (!vec_push(info, &cmd_flag))
-		return; // NOTE: malloc fail
+		return (MALLOC_FAIL); // NOTE: malloc fail
+	return (MALLOC_SUCCESS);
 }
 
 int	ft_validate_commands(t_input *input, t_vec *info, char **envp)
@@ -137,9 +147,15 @@ int	ft_validate_commands(t_input *input, t_vec *info, char **envp)
 		return (0); // TODO: check malloc error handling
 	command = *(char **)vec_get(input->cmd, 0);
 	if (ft_ispresent(command, '/'))
-		ft_handle_absolute(command, info);
+	{
+		if (ft_handle_absolute(command, info) == MALLOC_FAIL)
+			return (MALLOC_FAIL);
+	}
 	else
-		ft_handle_relative(input->cmd, info, paths);
-	return (1);
+	{
+		if (ft_handle_relative(input->cmd, info, paths) == MALLOC_FAIL)
+			return (MALLOC_FAIL);
+	}
+	return (MALLOC_SUCCESS);
 }
 

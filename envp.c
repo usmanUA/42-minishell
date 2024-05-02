@@ -87,7 +87,7 @@ t_envp *create_new_node(t_shell *data)
         //error msg???
         exit(1);
     }    
-    node->env_name = NULL;;
+    node->env_name = NULL;
     node->env_value = NULL;
     node->next = NULL;
     return (node);
@@ -103,7 +103,7 @@ char    *get_name_of_envp_variable(t_shell *data, char *envp_string)
     if (name == NULL)
     {
         //free all
-        exit (1);
+        exit (1); // NOTE: exit what?
     }
     name = string_n_copy(name, envp_string, name_length);
     return (name);

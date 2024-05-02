@@ -9,7 +9,9 @@
 /*   Updated: 2024/04/24 09:40:14 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include "libft/libft.h"
 #include "miniwell.h"
+#include <stdlib.h>
 
 static void  ft_commands_end_index(t_vars *vars, int *ind)
 {
@@ -35,16 +37,34 @@ static void  ft_commands_end_index(t_vars *vars, int *ind)
     vars->qontinue = qontinue;
 }
 
+static	int ft_valid_char(char next)
+{
+    if (ft_isdigit(next))
+	return (INVALID);
+    if (next == '-')
+	return (INVALID);
+    return (VALID);
+}
 static void ft_commands_end(t_vars *vars, int quote, int *ind)
 {
     // NOTE: knows the command string has started, brings the pointer to the last char of the command string
     // takes care of the quotes if present
+    char	c;
+    char	next;
+
     if (vars->d_quote || vars->s_quote)
     {
 	if (vars->s_quote)
 	    quote = '\'';
-	while (vars->input_line[vars->ind + *ind] && vars->input_line[vars->ind + *ind] != quote)
+	c = vars->input_line[vars->ind + *ind];
+	while (c && c != quote)
+	{
+	    next = vars->input_line[vars->ind + (*ind+1)];
+	    if (c == '$' && ft_valid_char(next) == VALID && vars->s_quote == 0)
+		vars->expand_it = 1;
 	    (*ind)++;
+	    c = vars->input_line[vars->ind + *ind];
+	}
 	if (!ft_isspace(vars->input_line[vars->ind + (*ind+1)]))
 	    vars->qontinue = 1;
 	vars->s_quote = 0;
@@ -54,6 +74,7 @@ static void ft_commands_end(t_vars *vars, int quote, int *ind)
     }
     ft_commands_end_index(vars, ind);
 }
+
 static void	ft_strings_end(t_vars *vars, int operator)
 {
     // NOTE: finds the index for the end of the current string and update the var vars->end 
@@ -80,16 +101,71 @@ static void	ft_strings_end(t_vars *vars, int operator)
     vars->end = vars->ind + ind; // NOTE: END updates here
 }
 
-char *ft_next_string(t_vars *vars, int op)
+char	*ft_find_value(t_envp *env_vars, char *key, int len)
+{
+    char *value;
+    t_envp  *envp;
+
+    value = NULL;
+    envp = env_vars;
+    while (envp->next)
+    {
+	if (!ft_strncmp(key, envp->env_name, len))
+	{
+	    value = ft_strdup(envp->env_value);	
+	    break;
+	}
+	envp = envp->next;
+    }
+    return (value);
+}
+
+char	*ft_expand_variable(t_vars *vars, t_envp *env_vars)
+{
+    int	start;
+    int	end;
+    int	len;
+    char    *str;
+    char    *key;
+    char    *value;
+
+    start = vars->ind-1;
+    end = vars->end;
+    while (++start < end)
+    {
+	if (vars->input_line[start] != '$')
+	    len++;
+    }
+    if (len > 0)
+    {
+	str = ft_substr(vars->input_line, vars->ind, len);
+	if (!str)
+	    return (NULL);
+	++len;
+	key = &vars->input_line[len];
+	value = ft_find_value(env_vars, key, end - len);
+	if (value)
+	    str = ft_strjoin(str, value);
+    }
+    else
+    {
+
+    }
+    return (str);
+}
+
+char *ft_next_string(t_vars *vars, int op, t_envp *env_vars)
 {
     // NOTE: returns the next string 
     char *s;
 
     ft_strings_end(vars, op); // NOTE: vars->end now points to the end of string
-    s = ft_substr(vars->input_line, vars->ind, vars->end - vars->ind); // NOTE: malloc that string in heap and point str to it
+    if (vars->expand_it)
+	s = ft_expand_variable(vars, env_vars);
+    else
+	s = ft_substr(vars->input_line, vars->ind, vars->end - vars->ind); // NOTE: malloc that string in heap and point str to it
     if (!s)
 	return (NULL); // WARN: malloc fail
-
     return (s);
 }
 

@@ -9,16 +9,17 @@
 /*   Updated: 2024/04/18 14:54:22 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include "libft/libft.h"
 #include "miniwell.h"
 
-int	ft_not_skipped(t_vars *vars, char quo)
+int	ft_quote_skipped(t_vars *vars, char quo)
 {
     if (vars->input_line[++vars->ind] != quo)
-	return (1);
+	return (NO);
     ++vars->ind;
     if (ft_isspace(vars->input_line[vars->ind] || vars->input_line[vars->ind] == '\0'))
 	vars->stop = 1;
-    return (0);
+    return (YES);
 }
 
 void	ft_skip_quotes(t_vars *vars)
@@ -27,7 +28,7 @@ void	ft_skip_quotes(t_vars *vars)
     {
 	if (vars->input_line[vars->ind] == '\"')
 	{
-	    if (ft_not_skipped(vars, '\"'))
+	    if (ft_quote_skipped(vars, '\"') == NO)
 	    {
 		vars->d_quote = 1;
 		return ;
@@ -35,7 +36,7 @@ void	ft_skip_quotes(t_vars *vars)
 	}
 	else if (vars->input_line[vars->ind] == '\'')
 	{
-	    if (ft_not_skipped(vars, '\''))
+	    if (ft_quote_skipped(vars, '\'') == NO)
 	    {
 		vars->s_quote = 1;
 		return ;
@@ -46,7 +47,7 @@ void	ft_skip_quotes(t_vars *vars)
     }
 }
 
-int ft_save_cmd_filename(t_vars *vars, char **s)
+int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *list)
 {
     char *temp;
 
@@ -59,7 +60,6 @@ int ft_save_cmd_filename(t_vars *vars, char **s)
     vars->increment = 0;
     while (vars->qontinue)
     {
-// PERF:     ""'"""""""""""'cat"''''''''  "'' main.c '\0'
 	temp = *s;
 	if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
 	    ft_skip_quotes(vars);
@@ -69,7 +69,7 @@ int ft_save_cmd_filename(t_vars *vars, char **s)
 	    vars->end = vars->ind;
 	    break ;
 	}
-	*s = ft_strjoin(*s, ft_next_string(vars, COMMAND));
+	*s = ft_strjoin(*s, ft_next_string(vars, COMMAND)); // WARN: Only malloc fail?
 	if (!*s)
 	{
 	    if (temp)
@@ -86,7 +86,7 @@ int ft_save_cmd_filename(t_vars *vars, char **s)
     return (1);
 }
 
-int ft_save_cmd(t_vec *cmd, t_vars *vars)
+int ft_save_cmd(t_vec *cmd, t_vars *vars, t_envp *env_vars)
 {
     // NOTE: PARSE command and its options if there are any
     char *temp;
@@ -94,7 +94,7 @@ int ft_save_cmd(t_vec *cmd, t_vars *vars)
 
     if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
 	ft_skip_quotes(vars);
-    if (!ft_save_cmd_filename(vars, &s))
+    if (!ft_save_cmd_filename(vars, &s, env_vars))
 	return (0);
     if (!vec_push(cmd, &s))
     {

@@ -12,61 +12,6 @@
 #include "miniwell.h"
 #include <stdio.h>
 
-void	ft_init_vars(t_vars *vars)
-{
-    // NOTE: Initialize vars struct
-    vars->ind = 0;
-    vars->end = 0;
-    vars->len = 0;
-    vars->fd = 0;
-    vars->qontinue = 0;
-    vars->s_quote = 0;
-    vars->d_quote = 0;
-    vars->increment = 0;
-    vars->stop = 0;
-    vars->file_error = 0;
-    vars->unlink_here_doc = NO;
-    vars->input_line = NULL;
-    vars->redir_count = NULL;
-    vars->redirect = NULL;
-}
-
-int ft_init_redirect_vecs(t_input **input, t_redir_count *redir_count)
-{
-    t_vec *new_fds;
-    t_vec *orig_fds;
-    t_vec *fds_info;
-    int redirections;
-
-    redirections = redir_count->in_redir+redir_count->err_redir+redir_count->out_redir;
-    if (redirections == 0)
-    {
-	(*input)->new_fds = NULL;
-	(*input)->orig_fds = NULL;
-	(*input)->fds_info = NULL;
-	return (1);
-    }
-    new_fds = (t_vec *)malloc(sizeof(t_vec));
-    if (!new_fds)
-	return (0);
-    orig_fds = (t_vec *)malloc(sizeof(t_vec));
-    if (!orig_fds)
-	return (0);
-    fds_info = (t_vec *)malloc(sizeof(t_vec));
-    if (!fds_info)
-	return (0);
-    if (!vec_new(new_fds, 2, sizeof(long))) // NOTE: Init a vec and allocate some mem for command
-	return (0); // NOTE: malloc fail
-    if (!vec_new(orig_fds, 2, sizeof(long))) // NOTE: Init a vec and allocate some mem for command
-	return (0); // NOTE: malloc fail
-    if (!vec_new(fds_info, 2, sizeof(long))) // NOTE: Init a vec and allocate some mem for command
-	return (0); // NOTE: malloc fail
-    (*input)->new_fds = new_fds;
-    (*input)->orig_fds = orig_fds;
-    (*input)->fds_info = fds_info;
-    return (1);
-}
-
 void ft_index_after_spaces(t_vars *vars)
 {
     // NOTE: SKIPS all the spaces and moves the pointer to the non-space character 
@@ -76,6 +21,7 @@ void ft_index_after_spaces(t_vars *vars)
     //                    '\0'
 }
 
+// NOTE: NOT USED function
 void	ft_shift_pointer(t_vars *vars)
 {
     // NOTE: moves the pointer either to the next | or null-terminator whatever comes first in the char *
@@ -98,49 +44,49 @@ int ft_redirection(t_vars *vars)
 
     ind = vars->ind;
     if (vars->input_line[ind] == '<' || vars->input_line[ind] == '>')
-	return (1);
+	return (YES);
     while (ft_isdigit(vars->input_line[ind]))
 	ind++;
     if (vars->input_line[ind] == '<' || vars->input_line[ind] == '>')
     {
 	vars->fd = 1;
-	return (1);
+	return (YES);
     }
-    return (0);
+    return (NO);
 }
 
-static int ft_parsing_action(t_input **input, t_vec *cmd, t_vars *vars)
+static int ft_parsing_action(t_input **input, t_vec *cmd, t_shell *shell)
 {
     // NOTE: Loops until either '\0' or '|'
     // parses everything in between
     // moves the pointer next to '|' if encountered
     char c;
 
-    c = vars->input_line[vars->ind]; 
+    c = shell->vars->input_line[shell->vars->ind]; 
     while (c != '\0' && c != '|')
     {
-	if (ft_redirection(vars))
+	if (ft_redirection(shell->vars) == YES)
 	{
-	    if (!ft_handle_redirects(input, vars)) // TODO: look for error handling 
+	    if (!ft_handle_redirects(input, shell->vars, shell->envp_linkedlist)) // TODO: look for error handling 
 		return (0);
 	}
 	else if (c != '\0' && c != '|')
 	{
-	    if (!ft_save_cmd(cmd, vars)) // TODO: look for error handling 
-		return (0);
+	    if (!ft_save_cmd(cmd, shell->vars, shell->envp_linkedlist)) // TODO: look for error handling 
+		return (MALLOC_FAIL);
 	}
-	ft_index_after_spaces(vars);
-	c = vars->input_line[vars->ind]; 
+	ft_index_after_spaces(shell->vars);
+	c = shell->vars->input_line[shell->vars->ind]; 
     }
-    if (vars->input_line[vars->ind] == '|')
+    if (shell->vars->input_line[shell->vars->ind] == '|')
     {
-	vars->end++;
-	ft_index_after_spaces(vars);
+	shell->vars->end++;
+	ft_index_after_spaces(shell->vars);
     }
     return (1);
 }
 
-static int ft_parse_command_line(t_input **input, t_vars *vars)
+static int ft_parse_command_line(t_input **input, t_shell *shell)
 {
     // NOTE: PARSES the WHOLE command line into the following two vectors
     int *file_flag;
@@ -150,18 +96,18 @@ static int ft_parse_command_line(t_input **input, t_vars *vars)
     null = NULL;
     cmd = (t_vec *)malloc(sizeof(t_vec));
     if (!cmd)
-	return (0);
+	return (MALLOC_FAIL);
     if (!vec_new(cmd, 2, sizeof(char **))) // NOTE: Init a vec and allocate some mem for command
-	return (0); // NOTE: malloc fail
+	return (MALLOC_FAIL); // NOTE: malloc fail
     file_flag = (int *)malloc(sizeof(int));
     if (!file_flag)
-	return (0);
+	return (MALLOC_FAIL);
     *file_flag = GREEN;
     (*input)->file_flag = file_flag;
-    if (!ft_parsing_action(input, cmd, vars)) // TODO: Handle errors correctly
-	return (0);
+    if (!ft_parsing_action(input, cmd, shell)) // TODO: Handle errors correctly
+	return (0); // NOTE: other error than malloc fail?
     if (!vec_push(cmd, &null))
-	return (0); // NOTE: malloc fail
+	return (MALLOC_FAIL); // NOTE: malloc fail
     // NOTE: saving addresses of cmd and redirect to input
     (*input)->cmd = cmd;
     return (1);
@@ -208,28 +154,29 @@ void	ft_zero_redirects(t_redir_count *redir_count)
     redir_count->in_redir = 0;
 }
 
-int ft_save_input(t_vec *pipes, t_vars *vars)
+int ft_save_input(t_shell *shell)
 {
     // NOTE: PARSE EVERYTHING
     t_input *input;
     t_redir_count redir_count;
 
     ft_zero_redirects(&redir_count);
-    ft_index_after_spaces(vars); 
-    while (vars->input_line[vars->ind] != '\0') // NOTE: loop over the whole user input line
+    ft_index_after_spaces(shell->vars); 
+    while (shell->vars->input_line[shell->vars->ind] != '\0') // NOTE: loop over the whole user input line
     {
-	ft_count_redirs(vars, &redir_count);
-	vars->redir_count = &redir_count;
+	ft_count_redirs(shell->vars, &redir_count);
+	shell->vars->redir_count = &redir_count;
+	printf("%d\n", redir_count.out_redir);
 	input = malloc(sizeof(t_input)); // NOTE: executed in the very beg. or the beg. of every pipe (|) if any
 	if (!input)
-	    return (0);
+	    return (MALLOC_FAIL);
 	if (!ft_init_redirect_vecs(&input, &redir_count))
-	    return (0);
-	if (!ft_parse_command_line(&input, vars)) // TODO: Handle errors correctly
+	    return (MALLOC_FAIL);
+	if (!ft_parse_command_line(&input, shell)) // TODO: Handle errors correctly
 	    return (0); // WARN: Handle malloc
-	if (!vec_push(pipes, &input))
-	    return (0); // NOTE: malloc fail
+	if (!vec_push(shell->pipes, &input))
+	    return (MALLOC_FAIL); // NOTE: malloc fail
 	ft_zero_redirects(&redir_count);
     }
-    return (1);
+    return (MALLOC_SUCCESS);
 }

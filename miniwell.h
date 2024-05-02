@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <readline/readline.h>
 # include "get_next_line/get_next_line.h"
 
@@ -30,6 +31,10 @@ typedef enum s_flags
 	RED,
 	YES,
 	NO,
+	VALID,
+	INVALID,
+	MALLOC_FAIL,
+	MALLOC_SUCCESS,
 }	t_flags;
 
 typedef enum s_consants
@@ -71,6 +76,7 @@ typedef struct s_vars
 	size_t end;
 	int fd;
 	int qontinue;
+	int expand_it;
 	int s_quote;
 	int d_quote;
 	int increment;
@@ -95,8 +101,10 @@ typedef struct s_pipex
 	int		idx;
 	int		infile;
 	int		status;
-	t_vec		*pids;
+	int		cmd_flag;
 	int		*fds;
+	t_vec		*pids;
+	t_input		*input;
 }			t_pipex;
 
 typedef struct envp_list
@@ -119,15 +127,15 @@ typedef struct s_shell
 void	ft_init_vars(t_vars *vars);
 int ft_syntax_error(t_vars *vars);
 int ft_space_until_end(t_vars *vars);
-int ft_save_input(t_vec *pipes, t_vars *vars);
-int	ft_handle_redirects(t_input **input, t_vars *vars);
-char *ft_next_string(t_vars *vars, int op);
+int ft_save_input(t_shell *shell);
+int	ft_handle_redirects(t_input **input, t_vars *vars, t_envp *env_vars);
+char *ft_next_string(t_vars *vars, int op, t_envp *env_vars);
 void	ft_shift_pointer(t_vars *vars);
 void	ft_next_pipe_null(t_vars *vars);
 int ft_operator_first(t_input *input, t_vars *vars);
 int ft_command_first(t_input *input, t_vars *vars);
-int ft_save_cmd_filename(t_vars *vars, char **s);
-int ft_save_cmd(t_vec *cmd, t_vars *vars);
+int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars);
+int ft_save_cmd(t_vec *cmd, t_vars *vars, t_envp *env_vars);
 int ft_token_error(char c, int sgle);
 void ft_index_after_spaces(t_vars *vars);
 int ft_redirection(t_vars *vars);
@@ -144,5 +152,12 @@ int    ft_validate_execute(t_shell *shell);
 int	ft_execute(t_shell *shell);
 void	ft_processes(t_input *input, t_pipex *pipex, char **envp);
 int	ft_execute_last_cmd(t_input *input, t_pipex *pipex, char **envp);
+
+int ft_init_shell(t_shell *shell, char **envp);
+void	ft_init_vars(t_vars *vars);
+int ft_init_redirect_vecs(t_input **input, t_redir_count *redir_count);
+void    ft_init_pipex(t_pipex *pipex);
+
+int    make_linked_list_of_envp(t_shell *data);
 
 #endif

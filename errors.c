@@ -64,6 +64,14 @@ void	ft_cmd_error(char *cmd, int permission, int file_exist)
 	perror(cmd);
 }
 
+int ft_token_error(char c, int sgle)
+{
+    if (sgle)
+	c = '\'';
+    printf("bash: syntax error near unexpected token  '%c'\n",c); 
+    return (1);
+}
+
 // void	ft_exit_error(t_pipex *pipex, int free, int status, int wait_index)
 // {
 // 	if (wait_index)

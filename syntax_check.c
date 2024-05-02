@@ -12,14 +12,6 @@
 #include "miniwell.h"
 
     // TODO: check the cases -> 0;, 0| (cases where fd is followed by special chars other than redirects)
-int ft_token_error(char c, int sgle)
-{
-    if (sgle)
-	c = '\'';
-    printf("bash: syntax error near unexpected token  '%c'\n",c); 
-    return (1);
-}
-
 static int ft_special_char(char s, int pipe_flag, int redir_flag)
 {
     // NOTE: checks for prohibited special characters and returns 1 if true 

@@ -227,7 +227,7 @@ int ft_here_doc(t_input **input,  char *eof, char **fd, t_vars *vars)
     return (1);
 }
 
-int	ft_handle_redirects(t_input **input, t_vars *vars)
+int	ft_handle_redirects(t_input **input, t_vars *vars, t_envp *env_vars)
 {
     // NOTE: checks the string right after the redirect operator is not an invalid operator and if so returns 1
     // OTHERWISE tries to open the files and save their file descriptors and moves the pointer to the next string after filename
@@ -250,7 +250,7 @@ int	ft_handle_redirects(t_input **input, t_vars *vars)
 	return (0);
     vars->ind = vars->end;
     ft_index_after_spaces(vars);
-    if (!ft_save_cmd_filename(vars, &file))
+    if (!ft_save_cmd_filename(vars, &file, env_vars))
 	return (0); // NOTE: malloc fail
     // WARNING: make sure to differentiate malloc fail or file open fail if needed be
     if (!ft_strncmp(redir, "<<", 2))

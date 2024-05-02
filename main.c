@@ -17,7 +17,8 @@ int ft_valid_user_input(t_vars *vars, t_vec *pipes)
     vars->input_line = readline("\x1b[32mMiniWell\x1b[0m😎:\x1b[31mV0.1\x1b[0m$ ");
     if (!vars->input_line)
 	return (0); // NOTE: malloc fail, error message | code?
-    add_history(vars->input_line);
+    if (vars->input_line && vars->input_line[0])
+	add_history(vars->input_line);
     if (ft_syntax_error(vars))
     {
 	free((char *)vars->input_line);
@@ -28,41 +29,28 @@ int ft_valid_user_input(t_vars *vars, t_vec *pipes)
     return (1);
 }
 
-void	ft_init_shell(t_shell *shell, char **envp)
-{
-    t_vec   *pipes;
-    t_vec   *info;
-    t_vars  *vars;
-
-    pipes = (t_vec *)malloc(sizeof(t_vec));
-    info = (t_vec *)malloc(sizeof(t_vec));
-    vars = (t_vars *)malloc(sizeof(t_vars));
-    shell->pipes = pipes;
-    shell->info = info;
-    shell->vars = vars;
-    shell->envp = envp; // NOTE: shell->envp once gave segfault in ft_split, be careful carrying this pointer along
-}
-
 int main(int argc, char **argv, char **envp)
 {
     t_shell shell;
 
+    make_linked_list_of_envp(&shell);
     while (42)
     {
 	ft_init_shell(&shell, envp);
 	if (!ft_valid_user_input(shell.vars, shell.pipes))
 	    continue ;
-	if (!ft_save_input(shell.pipes, shell.vars))
+	if (!ft_save_input(&shell))
 	{
 	    free((char *)shell.vars->input_line);
-	    continue ; // NOTE: [malloc fail, what else fails there?], error message | code?
+	    ft_free_vec(&shell); 
+	    continue ; // NOTE: [malloc fail, what else could fail there?], error message | code?
 	}
 	free((char *)shell.vars->input_line); // NOTE: everything saved to vector pipes 
 	// TODO: everything is parsed, do:wq
 	// Of course there's a lot missing which I did not add to TODO list
 	// NOTE: FREE everything
 /* 	ft_print_vecs(&pipes); */
-	ft_validate_execute(&shell);
+	ft_validate_execute(&shell); // TODO: WHAT TODO when malloc fails in subsequent funcitons
 	ft_free_vec(&shell); 
     }
 }
