@@ -9,75 +9,43 @@
 /*   Updated: 2024/04/16 16:52:52 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft/libft.h"
 #include "miniwell.h"
-#include "vec/vec.h"
-
-int ft_init_vecs(t_redirect *redirect, t_input **input, t_vars *vars)
-{
-    t_vec *new_fds;
-    t_vec *orig_fds;
-    t_vec *fds_info;
-
-    new_fds = (t_vec *)malloc(sizeof(t_vec));
-    if (!new_fds)
-	return (0);
-    orig_fds = (t_vec *)malloc(sizeof(t_vec));
-    if (!orig_fds)
-	return (0);
-    fds_info = (t_vec *)malloc(sizeof(t_vec));
-    if (!fds_info)
-	return (0);
-    if (!vec_new(new_fds, 2, sizeof(long))) // NOTE: Init a vec and allocate some mem for command
-	return (0); // NOTE: malloc fail
-    if (!vec_new(orig_fds, 2, sizeof(long))) // NOTE: Init a vec and allocate some mem for command
-	return (0); // NOTE: malloc fail
-    if (!vec_new(fds_info, 2, sizeof(long))) // NOTE: Init a vec and allocate some mem for command
-	return (0); // NOTE: malloc fail
-    redirect->new_fds = new_fds;
-    redirect->orig_fds = orig_fds;
-    redirect->fds_info = fds_info;
-    redirect->file_flag = &(*input)->file_flag;
-    return (1);
-}
 
 // TODO: check if decrementing redir_count with correct logic
-int ft_input_redir(t_redirect *redirect,  char *filename, char **fd, t_vars *vars)
+int ft_input_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
 {
     // NOTE: UPDATES redirect based on the possible input redirection
     int std_in;
     int file_fd;
-    int redir_pair;
     int infile;
 
-    redir_pair = vars->redir_count->in_redir;
-    std_in = 0;
-    infile = 0;
+    std_in = STDIN_FILENO;
+    infile = STDIN_FILENO;
     if (vars->fd)
 	std_in = ft_atoi(*fd);
     file_fd = open(filename, O_RDONLY);
     if (file_fd == -1)
     {
 	ft_filerror(errno, filename, 1, 1);	
-	**redirect->file_flag = RED;
+	*(*input)->file_flag = RED;
 	free(*fd);
 	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
-    if (redir_pair  == 1)
+    if (vars->redir_count->in_redir == 1)
     {
-	if (!vec_push(redirect->new_fds, &file_fd)) // NOTE: fd_in is in stack mem of this function, be careful
+	if (!vec_push((*input)->new_fds, &file_fd)) // NOTE: fd_in is in stack mem of this function, be careful
 	{
 	    if (vars->fd && fd)
 		free(*fd);
 	    return (0);
 	}
-	if (!vec_push(redirect->orig_fds, &std_in)) // NOTE: fd_in is in stack mem of this function, be careful
+	if (!vec_push((*input)->orig_fds, &std_in)) // NOTE: fd_in is in stack mem of this function, be careful
 	{
 	    if (vars->fd && fd)
 		free(*fd);
 	    return (0);
 	}
-	if (!vec_push(redirect->fds_info, &infile)) // NOTE: fd_in is in stack mem of this function, be careful
+	if (!vec_push((*input)->fds_info, &infile)) // NOTE: fd_in is in stack mem of this function, be careful
 	{
 	    if (vars->fd && fd)
 		free(*fd);
@@ -91,42 +59,42 @@ int ft_input_redir(t_redirect *redirect,  char *filename, char **fd, t_vars *var
     return (1);
 }
 
-int ft_output_redir(t_redirect *redirect,  char *filename, char **fd, t_vars *vars)
+int ft_output_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
 {
     // NOTE: UPDATES fds based on the possible output redirection
     int file_fd;
     int std_out;
-    int redir_pair;
     int outfile;
 
-    outfile = 1;
-    std_out = 1;
+    outfile = STDOUT_FILENO;
+    std_out = STDOUT_FILENO;
     if (vars->fd)
 	std_out = ft_atoi(*fd);
-    redir_pair = vars->redir_count->out_redir;
     file_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (file_fd == -1)
     {
 	ft_filerror(errno, filename, 0, 0);	
-	**redirect->file_flag = RED;
+	*(*input)->file_flag = RED;
 	free(*fd);
 	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
-    if (redir_pair  == 1)
+    if (vars->redir_count->out_redir == 1)
     {
-	if (!vec_push(redirect->new_fds, &file_fd))
+	if (!vec_push((*input)->new_fds, &file_fd))
 	{
 	    if (vars->fd && fd)
 		free(*fd);
 	    return (0);
 	}
-	if (!vec_push(redirect->orig_fds, &std_out))
+	if (!vec_push((*input)->orig_fds, &std_out))
 	{
 	    if (vars->fd && *fd)
 		free(*fd);
 	    return (0);
 	}
-	if (!vec_push(redirect->fds_info, &outfile))
+	if (std_out == STDERR_FILENO)
+	    outfile = STDERR_FILENO;
+	if (!vec_push((*input)->fds_info, &outfile))
 	{
 	    if (vars->fd && *fd)
 		free(*fd);
@@ -140,42 +108,42 @@ int ft_output_redir(t_redirect *redirect,  char *filename, char **fd, t_vars *va
     return (1);
 }
 
-int ft_output_append(t_redirect *redirect,  char *filename, char **fd, t_vars *vars)
+int ft_output_append(t_input **input,  char *filename, char **fd, t_vars *vars)
 {
     // NOTE: UPDATES fds based on the possible output append redirection
     int file_fd;
-    int redir_pair;
     int append_fd;
     int	outfile;
 
-    redir_pair = vars->redir_count->out_redir;
-    outfile = 1;
-    append_fd = 1;
+    outfile = STDOUT_FILENO;
+    append_fd = STDOUT_FILENO;
     if (vars->fd)
 	append_fd = ft_atoi(*fd);
     file_fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
     if (file_fd == -1)
     {
 	ft_filerror(errno, filename, 0, 0);	
-	**redirect->file_flag = RED;
+	*(*input)->file_flag = RED;
 	free(*fd);
 	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
-    if (redir_pair  == 1)
+    if (vars->redir_count->out_redir == 1)
     {
-	if (!vec_push(redirect->new_fds, &file_fd))
+	if (!vec_push((*input)->new_fds, &file_fd))
 	{
 	    if (vars->fd && fd)
 		free(*fd);
 	    return (0);
 	}
-	if (!vec_push(redirect->orig_fds, &append_fd)) // NOTE: fd_in is in stack mem of this function, be careful
+	if (!vec_push((*input)->orig_fds, &append_fd)) // NOTE: fd_in is in stack mem of this function, be careful
 	{
 	    if (vars->fd && fd)
 		free(*fd);
 	    return (0);
 	}
-	if (!vec_push(redirect->fds_info, &outfile)) // NOTE: fd_in is in stack mem of this function, be careful
+	if (append_fd == STDERR_FILENO)
+	    outfile = STDERR_FILENO;
+	if (!vec_push((*input)->fds_info, &outfile)) // NOTE: fd_in is in stack mem of this function, be careful
 	{
 	    if (vars->fd && fd)
 		free(*fd);
@@ -189,23 +157,25 @@ int ft_output_append(t_redirect *redirect,  char *filename, char **fd, t_vars *v
     return (1);
 }
 
-int ft_here_doc(t_redirect *redirect,  char *eof, char **fd, t_vars *vars)
+int ft_here_doc(t_input **input,  char *eof, char **fd, t_vars *vars)
 {
     // NOTE:UPDATES the fds and reads STDIN and saves the input to hidden file .here_doc 
     char *line;
     int	std_in;
+    int	infile;
     int fd_here_doc;
-    int infile;
+    int	file_fd;
 
-    infile = 0;
     std_in = 0;
+    infile = STDIN_FILENO;
     if (vars->fd)
 	std_in = ft_atoi(*fd);
-    fd_here_doc = open(".infile.txt", O_WRONLY | O_TRUNC | O_CREAT, 0666);
+    fd_here_doc = open(".here_doc", O_WRONLY | O_TRUNC | O_CREAT, 0666);
     if (fd_here_doc == -1)
     {
-	ft_filerror(errno, ".infile.txt", 0, 0);	
+	ft_filerror(errno, ".here_doc", 0, 0);	
 	free(*fd);
+	vars->unlink_here_doc = NO;
 	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
     }
     line = get_next_line(0);
@@ -216,21 +186,31 @@ int ft_here_doc(t_redirect *redirect,  char *eof, char **fd, t_vars *vars)
 	write(fd_here_doc, line, ft_strlen(line));
 	line = get_next_line(0);
     }
+    close(fd_here_doc);
     if (vars->redir_count->in_redir  == 1)
     {
-	if (!vec_push(redirect->new_fds, &fd_here_doc)) // NOTE: fd_in is in stack mem of this function, be careful
+	file_fd = open(".here_doc", O_RDONLY);
+	if (file_fd == -1)
+	{
+	    ft_filerror(errno, ".here_doc", 1, 1);	
+	    *(*input)->file_flag = RED;
+	    free(*fd);
+	    return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
+	}
+	vars->unlink_here_doc = YES;
+	if (!vec_push((*input)->new_fds, &file_fd)) // NOTE: fd_in is in stack mem of this function, be careful
 	{
 	    if (vars->fd && fd)
 		free(*fd);
 	    return (0);
 	}
-	if (!vec_push(redirect->orig_fds, &std_in))
+	if (!vec_push((*input)->orig_fds, &std_in))
 	{
 	    if (vars->fd && fd)
 		free(*fd);
 	    return (0);
 	}
-	if (!vec_push(redirect->fds_info, &infile))
+	if (!vec_push((*input)->fds_info, &infile))
 	{
 	    if (vars->fd && fd)
 		free(*fd);
@@ -238,7 +218,10 @@ int ft_here_doc(t_redirect *redirect,  char *eof, char **fd, t_vars *vars)
 	}
     }
     else if (vars->redir_count->in_redir > 1)
+    {
+	unlink(".here_doc");
 	vars->redir_count->in_redir--;
+    }
     if (vars->fd && fd)
 	free(*fd);
     return (1);
@@ -251,13 +234,10 @@ int	ft_handle_redirects(t_input **input, t_vars *vars)
     char *redir;
     char *fd;
     char *file;
-    t_redirect redirect;
 
     file = NULL;
     fd = NULL;
     file = NULL;
-    if (!ft_init_vecs(&redirect, input, vars))
-	return (0);
     if (vars->fd)
     {
 	fd = ft_next_string(vars, FD); // NOTE: str in heap, vars->ind points ->FD)<-vars->end 
@@ -275,31 +255,28 @@ int	ft_handle_redirects(t_input **input, t_vars *vars)
     // WARNING: make sure to differentiate malloc fail or file open fail if needed be
     if (!ft_strncmp(redir, "<<", 2))
     {
-	if (!ft_here_doc(&redirect, file, &fd, vars))
+	if (!ft_here_doc(input, file, &fd, vars))
 	    return (0); // NOTE: could be malloc error or file opening error
     }
     else if (!ft_strncmp(redir, ">>", 2))
     {
-	if (!ft_output_append(&redirect, file, &fd, vars))
+	if (!ft_output_append(input, file, &fd, vars))
 	    return (0); // NOTE: could be malloc error or file opening error
     }
     else if (!ft_strncmp(redir, "<", 1))
     {
-	if (!ft_input_redir(&redirect, file, &fd, vars))
+	if (!ft_input_redir(input, file, &fd, vars))
 	    return (0); // NOTE: could be malloc error or file opening error
     }
     else if (!ft_strncmp(redir, ">", 1))
     {
-	if (!ft_output_redir(&redirect, file, &fd, vars))
+	if (!ft_output_redir(input, file, &fd, vars))
 	    return (0); // NOTE: could be malloc error or file opening error
     }
     if (file)
 	free(file);
     if (redir)
 	free(redir);
-    (*input)->new_fds = redirect.new_fds;
-    (*input)->orig_fds = redirect.orig_fds;
-    (*input)->fds_info = redirect.fds_info;
    return (1);
 }
 

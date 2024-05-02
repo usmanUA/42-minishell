@@ -28,6 +28,8 @@ typedef enum s_flags
 	PIPE,
 	GREEN,
 	RED,
+	YES,
+	NO,
 }	t_flags;
 
 typedef enum s_consants
@@ -61,12 +63,6 @@ typedef struct s_redir_count
 	int out_redir;
 }	t_redir_count;
 
-typedef struct s_info
-{
-	int no_cmd;
-	int cmd_permission;
-}	t_info;
-
 typedef struct s_vars
 {
 	char *input_line;
@@ -80,6 +76,7 @@ typedef struct s_vars
 	int increment;
 	int stop;
 	int file_error;
+	int unlink_here_doc;
 	t_redir_count *redir_count;
 	t_redirect *redirect;
 }	t_vars;
@@ -96,6 +93,7 @@ typedef struct s_input
 typedef struct s_pipex
 {
 	int		idx;
+	int		infile;
 	int		status;
 	t_vec		*pids;
 	int		*fds;
@@ -112,9 +110,9 @@ typedef struct s_shell
 {
 	char    **envp;
 	t_envp    *envp_linkedlist;
-	t_vec	pipes;
-	t_vec	info;
-	t_vars	vars;
+	t_vec	*pipes;
+	t_vec	*info;
+	t_vars	*vars;
 
 } t_shell;
 
@@ -133,16 +131,18 @@ int ft_save_cmd(t_vec *cmd, t_vars *vars);
 int ft_token_error(char c, int sgle);
 void ft_index_after_spaces(t_vars *vars);
 int ft_redirection(t_vars *vars);
-void	ft_free_vec(t_vec *pipes, t_vars *vars);
+void	ft_free_vec(t_shell *shell);
 
 void	ft_filerror(int errnu, char *filename, int infile, int write);
 void	ft_cmd_error(char *cmd, int permission, int file_exist);
 
 void	ft_print_vecs(t_vec *pipes);
 
-void	ft_validate_commands(t_shell *shell, int index);
+int	ft_validate_commands(t_input *input, t_vec *info, char **envp);
 
-void    ft_validate_execute(t_shell *shell);
-int	ft_execute(t_vec *pipes);
+int    ft_validate_execute(t_shell *shell);
+int	ft_execute(t_shell *shell);
+void	ft_processes(t_input *input, t_pipex *pipex, char **envp);
+int	ft_execute_last_cmd(t_input *input, t_pipex *pipex, char **envp);
 
 #endif

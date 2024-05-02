@@ -11,22 +11,22 @@
 /* ************************************************************************** */
 #include "miniwell.h"
 
-static void	ft_free_redirect(t_vec *redirect)
+static void	ft_free_redirect(t_vec **redirect)
 {
     int ind;
     int	fd;
 
     ind = -1;
-    if (redirect)
+    if (redirect && *redirect)
     {
-	while (++ind < redirect->len)
+	while (++ind < (*redirect)->len)
 	{
-	    fd = redirect->mem[ind * redirect->size];
+	    fd = (*redirect)->mem[ind * (*redirect)->size];
 	    if (fd > 2)
 		close(fd);
 	}
-	vec_free(redirect);
-	free(redirect);
+	vec_free(*redirect);
+	free(*redirect);
     }
 }
 
@@ -58,19 +58,28 @@ static void	ft_free_input(void **inpt)
     {
 	ft_free_cmd(input->cmd);
 	if (input->new_fds)
-		ft_free_redirect(input->new_fds);
-	if (input->new_fds)
-	    ft_free_redirect(input->orig_fds);
+		ft_free_redirect(&input->new_fds);
+	if (input->orig_fds)
+	    ft_free_redirect(&input->orig_fds);
+	if (input->fds_info)
+	    ft_free_redirect(&input->fds_info);
 	free(input->file_flag);
 	free(input);
     }
 }
-void	ft_free_vec(t_vec *pipes, t_vars *vars)
+void	ft_free_vec(t_shell *shell)
 {
     int ind;
     
     ind = -1;
-    while (++ind < pipes->len)
-	ft_free_input(vec_get(pipes, ind));
-    vec_free(pipes);
+    vec_free(shell->info);
+    free(shell->info);
+    ind = -1;
+    while (++ind < shell->pipes->len)
+	ft_free_input(vec_get(shell->pipes, ind));
+    vec_free(shell->pipes);
+    free(shell->pipes);
+    if (shell->vars->unlink_here_doc == YES)
+	unlink(".here_doc");
+    free(shell->vars);
 }

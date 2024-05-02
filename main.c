@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include "vec/vec.h"
-#include <unistd.h>
 
 int ft_valid_user_input(t_vars *vars, t_vec *pipes)
 {
@@ -32,36 +30,39 @@ int ft_valid_user_input(t_vars *vars, t_vec *pipes)
 
 void	ft_init_shell(t_shell *shell, char **envp)
 {
-    t_vec   pipes;
-    t_vec   info;
-    t_vars  vars;
+    t_vec   *pipes;
+    t_vec   *info;
+    t_vars  *vars;
 
+    pipes = (t_vec *)malloc(sizeof(t_vec));
+    info = (t_vec *)malloc(sizeof(t_vec));
+    vars = (t_vars *)malloc(sizeof(t_vars));
     shell->pipes = pipes;
     shell->info = info;
     shell->vars = vars;
-    shell->envp = envp;
+    shell->envp = envp; // NOTE: shell->envp once gave segfault in ft_split, be careful carrying this pointer along
 }
 
 int main(int argc, char **argv, char **envp)
 {
     t_shell shell;
 
-    ft_init_shell(&shell, envp);
     while (42)
     {
-	if (!ft_valid_user_input(&shell.vars, &shell.pipes))
+	ft_init_shell(&shell, envp);
+	if (!ft_valid_user_input(shell.vars, shell.pipes))
 	    continue ;
-	if (!ft_save_input(&shell.pipes, &shell.vars))
+	if (!ft_save_input(shell.pipes, shell.vars))
 	{
-	    free((char *)shell.vars.input_line);
+	    free((char *)shell.vars->input_line);
 	    continue ; // NOTE: [malloc fail, what else fails there?], error message | code?
 	}
-	free((char *)shell.vars.input_line); // NOTE: everything saved to vector pipes 
+	free((char *)shell.vars->input_line); // NOTE: everything saved to vector pipes 
 	// TODO: everything is parsed, do:wq
 	// Of course there's a lot missing which I did not add to TODO list
 	// NOTE: FREE everything
 /* 	ft_print_vecs(&pipes); */
 	ft_validate_execute(&shell);
-	ft_free_vec(&shell.pipes, &shell.vars); 
+	ft_free_vec(&shell); 
     }
 }
