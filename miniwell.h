@@ -28,6 +28,7 @@ typedef enum s_flags
 	REDIR,
 	PIPE,
 	GREEN,
+	YELLOW,
 	RED,
 	YES,
 	NO,
@@ -77,7 +78,8 @@ typedef struct s_vars
 	int fd;
 	int qontinue;
 	int expand_it;
-	int no_expansion;
+	int expanded;
+	int malloc_flag;
 	int s_quote;
 	int d_quote;
 	int increment;
@@ -135,14 +137,14 @@ void	ft_shift_pointer(t_vars *vars);
 void	ft_next_pipe_null(t_vars *vars);
 int ft_operator_first(t_input *input, t_vars *vars);
 int ft_command_first(t_input *input, t_vars *vars);
-int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars);
+int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars, int op);
 int ft_save_cmd(t_vec *cmd, t_vars *vars, t_envp *env_vars);
 int ft_token_error(char c, int sgle);
 void ft_index_after_spaces(t_vars *vars);
 int ft_redirection(t_vars *vars);
 void	ft_free_vec(t_shell *shell);
 
-void	ft_filerror(int errnu, char *filename, int infile, int write);
+void	ft_filerror(int errnu, char *filename, int write);
 void	ft_cmd_error(char *cmd, int permission, int file_exist);
 
 void	ft_print_vecs(t_vec *pipes);

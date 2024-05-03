@@ -13,12 +13,12 @@
 
 static void	ft_write_error(int errnu, char *filename)
 {
-	if (!errnu)
+	if (errnu == 0)
 	{
 		ft_putstr_fd("miniwell: ", 2);
 		ft_putstr_fd(filename, 2);
 		ft_putstr_fd(": ", 2);
-		ft_putendl_fd("No such file or directory", 2);
+		ft_putendl_fd("ambiguous redirect", 2);
 		return ;
 	}
 	ft_putstr_fd("miniwell: ", 2);
@@ -27,16 +27,11 @@ static void	ft_write_error(int errnu, char *filename)
 	ft_putendl_fd(strerror(errnu), 2);
 }
 
-void	ft_filerror(int errnu, char *filename, int infile, int write)
+void	ft_filerror(int errnu, char *filename, int write)
 {
-	if (infile)
+	if (write == YES)
 	{
 		ft_write_error(errnu, filename);
-	}
-	else
-	{
-		if (write)
-			ft_write_error(errnu, filename);
 	}
 }
 

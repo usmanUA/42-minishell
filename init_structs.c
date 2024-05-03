@@ -40,12 +40,13 @@ void	ft_init_vars(t_vars *vars)
     vars->end = 0;
     vars->len = 0;
     vars->fd = 0;
-    vars->qontinue = 0;
-    vars->expand_it = 0;
-    vars->no_expansion = 0;
+    vars->qontinue = NO;
+    vars->expand_it = NO;
+    vars->expanded = NO;
+    vars->malloc_flag = GREEN;
     vars->s_quote = 0;
     vars->d_quote = 0;
-    vars->increment = 0;
+    vars->increment = NO;
     vars->stop = 0;
     vars->file_error = 0;
     vars->unlink_here_doc = NO;

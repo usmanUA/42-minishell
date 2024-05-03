@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
+#include <stdio.h>
 
 // TODO: check if decrementing redir_count with correct logic
 int ft_input_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
@@ -26,7 +27,7 @@ int ft_input_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
     file_fd = open(filename, O_RDONLY);
     if (file_fd == -1)
     {
-	ft_filerror(errno, filename, 1, 1);	
+	ft_filerror(errno, filename, YES);	
 	*(*input)->file_flag = RED;
 	free(*fd);
 	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
@@ -73,7 +74,7 @@ int ft_output_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
     file_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (file_fd == -1)
     {
-	ft_filerror(errno, filename, 0, 0);	
+	ft_filerror(errno, filename, YES); // NOTE: write error when there's no permission for the output file	
 	*(*input)->file_flag = RED;
 	free(*fd);
 	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
@@ -122,7 +123,7 @@ int ft_output_append(t_input **input,  char *filename, char **fd, t_vars *vars)
     file_fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
     if (file_fd == -1)
     {
-	ft_filerror(errno, filename, 0, 0);	
+	ft_filerror(errno, filename, YES);	
 	*(*input)->file_flag = RED;
 	free(*fd);
 	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
@@ -173,7 +174,7 @@ int ft_here_doc(t_input **input,  char *eof, char **fd, t_vars *vars)
     fd_here_doc = open(".here_doc", O_WRONLY | O_TRUNC | O_CREAT, 0666);
     if (fd_here_doc == -1)
     {
-	ft_filerror(errno, ".here_doc", 0, 0);	
+	ft_filerror(errno, ".here_doc", NO);	
 	free(*fd);
 	vars->unlink_here_doc = NO;
 	return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
@@ -192,7 +193,7 @@ int ft_here_doc(t_input **input,  char *eof, char **fd, t_vars *vars)
 	file_fd = open(".here_doc", O_RDONLY);
 	if (file_fd == -1)
 	{
-	    ft_filerror(errno, ".here_doc", 1, 1);	
+	    ft_filerror(errno, ".here_doc", NO);	
 	    *(*input)->file_flag = RED;
 	    free(*fd);
 	    return (1); //WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
@@ -250,9 +251,18 @@ int	ft_handle_redirects(t_input **input, t_vars *vars, t_envp *env_vars)
 	return (0);
     vars->ind = vars->end;
     ft_index_after_spaces(vars);
-    if (!ft_save_cmd_filename(vars, &file, env_vars))
+    if (!ft_save_cmd_filename(vars, &file, env_vars, FILENAME))
 	return (0); // NOTE: malloc fail
     // WARNING: make sure to differentiate malloc fail or file open fail if needed be
+    if (vars->expand_it == YES && vars->expanded == NO)
+    {
+	*(*input)->file_flag = RED;
+	if (file)
+	    free(file);
+	if (redir)
+	    free(redir);
+	return (1);
+    }
     if (!ft_strncmp(redir, "<<", 2))
     {
 	if (!ft_here_doc(input, file, &fd, vars))

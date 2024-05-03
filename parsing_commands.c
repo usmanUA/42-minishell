@@ -9,8 +9,8 @@
 /*   Updated: 2024/04/18 14:54:22 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft/libft.h"
 #include "miniwell.h"
+#include <unistd.h>
 
 int	ft_quote_skipped(t_vars *vars, char quo)
 {
@@ -47,22 +47,22 @@ void	ft_skip_quotes(t_vars *vars)
     }
 }
 
-int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars)
+int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars, int op)
 {
     char *temp;
+    char *new;
 
-    *s = ft_next_string(vars, COMMAND, env_vars);
-    if (vars->no_expansion == 0 && !*s)
+    temp = NULL;
+    *s = ft_next_string(vars, op, env_vars);
+    if (vars->malloc_flag == RED && !*s)
     {
 	return (0); // NOTE: Either malloc fail or all spaces until '\0'
     }
-    if (vars->increment)// WARN: adding 1 here works for all cases?
+    if (vars->increment == YES)// WARN: adding 1 here works for all cases?
 	vars->end++;
     vars->ind = vars->end;
-    vars->increment = 0;
-    while (vars->qontinue)
+    while (vars->qontinue == YES)
     {
-	temp = *s;
 	if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
 	    ft_skip_quotes(vars);
 	// WARN: make sure the stop thing (space after quotes end case) works 
@@ -71,19 +71,18 @@ int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars)
 	    vars->end = vars->ind;
 	    break ;
 	}
-	*s = ft_strjoin(*s, ft_next_string(vars, COMMAND, env_vars)); // WARN: Only malloc fail?
-	if (!*s)
+	new = ft_next_string(vars, op, env_vars);
+	if (vars->expand_it == NO || (vars->expand_it == YES && vars->expanded == YES))
 	{
-	    if (temp)
-		free(temp);
-	    return (0);
-	}
-	if (temp)
+	    temp = *s;
+	    *s = ft_strjoin(*s, new);
 	    free(temp);
-	if (vars->increment)
+	    if (!*s)
+		return (0);
+	}
+	if (vars->increment == YES)
 	    vars->end++; 
 	vars->ind = vars->end;
-	vars->increment = 0;
     }
     return (1);
 }
@@ -96,13 +95,16 @@ int ft_save_cmd(t_vec *cmd, t_vars *vars, t_envp *env_vars)
 
     if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
 	ft_skip_quotes(vars);
-    if (!ft_save_cmd_filename(vars, &s, env_vars))
+    if (!ft_save_cmd_filename(vars, &s, env_vars, COMMAND))
 	return (0);
-    if (!vec_push(cmd, &s))
+    if (s)
     {
-	if (s)
-	    free(s);
-	return (0);
+	if (!vec_push(cmd, &s))
+	{
+	    if (s)
+		free(s);
+	    return (0);
+	}
     }
     return (1);
 }

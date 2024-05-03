@@ -50,7 +50,7 @@ char	*ft_give_path(char **envp)
 	return (&path[5]);
 }
 
-static	int	ft_check_command(char *command, int check_dir)
+static	int	ft_check_command(char *command, int check_dir, int *cmd_flag)
 {
 	int	fd;
 
@@ -64,6 +64,7 @@ static	int	ft_check_command(char *command, int check_dir)
 			{
 				close(fd);
 				ft_cmd_error(command, 2, 1); // NOTE: is a directory
+				*cmd_flag = YELLOW;
 				// TODO: return relevant exit status 126
 				return (0);
 			}
@@ -89,8 +90,7 @@ int	ft_handle_absolute(char *command, t_vec *info)
 
 	fd = -2;
 	cmd_flag = RED;
-	if (ft_check_command(command, YES) == VALID)
-		cmd_flag = GREEN;
+	ft_check_command(command, YES, &cmd_flag);
 	// NOTE: if absolute command (given) does not exist
 	if (cmd_flag == RED)
 		ft_cmd_error(command, 0, 0); // TODO: define MACROS for const. values
@@ -115,7 +115,7 @@ int	ft_handle_relative(t_vec *cmd, t_vec *info, char **paths)
 		cmd_path = ft_join_path(paths[i], command);
 		if (!cmd_path)
 			return (MALLOC_FAIL);
-		if (ft_check_command(cmd_path, NO) == VALID)
+		if (ft_check_command(cmd_path, NO, &cmd_flag) == VALID)
 		{
 			// TODO: look for handling ft_memmove and ft_memcpy failures 
 			// WARN: make sure you're doing correctly
