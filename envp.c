@@ -62,11 +62,11 @@ int    get_name_length(char *envp_string)
     return (i);
 }
 
-void    print_envp_list_instance(t_shell data)
+void    print_envp_list_instance(t_shell *data)
 {
     t_envp    *temp;
 
-    temp = data.envp_linkedlist;
+    temp = data->envp_linkedlist;
     while (temp && temp->env_name)
     {
         printf("%s", temp->env_name);
@@ -136,24 +136,24 @@ t_envp *add_envp_name_and_value(t_shell *data, t_envp *node, char *envp_string)
     return (node);
 }
 
-int    make_linked_list_of_envp(t_shell *data)
+int    make_linked_list_of_envp(t_shell *data, char **envp)
 {
     t_envp    *list;
     t_envp    *node;
     int        i;
 
     list = NULL;
-    if (data->envp == NULL)// NOTE: If env is set to NULL (f.ex. by running "env -i") [this protects against SEGFAULT]
+    if (envp == NULL)// NOTE: If env is set to NULL (f.ex. by running "env -i") [this protects against SEGFAULT]
     {
         // TODO: error msg???
         return (0); // NOTE: Technically it's ok if envp is set to NULL -> so no error number
     }
     i = 0;
-    while (data->envp[i])
+    while (envp[i])
     {
         node = create_new_node(data);
         //restructure - name and value here
-        node = add_envp_name_and_value(data, node, data->envp[i]);
+        node = add_envp_name_and_value(data, node, envp[i]);
         ft_listadd_back(&list, node);
         i++;
     }

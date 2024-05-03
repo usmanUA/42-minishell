@@ -166,7 +166,6 @@ int ft_save_input(t_shell *shell)
     {
 	ft_count_redirs(shell->vars, &redir_count);
 	shell->vars->redir_count = &redir_count;
-	printf("%d\n", redir_count.out_redir);
 	input = malloc(sizeof(t_input)); // NOTE: executed in the very beg. or the beg. of every pipe (|) if any
 	if (!input)
 	    return (MALLOC_FAIL);

@@ -47,13 +47,15 @@ void	ft_skip_quotes(t_vars *vars)
     }
 }
 
-int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *list)
+int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars)
 {
     char *temp;
 
-    *s = ft_next_string(vars, COMMAND);
-    if (!*s)
+    *s = ft_next_string(vars, COMMAND, env_vars);
+    if (vars->no_expansion == 0 && !*s)
+    {
 	return (0); // NOTE: Either malloc fail or all spaces until '\0'
+    }
     if (vars->increment)// WARN: adding 1 here works for all cases?
 	vars->end++;
     vars->ind = vars->end;
@@ -69,7 +71,7 @@ int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *list)
 	    vars->end = vars->ind;
 	    break ;
 	}
-	*s = ft_strjoin(*s, ft_next_string(vars, COMMAND)); // WARN: Only malloc fail?
+	*s = ft_strjoin(*s, ft_next_string(vars, COMMAND, env_vars)); // WARN: Only malloc fail?
 	if (!*s)
 	{
 	    if (temp)

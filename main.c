@@ -33,7 +33,7 @@ int main(int argc, char **argv, char **envp)
 {
     t_shell shell;
 
-    make_linked_list_of_envp(&shell);
+    make_linked_list_of_envp(&shell, envp);
     while (42)
     {
 	ft_init_shell(&shell, envp);

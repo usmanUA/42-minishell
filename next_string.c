@@ -9,9 +9,8 @@
 /*   Updated: 2024/04/24 09:40:14 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft/libft.h"
 #include "miniwell.h"
-#include <stdlib.h>
+#include <stdio.h>
 
 static void  ft_commands_end_index(t_vars *vars, int *ind)
 {
@@ -22,6 +21,8 @@ static void  ft_commands_end_index(t_vars *vars, int *ind)
     
     qontinue = 0;
     c = vars->input_line[vars->ind + *ind];
+    if (c == '$')
+	vars->expand_it = 1;
     while (c != '\0')
     {
 	if (c == '\'' || c == '\"')
@@ -101,55 +102,58 @@ static void	ft_strings_end(t_vars *vars, int operator)
     vars->end = vars->ind + ind; // NOTE: END updates here
 }
 
-char	*ft_find_value(t_envp *env_vars, char *key, int len)
+char	*ft_find_value(t_vars *vars, t_envp *env_vars, char *key, int len)
 {
     char *value;
     t_envp  *envp;
+    int	    not_found;
 
     value = NULL;
     envp = env_vars;
+    not_found = 1;
     while (envp->next)
     {
 	if (!ft_strncmp(key, envp->env_name, len))
 	{
+	    not_found = 0;
 	    value = ft_strdup(envp->env_value);	
 	    break;
 	}
 	envp = envp->next;
     }
+    if (not_found)
+	vars->no_expansion = 1;
     return (value);
 }
 
 char	*ft_expand_variable(t_vars *vars, t_envp *env_vars)
 {
-    int	start;
-    int	end;
     int	len;
     char    *str;
     char    *key;
     char    *value;
 
-    start = vars->ind-1;
-    end = vars->end;
-    while (++start < end)
+    len = vars->ind-1;
+    if (vars->input_line[vars->ind] == '$')
     {
-	if (vars->input_line[start] != '$')
-	    len++;
+	key = &vars->input_line[vars->ind+1];
+	str = ft_find_value(vars, env_vars, key, vars->end - (vars->ind+1));
     }
-    if (len > 0)
+    else
     {
+	while (++len < vars->end)
+	{
+	    if (vars->input_line[len] == '$')
+		break ;
+	}
 	str = ft_substr(vars->input_line, vars->ind, len);
 	if (!str)
 	    return (NULL);
 	++len;
 	key = &vars->input_line[len];
-	value = ft_find_value(env_vars, key, end - len);
+	value = ft_find_value(vars, env_vars, key, vars->end - len);
 	if (value)
 	    str = ft_strjoin(str, value);
-    }
-    else
-    {
-
     }
     return (str);
 }
@@ -161,7 +165,10 @@ char *ft_next_string(t_vars *vars, int op, t_envp *env_vars)
 
     ft_strings_end(vars, op); // NOTE: vars->end now points to the end of string
     if (vars->expand_it)
+    {
+	vars->expand_it = 0;
 	s = ft_expand_variable(vars, env_vars);
+    }
     else
 	s = ft_substr(vars->input_line, vars->ind, vars->end - vars->ind); // NOTE: malloc that string in heap and point str to it
     if (!s)

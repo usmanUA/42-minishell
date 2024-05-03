@@ -77,6 +77,7 @@ typedef struct s_vars
 	int fd;
 	int qontinue;
 	int expand_it;
+	int no_expansion;
 	int s_quote;
 	int d_quote;
 	int increment;
@@ -158,6 +159,7 @@ void	ft_init_vars(t_vars *vars);
 int ft_init_redirect_vecs(t_input **input, t_redir_count *redir_count);
 void    ft_init_pipex(t_pipex *pipex);
 
-int    make_linked_list_of_envp(t_shell *data);
+int    make_linked_list_of_envp(t_shell *data, char **envp);
+void    print_envp_list_instance(t_shell *data);
 
 #endif

@@ -240,12 +240,12 @@ int	ft_handle_redirects(t_input **input, t_vars *vars, t_envp *env_vars)
     file = NULL;
     if (vars->fd)
     {
-	fd = ft_next_string(vars, FD); // NOTE: str in heap, vars->ind points ->FD)<-vars->end 
+	fd = ft_next_string(vars, FD, env_vars); // NOTE: str in heap, vars->ind points ->FD)<-vars->end 
 	if (!fd)
 	    return (0);
     }
     vars->ind = vars->end;
-    redir = ft_next_string(vars, REDIRECT); // NOTE: str in heap, vars->ind points ->opertr)<-vars->end 
+    redir = ft_next_string(vars, REDIRECT, env_vars); // NOTE: str in heap, vars->ind points ->opertr)<-vars->end 
     if (!redir)
 	return (0);
     vars->ind = vars->end;

@@ -42,6 +42,7 @@ void	ft_init_vars(t_vars *vars)
     vars->fd = 0;
     vars->qontinue = 0;
     vars->expand_it = 0;
+    vars->no_expansion = 0;
     vars->s_quote = 0;
     vars->d_quote = 0;
     vars->increment = 0;
