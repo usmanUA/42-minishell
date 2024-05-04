@@ -9,9 +9,7 @@
 /*   Updated: 2024/04/24 09:40:14 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft/libft.h"
 #include "miniwell.h"
-#include <stdio.h>
 
 static	int ft_valid_char(char next)
 {
@@ -137,14 +135,36 @@ char	*ft_find_value(t_vars *vars, t_envp *env_vars, char *key, int len)
     return (value);
 }
 
-char	*ft_expand_variable(t_vars *vars, t_envp *env_vars, int op)
+char	*ft_join_str_expansion(t_vars *vars, t_envp *env_vars)
 {
-    int	len;
     char    *str;
+    int	    len;
     char    *key;
     char    *value;
 
+    str = NULL;
     len = vars->ind-1;
+    while (++len < vars->end)
+    {
+	if (vars->input_line[len] == '$')
+	    break ;
+    }
+    str = ft_substr(vars->input_line, vars->ind, len);
+    if (!str)
+	return (NULL);
+    ++len;
+    key = &vars->input_line[len];
+    value = ft_find_value(vars, env_vars, key, vars->end - len);
+    if (value)
+	str = ft_strjoin(str, value);
+    return (str);
+}
+
+char	*ft_expand_variable(t_vars *vars, t_envp *env_vars, int op)
+{
+    char    *str;
+    char    *key;
+
     if (vars->input_line[vars->ind] == '$')
     {
 	key = &vars->input_line[vars->ind+1];
@@ -159,21 +179,7 @@ char	*ft_expand_variable(t_vars *vars, t_envp *env_vars, int op)
 	}
     }
     else
-    {
-	while (++len < vars->end)
-	{
-	    if (vars->input_line[len] == '$')
-		break ;
-	}
-	str = ft_substr(vars->input_line, vars->ind, len);
-	if (!str)
-	    return (NULL);
-	++len;
-	key = &vars->input_line[len];
-	value = ft_find_value(vars, env_vars, key, vars->end - len);
-	if (value)
-	    str = ft_strjoin(str, value);
-    }
+	str = ft_join_str_expansion(vars, env_vars);
     return (str);
 }
 
@@ -192,7 +198,7 @@ char *ft_next_string(t_vars *vars, int op, t_envp *env_vars)
 	s = ft_expand_variable(vars, env_vars, op);
     else
 	s = ft_substr(vars->input_line, vars->ind, vars->end - vars->ind); // NOTE: malloc that string in heap and point str to it
-    if ((vars->expand_it == NO && !s) || (vars->expanded == YES && vars->expanded == YES && !s)) // TODO: look back to the condition
+    if ((vars->expand_it == NO && !s) || (vars->expand_it == YES && vars->expanded == YES && !s)) // TODO: look back to the condition
 	vars->malloc_flag = RED;
     return (s);
 }

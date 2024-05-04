@@ -20,7 +20,10 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <readline/readline.h>
-# include "get_next_line/get_next_line.h"
+#include <readline/history.h>
+#include "get_next_line/get_next_line.h"
+
+#define PROMPT	"\x1b[32mMiniWell\x1b[0m😎:\x1b[31mV0.1\x1b[0m$ "
 
 typedef enum s_flags
 {
@@ -128,7 +131,6 @@ typedef struct s_shell
 } t_shell;
 
 void	ft_init_vars(t_vars *vars);
-int ft_syntax_error(t_vars *vars);
 int ft_space_until_end(t_vars *vars);
 int ft_save_input(t_shell *shell);
 int	ft_handle_redirects(t_input **input, t_vars *vars, t_envp *env_vars);
@@ -164,4 +166,6 @@ void    ft_init_pipex(t_pipex *pipex);
 int    make_linked_list_of_envp(t_shell *data, char **envp);
 void    print_envp_list_instance(t_shell *data);
 
+int ft_syntax_error(t_vars *vars);
+int ft_prohibited_chars(t_vars *vars);
 #endif

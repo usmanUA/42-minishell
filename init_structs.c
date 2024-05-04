@@ -47,7 +47,7 @@ void	ft_init_vars(t_vars *vars)
     vars->s_quote = 0;
     vars->d_quote = 0;
     vars->increment = NO;
-    vars->stop = 0;
+    vars->stop = NO;
     vars->file_error = 0;
     vars->unlink_here_doc = NO;
     vars->input_line = NULL;

@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include <unistd.h>
 
 int	ft_quote_skipped(t_vars *vars, char quo)
 {
@@ -47,12 +46,37 @@ void	ft_skip_quotes(t_vars *vars)
     }
 }
 
-int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars, int op)
+static	int ft_cont_parsing(t_vars *vars, char **s, t_envp *env_vars, int op)
 {
     char *temp;
     char *new;
 
     temp = NULL;
+    if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
+	ft_skip_quotes(vars);
+    // WARN: make sure the stop thing (space after quotes end case) works 
+    if (vars->stop)
+    {
+	vars->end = vars->ind;
+	vars->qontinue = NO;
+    }
+    new = ft_next_string(vars, op, env_vars);
+    if (vars->expand_it == NO || (vars->expand_it == YES && vars->expanded == YES))
+    {
+	temp = *s;
+	*s = ft_strjoin(*s, new);
+	free(temp);
+	if (!*s)
+	    return (0);
+    }
+    if (vars->increment == YES)
+	vars->end++; 
+    vars->ind = vars->end;
+    return (1);
+}
+
+int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars, int op)
+{
     *s = ft_next_string(vars, op, env_vars);
     if (vars->malloc_flag == RED && !*s)
     {
@@ -63,26 +87,8 @@ int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars, int op)
     vars->ind = vars->end;
     while (vars->qontinue == YES)
     {
-	if (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\'')
-	    ft_skip_quotes(vars);
-	// WARN: make sure the stop thing (space after quotes end case) works 
-	if (vars->stop)
-	{
-	    vars->end = vars->ind;
-	    break ;
-	}
-	new = ft_next_string(vars, op, env_vars);
-	if (vars->expand_it == NO || (vars->expand_it == YES && vars->expanded == YES))
-	{
-	    temp = *s;
-	    *s = ft_strjoin(*s, new);
-	    free(temp);
-	    if (!*s)
-		return (0);
-	}
-	if (vars->increment == YES)
-	    vars->end++; 
-	vars->ind = vars->end;
+	if (!ft_cont_parsing(vars, s, env_vars, op))
+	    return (0);
     }
     return (1);
 }

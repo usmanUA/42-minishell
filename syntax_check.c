@@ -12,68 +12,6 @@
 #include "miniwell.h"
 
     // TODO: check the cases -> 0;, 0| (cases where fd is followed by special chars other than redirects)
-static int ft_special_char(char s, int pipe_flag, int redir_flag)
-{
-    // NOTE: checks for prohibited special characters and returns 1 if true 
-    if (pipe_flag != NOFLAG && redir_flag != NOFLAG)
-    {
-	if (s == '|')
-	    return (1);
-	if (s == '<' || s == '>')
-	    return (1);
-    }
-    if (s == '(' || s == ')') 
-	return (1);
-    if (s == '&' || s == ';' || s == '\\')
-	return (1);
-    return (0);
-}
-
-static int ft_redirect_operator(char *s, int *ind)
-{
-    if (!ft_strncmp(&s[*ind], "<<", 2) || !ft_strncmp(&s[*ind], ">>", 2))
-    {
-	*ind += 2;
-	return (1);
-    }
-    else if (!ft_strncmp(&s[*ind], "<", 1) || !ft_strncmp(&s[*ind], ">", 1))
-    {
-	++(*ind);
-	return (1);
-    }
-    return (0);
-}
-
-static void ft_skip_spaces(char *s, int *ind)
-{
-    while (s[*ind] != '\0' && ft_isspace(s[*ind]))
-	    ++(*ind);
-}
-
-static int ft_prohibited_chars(t_vars *vars)
-{
-    // NOTE: loops over the user input and checks for prohibited special characters and returns 1 if true 
-    int ind;
-    
-    ind = 0;
-    ft_skip_spaces(vars->input_line, &ind);
-    if (vars->input_line[ind] == '|')
-	return (1);
-    while (ind < vars->len)
-    {
-	if (ft_redirect_operator(vars->input_line, &ind))
-	{
-	    ft_skip_spaces(vars->input_line, &ind);
-	    if (ft_special_char(vars->input_line[ind], PIPE, REDIR))
-		return (ft_token_error(vars->input_line[ind], 0));
-	}
-	else if (ft_special_char(vars->input_line[ind], NOFLAG, NOFLAG))
-	    return (ft_token_error(vars->input_line[ind], 0));
-	++ind;
-    }
-    return (0);
-}
-
 int ft_space_until_end(t_vars *vars)
 {
     // NOTE: check if all the characters after in s are spaces 
@@ -84,9 +22,9 @@ int ft_space_until_end(t_vars *vars)
     while (++ind < vars->len)
     {
 	if (!ft_isspace(vars->input_line[ind])) //WARN: make sure should it be all whitespace chars or just ' ' (single space)
-	    return (0);
+	    return (NO);
     }
-    return (ind);
+    return (YES);
 }
 
 static void ft_handle_quotes(char *input, int *ind, int *sgle, int *dble)
@@ -127,7 +65,7 @@ static int ft_unclosed_quote(t_vars *vars)
     }
     if (sgle || dble)
 	return (ft_token_error('\"', sgle));
-    return (0);
+    return (NO);
 }
 
 int ft_syntax_error(t_vars *vars)
@@ -136,12 +74,27 @@ int ft_syntax_error(t_vars *vars)
     // Errors: 1. if one of the operators come in the beginning or there's an unclosed quotation mark
     //	       2. OR if all the characters are spaces
     //	 TODO: RETURN EXIT STATUS IF THERE's SYNTAX ERROR
+    char    c;
+    char    next;
+    char    null_term;
+
+    null_term = '\0';
     vars->len = ft_strlen(vars->input_line);
-    if (ft_space_until_end(vars))
-	return (1);
-    if (ft_prohibited_chars(vars))
-	return (1);
-    if (ft_unclosed_quote(vars))
-	return (1);
-    return (0);
+    c = vars->input_line[0];
+    if (vars->len > 1)
+    {
+	next = vars->input_line[1];
+	if ((c == '\'' && next == '\'') || (c == '\"' && next == '\"'))
+	{
+	    ft_cmd_error(&null_term, 1, 1);
+	    return (YES);
+	}
+    }
+    if (ft_space_until_end(vars) == YES)
+	return (YES);
+    if (ft_prohibited_chars(vars) == YES)
+	return (YES);
+    if (ft_unclosed_quote(vars) == YES)
+	return (YES);
+    return (NO);
 }

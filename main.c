@@ -14,12 +14,12 @@
 int ft_valid_user_input(t_vars *vars, t_vec *pipes)
 {
     ft_init_vars(vars);
-    vars->input_line = readline("\x1b[32mMiniWell\x1b[0m😎:\x1b[31mV0.1\x1b[0m$ ");
+    vars->input_line = readline(PROMPT);
     if (!vars->input_line)
 	return (0); // NOTE: malloc fail, error message | code?
     if (vars->input_line && vars->input_line[0])
 	add_history(vars->input_line);
-    if (ft_syntax_error(vars))
+    if (ft_syntax_error(vars) == YES)
     {
 	free((char *)vars->input_line);
 	return (0);
@@ -27,6 +27,21 @@ int ft_valid_user_input(t_vars *vars, t_vec *pipes)
     if (!vec_new(pipes, 1, sizeof(t_input **))) 
 	return (0); // NOTE: malloc fail, error message | code?
     return (1);
+}
+
+void	ft_ctrl_c_handler(int num)
+{
+    rl_on_new_line();
+
+}
+
+void	ft_ctrl_c()
+{
+    struct  sigaction sa;
+
+    sa.sa_handler = ft_ctrl_c_handler;
+    sa.sa_flags = 0;
+    sigaction(SIGINT, &sa, NULL);
 }
 
 int main(int argc, char **argv, char **envp)
