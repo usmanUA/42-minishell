@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
+#include <stdio.h>
 
 int    ft_validate_execute(t_shell *shell)
 {

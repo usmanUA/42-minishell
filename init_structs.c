@@ -19,18 +19,18 @@ int ft_init_shell(t_shell *shell, char **envp)
 
     pipes = (t_vec *)malloc(sizeof(t_vec));
     if (!pipes)
-	return (0);
+	return (MALLOC_FAIL);
     info = (t_vec *)malloc(sizeof(t_vec));
     if (!info)
-	return (0);
+	return (MALLOC_FAIL);
     vars = (t_vars *)malloc(sizeof(t_vars));
     if (!vars)
-	return (0);
+	return (MALLOC_FAIL);
     shell->pipes = pipes;
     shell->info = info;
     shell->vars = vars;
     shell->envp = envp; // NOTE: shell->envp once gave segfault in ft_split, be careful carrying this pointer along
-    return (1);
+    return (MALLOC_SUCCESS);
 }
 
 void	ft_init_vars(t_vars *vars)

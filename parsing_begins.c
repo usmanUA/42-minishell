@@ -115,7 +115,9 @@ static int ft_parse_command_line(t_input **input, t_shell *shell)
 
 static void ft_update_index(int redirect, int *ind, int count)
 {
-    (int)redirect;
+    int	no_use;
+
+    no_use = redirect;
     *ind += count;
 }
 

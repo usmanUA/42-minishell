@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <termios.h>
 #include <signal.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -170,4 +171,10 @@ void    print_envp_list_instance(t_shell *data);
 
 int ft_syntax_error(t_vars *vars);
 int ft_prohibited_chars(t_vars *vars);
+
+void	ft_parent_signals(int place, int button);
+
+int ft_valid_input(t_vars *vars, t_vec *pipes);
+int ft_prompt(t_shell *shell, char **envp);
+
 #endif
