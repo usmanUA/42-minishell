@@ -40,6 +40,8 @@ void	ft_init_vars(t_vars *vars)
     vars->end = 0;
     vars->len = 0;
     vars->fd = 0;
+    vars->file_fd = 0;
+    vars->redirection_type = -42;
     vars->qontinue = NO;
     vars->expand_it = NO;
     vars->expanded = NO;

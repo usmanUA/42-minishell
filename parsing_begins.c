@@ -113,6 +113,12 @@ static int ft_parse_command_line(t_input **input, t_shell *shell)
     return (1);
 }
 
+static void ft_update_index(int redirect, int *ind, int count)
+{
+    (int)redirect;
+    *ind += count;
+}
+
 void ft_count_redirs(t_vars *vars, t_redir_count *redir_count)
 {
     int ind;
@@ -123,25 +129,13 @@ void ft_count_redirs(t_vars *vars, t_redir_count *redir_count)
     while (c != '\0' && c!= '|')
     {
 	if (!ft_strncmp(&vars->input_line[ind], "<<", 2))
-	{
-	    ind += 2;
-	    redir_count->in_redir++;
-	}
+	    ft_update_index(++redir_count->in_redir, &ind, 2);
 	else if (!ft_strncmp(&vars->input_line[ind], ">>", 2))
-	{
-	    ind += 2;
-	    redir_count->out_redir++;
-	}
+	    ft_update_index(++redir_count->out_redir, &ind, 2);
 	else if (!ft_strncmp(&vars->input_line[ind], "<", 1))
-	{
-	    ind++;
-	    redir_count->in_redir++;
-	}
+	    ft_update_index(++redir_count->in_redir, &ind, 1);
 	else if (!ft_strncmp(&vars->input_line[ind], ">", 1))
-	{
-	    ind++;
-	    redir_count->out_redir++;
-	}
+	    ft_update_index(++redir_count->out_redir, &ind, 1);
 	else
 	    ind++;
 	c = vars->input_line[ind];

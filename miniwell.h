@@ -79,6 +79,8 @@ typedef struct s_vars
 	size_t	len;
 	size_t end;
 	int fd;
+	int file_fd;
+	int redirection_type;
 	int qontinue;
 	int expand_it;
 	int expanded;

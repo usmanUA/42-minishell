@@ -10,22 +10,36 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include <stdio.h>
+
+int ft_push_fds(t_input **input, char **fd, t_vars *vars)
+{
+    int	redirect;
+    int	fd_info;
+    int	file_fd;
+
+    redirect = vars->redirection_type;
+    fd_info = vars->redirection_type;
+    if (vars->fd)
+	redirect = ft_atoi(*fd);
+    file_fd = vars->file_fd;
+    if (!vec_push((*input)->new_fds, &file_fd)) // NOTE: fd_in is in stack mem of this function, be careful
+	return (0);
+    if (!vec_push((*input)->orig_fds, &redirect)) // NOTE: fd_in is in stack mem of this function, be careful
+	return (0);
+    if (redirect == STDERR_FILENO)
+	fd_info = STDERR_FILENO;
+    if (!vec_push((*input)->fds_info, &fd_info)) // NOTE: fd_in is in stack mem of this function, be careful
+	return (0);
+    return (1);
+}
 
 // TODO: check if decrementing redir_count with correct logic
 int ft_input_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
 {
     // NOTE: UPDATES redirect based on the possible input redirection
-    int std_in;
-    int file_fd;
-    int infile;
-
-    std_in = STDIN_FILENO;
-    infile = STDIN_FILENO;
-    if (vars->fd)
-	std_in = ft_atoi(*fd);
-    file_fd = open(filename, O_RDONLY);
-    if (file_fd == -1)
+    vars->redirection_type = STDIN_FILENO;
+    vars->file_fd = open(filename, O_RDONLY);
+    if (vars->file_fd == -1)
     {
 	ft_filerror(errno, filename, YES);	
 	*(*input)->file_flag = RED;
@@ -34,21 +48,9 @@ int ft_input_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
     }
     if (vars->redir_count->in_redir == 1)
     {
-	if (!vec_push((*input)->new_fds, &file_fd)) // NOTE: fd_in is in stack mem of this function, be careful
+	if (!ft_push_fds(input, fd, vars))
 	{
-	    if (vars->fd && fd)
-		free(*fd);
-	    return (0);
-	}
-	if (!vec_push((*input)->orig_fds, &std_in)) // NOTE: fd_in is in stack mem of this function, be careful
-	{
-	    if (vars->fd && fd)
-		free(*fd);
-	    return (0);
-	}
-	if (!vec_push((*input)->fds_info, &infile)) // NOTE: fd_in is in stack mem of this function, be careful
-	{
-	    if (vars->fd && fd)
+	    if (vars->fd && *fd)
 		free(*fd);
 	    return (0);
 	}
@@ -63,16 +65,9 @@ int ft_input_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
 int ft_output_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
 {
     // NOTE: UPDATES fds based on the possible output redirection
-    int file_fd;
-    int std_out;
-    int outfile;
-
-    outfile = STDOUT_FILENO;
-    std_out = STDOUT_FILENO;
-    if (vars->fd)
-	std_out = ft_atoi(*fd);
-    file_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (file_fd == -1)
+    vars->redirection_type = STDOUT_FILENO;
+    vars->file_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (vars->file_fd == -1)
     {
 	ft_filerror(errno, filename, YES); // NOTE: write error when there's no permission for the output file	
 	*(*input)->file_flag = RED;
@@ -81,21 +76,7 @@ int ft_output_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
     }
     if (vars->redir_count->out_redir == 1)
     {
-	if (!vec_push((*input)->new_fds, &file_fd))
-	{
-	    if (vars->fd && fd)
-		free(*fd);
-	    return (0);
-	}
-	if (!vec_push((*input)->orig_fds, &std_out))
-	{
-	    if (vars->fd && *fd)
-		free(*fd);
-	    return (0);
-	}
-	if (std_out == STDERR_FILENO)
-	    outfile = STDERR_FILENO;
-	if (!vec_push((*input)->fds_info, &outfile))
+	if (!ft_push_fds(input, fd, vars))
 	{
 	    if (vars->fd && *fd)
 		free(*fd);
@@ -112,16 +93,9 @@ int ft_output_redir(t_input **input,  char *filename, char **fd, t_vars *vars)
 int ft_output_append(t_input **input,  char *filename, char **fd, t_vars *vars)
 {
     // NOTE: UPDATES fds based on the possible output append redirection
-    int file_fd;
-    int append_fd;
-    int	outfile;
-
-    outfile = STDOUT_FILENO;
-    append_fd = STDOUT_FILENO;
-    if (vars->fd)
-	append_fd = ft_atoi(*fd);
-    file_fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-    if (file_fd == -1)
+    vars->redirection_type = STDOUT_FILENO;
+    vars->file_fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (vars->file_fd == -1)
     {
 	ft_filerror(errno, filename, YES);	
 	*(*input)->file_flag = RED;
@@ -130,30 +104,10 @@ int ft_output_append(t_input **input,  char *filename, char **fd, t_vars *vars)
     }
     if (vars->redir_count->out_redir == 1)
     {
-	if (!vec_push((*input)->new_fds, &file_fd))
-	{
-	    if (vars->fd && fd)
-		free(*fd);
-	    return (0);
-	}
-	if (!vec_push((*input)->orig_fds, &append_fd)) // NOTE: fd_in is in stack mem of this function, be careful
-	{
-	    if (vars->fd && fd)
-		free(*fd);
-	    return (0);
-	}
-	if (append_fd == STDERR_FILENO)
-	    outfile = STDERR_FILENO;
-	if (!vec_push((*input)->fds_info, &outfile)) // NOTE: fd_in is in stack mem of this function, be careful
-	{
-	    if (vars->fd && fd)
-		free(*fd);
-	    return (0);
-	}
     }
     else if (vars->redir_count->out_redir > 1)
 	vars->redir_count->out_redir--;
-    if (vars->fd && fd)
+    if (vars->fd && *fd)
 	free(*fd);
     return (1);
 }
@@ -236,9 +190,7 @@ int	ft_handle_redirects(t_input **input, t_vars *vars, t_envp *env_vars)
     char *fd;
     char *file;
 
-    file = NULL;
     fd = NULL;
-    file = NULL;
     if (vars->fd)
     {
 	fd = ft_next_string(vars, FD, env_vars); // NOTE: str in heap, vars->ind points ->FD)<-vars->end 
