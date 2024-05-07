@@ -11,27 +11,33 @@
 /* ************************************************************************** */
 #include "miniwell.h"
 
-int ft_valid_input(t_vars *vars, t_vec *pipes)
+int	ft_valid_input(t_vars *vars, t_shell *shell)
 {
-    if (vars->input_line && vars->input_line[0])
-	add_history(vars->input_line);
-    if (ft_syntax_error(vars) == YES)
-    {
-	free((char *)vars->input_line);
-	return (NO);
-    }
-    if (!vec_new(pipes, 1, sizeof(t_input **))) 
-	return (NO); // NOTE: malloc fail, error message | code?
-    return (YES);
+	if (vars->input_line && vars->input_line[0])
+		add_history(vars->input_line);
+	vars->exit_status = shell->status;
+	if (vars->input_line[0] == '\0')
+	{
+		shell->status = GREEN;
+		return (NO);
+	}
+	if (ft_syntax_error(vars) == YES)
+	{
+		shell->status = 258;
+		free((char *)vars->input_line);
+		return (NO);
+	}
+	if (!vec_new(shell->pipes, 1, sizeof(t_input **)))
+		return (NO); // NOTE: malloc fail, error message | code?
+	return (YES);
 }
 
-int ft_prompt(t_shell *shell, char **envp)
+int	ft_prompt(t_shell *shell, char **envp)
 {
-    if (ft_init_shell(shell, envp) == MALLOC_FAIL)
-	return (MALLOC_FAIL);
-    ft_init_vars(shell->vars);
-    ft_parent_signals(0, 0);
-    shell->vars->input_line = readline(PROMPT);
-    return (MALLOC_SUCCESS);
+	if (ft_init_shell(shell, envp) == MALLOC_FAIL)
+		return (MALLOC_FAIL);
+	ft_init_vars(shell->vars);
+	ft_signals(PARENT, OFF, &shell->status);
+	shell->vars->input_line = readline(PROMPT);
+	return (MALLOC_SUCCESS);
 }
-

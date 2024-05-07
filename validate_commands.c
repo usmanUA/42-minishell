@@ -50,7 +50,7 @@ char	*ft_give_path(char **envp)
 	return (&path[5]);
 }
 
-static	int	ft_check_dir(char *command, int *cmd_flag)	
+static int	ft_check_dir(char *command, int *cmd_flag)
 {
 	int	fd;
 
@@ -69,7 +69,7 @@ static	int	ft_check_dir(char *command, int *cmd_flag)
 	return (VALID);
 }
 
-static	int	ft_check_command(char *command, int check_dir, int *cmd_flag)
+static int	ft_check_command(char *command, int check_dir, int *cmd_flag)
 {
 	if (!access(command, F_OK))
 	{
@@ -81,8 +81,7 @@ static	int	ft_check_command(char *command, int check_dir, int *cmd_flag)
 		if (access(command, X_OK) == -1)
 		{
 			ft_cmd_error(command, 0, 1);
-			// TODO: command no permission, 
-			// return 126 exit status
+			*cmd_flag = YELLOW;
 			return (INVALID);
 		}
 	}
@@ -101,7 +100,7 @@ int	ft_handle_absolute(char *command, t_vec *info)
 	cmd_flag = RED;
 	ft_check_command(command, YES, &cmd_flag);
 	// NOTE: if absolute command (given) does not exist
-	if (cmd_flag == RED)
+	if (cmd_flag != GREEN)
 		ft_cmd_error(command, 0, 0); // TODO: define MACROS for const. values
 	// TODO: return exit status 127
 	if (!vec_push(info, &cmd_flag))
@@ -109,10 +108,11 @@ int	ft_handle_absolute(char *command, t_vec *info)
 	return (MALLOC_SUCCESS);
 }
 
-static	int	ft_make_command(t_vec *cmd, char **command, char **paths, int *cmd_flag)
+static int	ft_make_command(t_vec *cmd, char **command, char **paths,
+		int *cmd_flag)
 {
 	char	*cmd_path;
-	int	i;
+	int		i;
 
 	i = -1;
 	while (paths[++i])
@@ -122,11 +122,14 @@ static	int	ft_make_command(t_vec *cmd, char **command, char **paths, int *cmd_fl
 			return (MALLOC_FAIL);
 		if (ft_check_command(cmd_path, NO, cmd_flag) == VALID)
 		{
-			// TODO: look for handling ft_memmove and ft_memcpy failures 
+			// TODO: look for handling ft_memmove and ft_memcpy failures
 			// WARN: make sure you're doing correctly
-			vec_insert(cmd, &cmd_path, 0); // NOTE: make sure the address of cmd_path goes along
-			vec_remove(cmd, 1); // NOTE: overwrites the address of command (overwritten address is the pointer to the address of command) 
-			free(*command); // NOTE: free the command (command is the pointer to the first char of malloced string)
+			vec_insert(cmd, &cmd_path, 0);
+				// NOTE: make sure the address of cmd_path goes along
+			vec_remove(cmd, 1);           
+				// NOTE: overwrites the address of command (overwritten address is the pointer to the address of command)
+			free(*command);               
+				// NOTE: free the command (command is the pointer to the first char of malloced string)
 			*cmd_flag = GREEN;
 			break ;
 		}
@@ -138,39 +141,39 @@ static	int	ft_make_command(t_vec *cmd, char **command, char **paths, int *cmd_fl
 
 int	ft_handle_relative(t_vec *cmd, char **command, t_vec *info, char **paths)
 {
-	int	cmd_flag;	
+	int	cmd_flag;
 
 	cmd_flag = RED;
 	if (ft_make_command(cmd, command, paths, &cmd_flag) == MALLOC_FAIL)
 		return (MALLOC_FAIL);
 	// NOTE: if it gets here it means command does not exits
 	// TODO: return exit status 127
-	if (cmd_flag == RED)
+	if (cmd_flag != GREEN)
 		ft_cmd_error(*command, 1, 1);
 	if (!vec_push(info, &cmd_flag))
 		return (MALLOC_FAIL); // NOTE: malloc fail
 	return (MALLOC_SUCCESS);
 }
 
-int	ft_validate_commands(t_input *input, t_vec *info, char **envp)
+int	ft_validate_commands(t_input *input, t_shell *shell)
 {
-	char **paths;
-	char *command;
-	
-	paths = ft_split(ft_give_path(envp), ':');
+	char	**paths;
+	char	*command;
+
+	paths = ft_split(ft_give_path(shell->envp), ':');
 	if (!paths)
 		return (0); // TODO: check malloc error handling
 	command = *(char **)vec_get(input->cmd, 0);
 	if (ft_ispresent(command, '/'))
 	{
-		if (ft_handle_absolute(command, info) == MALLOC_FAIL)
+		if (ft_handle_absolute(command, shell->info) == MALLOC_FAIL)
 			return (MALLOC_FAIL);
 	}
 	else
 	{
-		if (ft_handle_relative(input->cmd, &command, info, paths) == MALLOC_FAIL)
+		if (ft_handle_relative(input->cmd, &command, shell->info,
+				paths) == MALLOC_FAIL)
 			return (MALLOC_FAIL);
 	}
 	return (MALLOC_SUCCESS);
 }
-

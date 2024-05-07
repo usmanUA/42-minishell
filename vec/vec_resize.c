@@ -11,19 +11,19 @@
 /* ************************************************************************** */
 #include "vec.h"
 
-int vec_resize(t_vec *src, size_t target_len)
+int	vec_resize(t_vec *src, size_t target_len)
 {
-    t_vec new;
+	t_vec	new;
 
-    if (!src)
-	return (0);
-    if (!src->mem)
-	return (vec_new(src, target_len, src->size));
-    if (!vec_new(&new, target_len, src->size))
-	return (0);
-    memcpy(new.mem, src->mem, src->len * src->size);
-    new.len = src->len;
-    vec_free(src);
-    *src = new;
-    return (1);
+	if (!src)
+		return (0);
+	if (!src->mem)
+		return (vec_new(src, target_len, src->size));
+	if (!vec_new(&new, target_len, src->size))
+		return (0);
+	memcpy(new.mem, src->mem, src->len * src->size);
+	new.len = src->len;
+	vec_free(src);
+	*src = new;
+	return (1);
 }

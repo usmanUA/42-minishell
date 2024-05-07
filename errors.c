@@ -59,12 +59,12 @@ void	ft_cmd_error(char *cmd, int permission, int file_exist)
 	perror(cmd);
 }
 
-int ft_token_error(char c, int sgle)
+int	ft_token_error(char c, int sgle)
 {
-    if (sgle)
-	c = '\'';
-    printf("miniwell: syntax error near unexpected token  '%c'\n",c); 
-    return (YES);
+	if (sgle)
+		c = '\'';
+	printf("miniwell: syntax error near unexpected token  '%c'\n", c);
+	return (YES);
 }
 
 // void	ft_exit_error(t_pipex *pipex, int free, int status, int wait_index)

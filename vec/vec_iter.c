@@ -11,11 +11,11 @@
 /* ************************************************************************** */
 #include "vec.h"
 
-void vec_iter(t_vec *src, void (*f) (void *))
+void	vec_iter(t_vec *src, void (*f)(void *))
 {
-    int ind;
+	int	ind;
 
-    ind = -1;
-    while(++ind < src->len)
-	(f)(&src->mem[ind * src->size]);
+	ind = -1;
+	while (++ind < (int)src->len)
+		(f)(&src->mem[ind * src->size]);
 }

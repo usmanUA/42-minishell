@@ -11,16 +11,16 @@
 /* ************************************************************************** */
 #include "vec.h"
 
-void vec_map(t_vec *dst, t_vec *src, void (*f) (void *))
+void	vec_map(t_vec *dst, t_vec *src, void (*f)(void *))
 {
-    int ind;
+	int	ind;
 
-    ind = -1;
-    if (!dst || !src)
-	return ;
-    if (!dst->mem)
-	vec_new(dst, dst->len, dst->size);
-    while(++ind < src->len)
-	(f)(&src->mem[ind * src->size]);
-    memcpy(dst->mem, src->mem, src->len * src->size);
+	ind = -1;
+	if (!dst || !src)
+		return ;
+	if (!dst->mem)
+		vec_new(dst, dst->len, dst->size);
+	while (++ind < (int)src->len)
+		(f)(&src->mem[ind * src->size]);
+	memcpy(dst->mem, src->mem, src->len * src->size);
 }

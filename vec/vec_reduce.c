@@ -11,14 +11,14 @@
 /* ************************************************************************** */
 #include "vec.h"
 
-int vec_reduce(void *acc, t_vec *src, void (*f) (void *, void *))
+int	vec_reduce(void *acc, t_vec *src, void (*f)(void *, void *))
 {
-    int ind;
+	int	ind;
 
-    ind = -1;
-    if (!acc || !src || !src->mem)
-	return (-1);
-    while(++ind < src->len)
-	(f)(acc, &src->mem[ind * src->size]);
-    return (1);
+	ind = -1;
+	if (!acc || !src || !src->mem)
+		return (-1);
+	while (++ind < (int)src->len)
+		(f)(acc, &src->mem[ind * src->size]);
+	return (1);
 }

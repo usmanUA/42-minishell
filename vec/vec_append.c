@@ -11,14 +11,14 @@
 /* ************************************************************************** */
 #include "vec.h"
 
-int vec_append(t_vec *dst, t_vec *src)
+int	vec_append(t_vec *dst, t_vec *src)
 {
-    int ind;
+	int	ind;
 
-    ind = -1;
-    if (!dst || !src) 
-	return (-1);
-    while(++ind < src->len)
-	vec_push(dst, &src->mem[ind * src->size]);
-    return (1);
+	ind = -1;
+	if (!dst || !src)
+		return (-1);
+	while (++ind < (int)src->len)
+		vec_push(dst, &src->mem[ind * src->size]);
+	return (1);
 }

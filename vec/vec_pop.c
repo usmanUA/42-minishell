@@ -11,13 +11,13 @@
 /* ************************************************************************** */
 #include "vec.h"
 
-int vec_pop(void *dst, t_vec *src)
+int	vec_pop(void *dst, t_vec *src)
 {
-    if (!dst || !src)
-	return (-1);
-    memcpy(dst, vec_get(src, src->len-1), src->size);
-    //NOTE: POP DOES NOT REMOVE THE LAST ELEMENT FROM MEMORY
-    //NOTE: INSTEAD ONLY DECREMENTS LEN
-    src->len--;
-    return (1);
+	if (!dst || !src)
+		return (-1);
+	memcpy(dst, vec_get(src, src->len - 1), src->size);
+	//NOTE: POP DOES NOT REMOVE THE LAST ELEMENT FROM MEMORY
+	//NOTE: INSTEAD ONLY DECREMENTS LEN
+	src->len--;
+	return (1);
 }

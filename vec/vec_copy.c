@@ -12,10 +12,10 @@
 #include "vec.h"
 #include <string.h>
 
-int vec_copy(t_vec *dst, t_vec *src)
+int	vec_copy(t_vec *dst, t_vec *src)
 {
-    if (!dst || !src)
-	return (-1);
-    memcpy((void *)dst->mem, (void *)src->mem, dst->mem_alloc);
-    return (1);
+	if (!dst || !src)
+		return (-1);
+	memcpy((void *)dst->mem, (void *)src->mem, dst->mem_alloc);
+	return (1);
 }

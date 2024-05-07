@@ -27,36 +27,50 @@
 
 #define PROMPT	"\x1b[32mMiniWell\x1b[0m😎:\x1b[31mV0.1\x1b[0m$ "
 
+typedef enum s_button
+{
+	ON,
+	OFF,
+}	t_button;
+
+typedef enum	s_status_flags
+{
+	GREEN = 0,
+	BROWN = 1,
+	YELLOW = 126,
+	RED = 127,
+}	t_status_flags;
+
 typedef enum s_flags
 {
 	NOFLAG,
 	REDIR,
 	PIPE,
-	GREEN,
-	YELLOW,
-	RED,
 	YES,
 	NO,
+	PARENT,
+	CHILD,
 	VALID,
 	INVALID,
+	FILE_FAIL,
 	MALLOC_FAIL,
 	MALLOC_SUCCESS,
 }	t_flags;
 
 typedef enum s_consants
 {
-	COMMAND = 0,
-	REDIRECT = 1,
-	FD = 2,
-	FILENAME = 3,
+	COMMAND,
+	REDIRECT,
+	FD,
+	FILENAME,
 }	t_constants;
  
 typedef enum s_redir_types
 {
-	INFILE = 0,
-	OUTFILE = 1,
-	APPEND = 2,
-	HERE_DOC = 3,
+	INFILE,
+	OUTFILE,
+	APPEND,
+	HERE_DOC,
 }	t_redir_types;
 
 typedef struct s_redirect
@@ -77,9 +91,10 @@ typedef struct s_redir_count
 typedef struct s_vars
 {
 	char *input_line;
-	size_t	ind;
-	size_t	len;
-	size_t end;
+	int	ind;
+	int	len;
+	int end;
+	int exit_status;
 	int fd;
 	int file_fd;
 	int redirection_type;
@@ -111,11 +126,11 @@ typedef struct s_input
 
 typedef struct s_pipex
 {
-	int		idx;
-	int		infile;
-	int		status;
-	int		cmd_flag;
-	int		*fds;
+	unsigned	long		idx;
+	unsigned	long		infile;
+	unsigned	long		status;
+	unsigned	long		cmd_flag;
+	unsigned	long		*fds;
 	t_vec		*pids;
 	t_input		*input;
 }			t_pipex;
@@ -129,6 +144,7 @@ typedef struct envp_list
 
 typedef struct s_shell
 {
+	int	status;
 	char    **envp;
 	t_envp    *envp_linkedlist;
 	t_vec	*pipes;
@@ -158,7 +174,7 @@ void	ft_cmd_error(char *cmd, int permission, int file_exist);
 
 void	ft_print_vecs(t_vec *pipes);
 
-int	ft_validate_commands(t_input *input, t_vec *info, char **envp);
+int	ft_validate_commands(t_input *input, t_shell *shell);
 
 int    ft_validate_execute(t_shell *shell);
 int	ft_execute(t_shell *shell);
@@ -176,9 +192,9 @@ void    print_envp_list_instance(t_shell *data);
 int ft_syntax_error(t_vars *vars);
 int ft_prohibited_chars(t_vars *vars);
 
-void	ft_parent_signals(int place, int button);
+void	ft_signals(int place, int button, int *status);
 
-int ft_valid_input(t_vars *vars, t_vec *pipes);
+int	ft_valid_input(t_vars *vars, t_shell *shell);
 int ft_prompt(t_shell *shell, char **envp);
 
 #endif

@@ -11,23 +11,23 @@
 /* ************************************************************************** */
 #include "vec.h"
 
-int  vec_filter(t_vec *dst, t_vec *src, bool (*f) (void *))
+int	vec_filter(t_vec *dst, t_vec *src, bool (*f)(void *))
 {
-    int ind;
+	int	ind;
 
-    ind = -1;
-    if (!dst || !src)
-	return (-1);
-    if (!dst->mem)
-    {
-	if  (vec_new(dst, dst->len, dst->size) < 0)
-	    return (-1);
-    }
-    while(++ind < src->len)
-    {
-	if ((f)(&src->mem[ind * src->size]))
-	   if (vec_push(dst, &src->mem[ind * src->size]) < 0)
+	ind = -1;
+	if (!dst || !src)
 		return (-1);
-    }
-    return (1);
+	if (!dst->mem)
+	{
+		if (vec_new(dst, dst->len, dst->size) < 0)
+			return (-1);
+	}
+	while (++ind < (int)src->len)
+	{
+		if ((f)(&src->mem[ind * src->size]))
+			if (vec_push(dst, &src->mem[ind * src->size]) < 0)
+				return (-1);
+	}
+	return (1);
 }

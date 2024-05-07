@@ -10,18 +10,23 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "miniwell.h"
-#include <unistd.h>
+#include <stdio.h>
 
 int	ft_status(int status)
 {
+	printf("status: %d\n", status);
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))
+	{
+		printf("here\n");
 		return (WTERMSIG(status) + 128);
+	}
 	return (1);
 }
 
-void	ft_io_redirections(t_input *input, int *read_from_pipe, int *output_to_pipe, int *err_to_pipe)
+void	ft_io_redirections(t_input *input, int *read_from_pipe,
+		int *output_to_pipe, int *err_to_pipe)
 {
 	int	ind;
 	int	orig_fd;
@@ -30,7 +35,7 @@ void	ft_io_redirections(t_input *input, int *read_from_pipe, int *output_to_pipe
 	ind = -1;
 	orig_fd = 42;
 	fds_info = 42;
-	while (input->new_fds && ++ind < input->new_fds->len)	
+	while (input->new_fds && ++ind < (int)input->new_fds->len)
 	{
 		fds_info = *(int *)vec_get(input->fds_info, ind);
 		orig_fd = *(int *)vec_get(input->orig_fds, ind);
@@ -57,16 +62,16 @@ void	ft_io_redirections(t_input *input, int *read_from_pipe, int *output_to_pipe
 
 static void	ft_child(t_input *input, t_pipex *pipex, int *fds, char **envp)
 {
-	int	read_from_pipe;
-	int	output_to_pipe;
-	int	err_to_pipe;
+	int		read_from_pipe;
+	int		output_to_pipe;
+	int		err_to_pipe;
 	char	**args;
 
 	read_from_pipe = YES;
 	output_to_pipe = YES;
 	err_to_pipe = YES;
 	ft_io_redirections(input, &read_from_pipe, &output_to_pipe, &err_to_pipe);
-	if (pipex->infile != -42)
+	if (pipex->infile != 42)
 	{
 		if (read_from_pipe == YES)
 			dup2(pipex->infile, STDIN_FILENO);
@@ -85,15 +90,15 @@ static void	ft_child(t_input *input, t_pipex *pipex, int *fds, char **envp)
 
 static void	ft_last_child(t_input *input, t_pipex *pipex, char **envp)
 {
-	// NOTE: 
-	// 1. If there were pipe/s (> 0) STDIN is the previous pipes read end OR 0< file is new STDIN (if there's input redirection)
-	// 2. If no pipe/s (pipes == 0), STDIN is STDIN OR 0< file is new STDIN (if there's input redirection)
 	char	**args;
-	int	read_from_pipe;
-	
+	int		read_from_pipe;
+
+	// NOTE:
+	// 1. If there were pipe/s (> 0) STDIN is the previous pipes read end OR 0< file is new STDIN (if there's input redirection)
+	// 2. If no pipe/s (pipes == 0),STDIN is STDIN OR 0< file is new STDIN (if there's input redirection)
 	read_from_pipe = YES;
 	ft_io_redirections(input, &read_from_pipe, NULL, NULL);
-	if (pipex->infile != -42)
+	if (pipex->infile != 42)
 	{
 		if (read_from_pipe == YES)
 			dup2(pipex->infile, STDIN_FILENO);
@@ -144,8 +149,7 @@ int	ft_execute_last_cmd(t_input *input, t_pipex *pipex, char **envp)
 	if (pid == 0)
 		ft_last_child(input, pipex, envp);
 	else
-		waitpid(pid, &pipex->status, 0);
+		waitpid(pid, (int *)&pipex->status, 0);
 	pipex->status = ft_status(pipex->status);
 	return (1);
 }
-

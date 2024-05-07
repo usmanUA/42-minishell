@@ -11,12 +11,12 @@
 /* ************************************************************************** */
 #include "vec.h"
 
-void *vec_get(t_vec *dst, size_t index)
+void	*vec_get(t_vec *dst, size_t index)
 {
-    unsigned char *new;
-    
-    if (index >= dst->len || !dst || !dst->mem)
-	return (NULL);
-    new = &dst->mem[index * dst->size];
-    return (new);
+	unsigned char	*new;
+
+	if (index >= dst->len || !dst || !dst->mem)
+		return (NULL);
+	new = &dst->mem[index * dst->size];
+	return (new);
 }

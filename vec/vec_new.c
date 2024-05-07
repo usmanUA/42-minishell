@@ -11,20 +11,20 @@
 /* ************************************************************************** */
 #include "vec.h"
 
-int vec_new(t_vec *dst, size_t len, size_t size)
+int	vec_new(t_vec *dst, size_t len, size_t size)
 {
-    if (!size)
-	return (0);
-    if (len)
-    {
-	dst->mem = (unsigned char *)malloc(len * size);
-        if (!dst->mem)
-    	    return (0);
-    }
-    else
-	dst->mem = NULL;
-    dst->size = size;
-    dst->len = 0;
-    dst->mem_alloc = size * len;
-    return (1);
+	if (!size)
+		return (0);
+	if (len)
+	{
+		dst->mem = (unsigned char *)malloc(len * size);
+		if (!dst->mem)
+			return (0);
+	}
+	else
+		dst->mem = NULL;
+	dst->size = size;
+	dst->len = 0;
+	dst->mem_alloc = size * len;
+	return (1);
 }
