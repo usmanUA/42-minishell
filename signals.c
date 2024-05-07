@@ -30,18 +30,32 @@ static void	ft_ctrl_c_handler_exec(int num)
 
 static void	ft_ctrl_c_handler_main(int num)
 {
-    write(1, "\n", 1);
+    ft_putstr_fd("\n", 1);
     rl_on_new_line();
     rl_replace_line("", 0);
     rl_redisplay();
     (void)num;
 }
 
-void    ft_slash_signal(int place)
+void    ft_ctrl_slash_handler(int sig)
 {
+    ft_putendl_fd("Quit", 1);
+}
+
+void    ft_sigquit(int place)
+{
+    struct  sigaction sa;
+
     if (place == 0)
+    {
         signal(SIGQUIT, SIG_IGN);
+        return ;
+    }
     else if (place == 1)
+        sa.sa_handler = ft_ctrl_slash_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGQUIT, &sa, NULL);
 
 }
 
@@ -57,7 +71,6 @@ void	ft_parent_signals(int place, int button)
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
     sigaction(SIGINT, &sa, NULL);
-    ft_quit_signal(place);
-    if (place == 0)
+    ft_sigquit(place);
 }
 

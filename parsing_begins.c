@@ -168,7 +168,7 @@ int ft_save_input(t_shell *shell)
 	if (!ft_init_redirect_vecs(&input, &redir_count))
 	    return (MALLOC_FAIL);
 	if (!ft_parse_command_line(&input, shell)) // TODO: Handle errors correctly
-	    return (0); // WARN: Handle malloc
+	    return (MALLOC_FAIL); // WARN: Handle malloc
 	if (!vec_push(shell->pipes, &input))
 	    return (MALLOC_FAIL); // NOTE: malloc fail
 	ft_zero_redirects(&redir_count);

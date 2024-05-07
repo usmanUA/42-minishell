@@ -27,8 +27,8 @@ int main(int argc, char **argv, char **envp)
 	    continue ;
 	if (ft_save_input(&shell) == MALLOC_FAIL)
 	{
-	    free((char *)shell.vars->input_line);
-	    ft_free_vec(&shell); 
+	    free(shell.vars->input_line);
+	    // ft_free_vec(&shell); 
 	    continue ; // NOTE: [malloc fail, what else could fail there?], error message | code?
 	}
 	free((char *)shell.vars->input_line); // NOTE: everything saved to vector pipes 

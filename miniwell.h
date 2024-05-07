@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <signal.h>
+#include <sys/wait.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "get_next_line/get_next_line.h"
@@ -92,6 +93,9 @@ typedef struct s_vars
 	int stop;
 	int file_error;
 	int unlink_here_doc;
+	char **f_des;
+	char **file;
+	char **redir;
 	t_redir_count *redir_count;
 	t_redirect *redirect;
 }	t_vars;

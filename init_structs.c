@@ -52,6 +52,9 @@ void	ft_init_vars(t_vars *vars)
     vars->stop = NO;
     vars->file_error = 0;
     vars->unlink_here_doc = NO;
+    vars->f_des = NULL;
+    vars->file = NULL;
+    vars->redir = NULL;
     vars->input_line = NULL;
     vars->redir_count = NULL;
     vars->redirect = NULL;
