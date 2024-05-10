@@ -9,7 +9,8 @@
 /*   Updated: 2024/04/18 14:54:22 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
+#include <stdio.h>
 
 int	ft_quote_skipped(t_vars *vars, char quo)
 {
@@ -81,6 +82,7 @@ static int	ft_cont_parsing(t_vars *vars, char **s, t_envp *env_vars, int op)
 int	ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars, int op)
 {
 	*s = ft_next_string(vars, op, env_vars);
+	printf("str: %s\n", *s);
 	if (vars->malloc_flag == RED && !*s)
 		return (MALLOC_FAIL); // NOTE: Either malloc fail or all spaces until '\0'
 	if (vars->increment == YES) // WARN: adding 1 here works for all cases?

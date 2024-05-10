@@ -9,7 +9,7 @@
 /*   Updated: 2024/04/16 16:52:52 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
 
 int	ft_push_fds(t_input **input, t_vars *vars)
 {

@@ -9,8 +9,7 @@
 /*   Updated: 2024/04/29 14:15:24 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
-#include <stdio.h>
+#include "minishell.h"
 
 char	*ft_join_path(char *path, char *command)
 {
@@ -100,7 +99,7 @@ int	ft_handle_absolute(char *command, t_vec *info)
 	cmd_flag = RED;
 	ft_check_command(command, YES, &cmd_flag);
 	// NOTE: if absolute command (given) does not exist
-	if (cmd_flag != GREEN)
+	if (cmd_flag == RED)
 		ft_cmd_error(command, 0, 0); // TODO: define MACROS for const. values
 	// TODO: return exit status 127
 	if (!vec_push(info, &cmd_flag))
@@ -155,6 +154,24 @@ int	ft_handle_relative(t_vec *cmd, char **command, t_vec *info, char **paths)
 	return (MALLOC_SUCCESS);
 }
 
+void	ft_check_builtin(t_shell *shell, char *command)
+{
+	if (ft_strcmp(command, "cd") == 0)
+		shell->builtin = CD;
+	if (ft_strcmp(command, "echo") == 0)
+		shell->builtin = MY_ECHO;
+	if (ft_strcmp(command, "env") == 0)
+		shell->builtin = ENV;
+	if (ft_strcmp(command, "exit") == 0)
+		shell->builtin = EXIT;
+	if (ft_strcmp(command, "export") == 0)
+		shell->builtin = EXPORT;
+	if (ft_strcmp(command, "pwd") == 0)
+		shell->builtin = PWD;
+	if (ft_strcmp(command, "unset") == 0)
+		shell->builtin = UNSET;
+}
+
 int	ft_validate_commands(t_input *input, t_shell *shell)
 {
 	char	**paths;
@@ -169,7 +186,8 @@ int	ft_validate_commands(t_input *input, t_shell *shell)
 		if (ft_handle_absolute(command, shell->info) == MALLOC_FAIL)
 			return (MALLOC_FAIL);
 	}
-	else
+	ft_check_builtin(shell, command);
+	if (shell->builtin == EXTERNAL) 
 	{
 		if (ft_handle_relative(input->cmd, &command, shell->info,
 				paths) == MALLOC_FAIL)

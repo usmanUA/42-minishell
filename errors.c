@@ -9,7 +9,7 @@
 /*   Updated: 2024/04/26 15:19:26 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
 
 static void	ft_write_error(int errnu, char *filename)
 {

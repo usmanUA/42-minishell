@@ -9,7 +9,7 @@
 /*   Updated: 2024/04/16 13:50:18 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
 
 // TODO: check the cases -> 0;, 0| (cases where fd is followed by special chars other than redirects)
 int	ft_space_until_end(t_vars *vars)

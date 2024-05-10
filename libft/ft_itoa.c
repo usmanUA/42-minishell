@@ -3,55 +3,89 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/24 16:30:43 by uahmed            #+#    #+#             */
-/*   Updated: 2023/10/27 12:01:08 by uahmed           ###   ########.fr       */
+/*   Created: 2023/11/02 14:26:33 by mkorpela          #+#    #+#             */
+/*   Updated: 2023/11/19 21:44:55 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "libft.h"
 
-static int	ft_size(int n)
+static void	check_min_int(int *i, int *j, int *n, char *s)
 {
-	int	len;
-
-	if (n == 0)
-		return (1);
-	len = 0;
-	while (n)
+	if (*n == -2147483648)
 	{
-		n /= 10;
-		len++;
+		s[*i + *j] = 8 + '0';
+		(*i)--;
+		*n = 214748364;
 	}
-	return (len);
 }
 
-static char	*ft_givenbr(int n, int size)
+static int	ft_len_num(int y)
 {
-	char		*num;
-	long int	m;
+	int	i;
 
-	m = n;
-	if (n < 0)
+	i = 0;
+	if (y == 0)
 	{
-		m *= -1;
-		size++;
+		return (1);
 	}
-	num = malloc(size + 1);
-	if (!num)
-		return (0);
-	num[size] = 0;
-	while (size--)
+	while (y != 0)
 	{
-		num[size] = m % 10 + 48;
-		m /= 10;
+		y /= 10;
+		i++;
 	}
-	if (n < 0)
-		num[0] = '-';
-	return (num);
+	return (i);
+}
+
+static char	*ft_calc_int_to_char(int i, int j, int n, char *s)
+{
+	int	x;
+
+	x = 0;
+	s[i + j] = '\0';
+	i--;
+	check_min_int(&i, &j, &n, s);
+	while (n >= 10)
+	{
+		x = n % 10;
+		s[i + j] = x + '0';
+		i--;
+		n /= 10;
+		x = 0;
+	}
+	if (n < 10)
+	{
+		s[i + j] = n + '0';
+		i--;
+	}
+	if (j == 1)
+		s[i + j] = '-';
+	return (s);
 }
 
 char	*ft_itoa(int n)
 {
-	return (ft_givenbr(n, ft_size(n)));
+	char	*s;
+	int		i;
+	int		j;
+	int		y;
+
+	i = 0;
+	j = 0;
+	y = n;
+	if (n < 0)
+	{
+		n *= -1;
+		j++;
+	}
+	i = ft_len_num(y);
+	s = (char *)malloc((i + j + 1) * sizeof(char));
+	if (s == NULL)
+	{
+		return (NULL);
+	}
+	s = ft_calc_int_to_char(i, j, n, s);
+	return (s);
 }

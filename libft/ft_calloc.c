@@ -3,31 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/24 16:32:23 by uahmed            #+#    #+#             */
-/*   Updated: 2023/11/03 13:41:16 by uahmed           ###   ########.fr       */
+/*   Created: 2023/11/01 14:42:38 by mkorpela          #+#    #+#             */
+/*   Updated: 2023/12/01 09:21:26 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "libft.h"
 
-void	*ft_calloc(size_t n, size_t s)
+void	*ft_calloc(size_t count, size_t size)
 {
-	void	*memptr;
-	size_t	tot;
-	size_t	max_size;
+	size_t	i;
+	size_t	size_max;
+	char	*str;
 
-	max_size = 4611686014132420608;
-	if (s && n && max_size / n < s)
-		return ((void *)0);
-	if (n == 0 || s == 0)
-		return (ft_calloc(1, 1));
-	tot = n * s;
-	if (tot / n != s)
-		return ((void *)0);
-	memptr = (void *)malloc(tot);
-	if (!memptr)
-		return ((void *)0);
-	ft_bzero(memptr, tot);
-	return (memptr);
+	i = 0;
+	size_max = -1;
+	if (count != 0 && size > (size_max / count))
+	{
+		return (NULL);
+	}
+	str = malloc(size * count);
+	if (str == NULL)
+	{
+		return (NULL);
+	}
+	while (i < size * count)
+	{
+		str[i] = '\0';
+		i++;
+	}
+	return (str);
 }

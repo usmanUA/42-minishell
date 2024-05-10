@@ -9,8 +9,7 @@
 /*   Updated: 2024/05/06 15:46:01 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
-#include <stdio.h>
+#include "minishell.h"
 
 int sigint_status;
 

@@ -9,8 +9,7 @@
 /*   Updated: 2024/05/02 13:15:31 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
-#include <stdlib.h>
+#include "minishell.h"
 
 int	ft_init_shell(t_shell *shell, char **envp)
 {
@@ -27,6 +26,7 @@ int	ft_init_shell(t_shell *shell, char **envp)
 	vars = (t_vars *)malloc(sizeof(t_vars));
 	if (!vars)
 		return (MALLOC_FAIL);
+	shell->builtin = EXTERNAL;
 	shell->pipes = pipes;
 	shell->info = info;
 	shell->vars = vars;

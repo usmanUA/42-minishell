@@ -1,22 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_cmds_utils.c                                  :+:      :+:    :+:   */
+/*   int_putchar.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/15 16:28:39 by uahmed            #+#    #+#             */
-/*   Updated: 2024/03/15 16:28:53 by uahmed           ###   ########.fr       */
+/*   Created: 2023/11/22 15:37:24 by mkorpela          #+#    #+#             */
+/*   Updated: 2024/03/12 10:21:45 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "libft.h"
 
-void	ft_wait_pids(t_pipex *ppx, int index)
+int	int_putchar(char c)
 {
-	int	i;
-
-	i = -1;
-	while (++i < index)
-		waitpid(ppx->pids[i], NULL, 0);
+	return (write(1, &c, 1));
 }

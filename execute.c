@@ -9,19 +9,14 @@
 /*   Updated: 2024/04/29 14:38:40 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
-#include <stdio.h>
+#include "minishell.h"
 
 int	ft_status(int status)
 {
-	printf("status: %d\n", status);
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))
-	{
-		printf("here\n");
 		return (WTERMSIG(status) + 128);
-	}
 	return (1);
 }
 
@@ -60,7 +55,7 @@ void	ft_io_redirections(t_input *input, int *read_from_pipe,
 	}
 }
 
-static void	ft_child(t_input *input, t_pipex *pipex, int *fds, char **envp)
+static void	ft_child(t_input *input, t_pipex *pipex, int *fds, t_shell *shell)
 {
 	int		read_from_pipe;
 	int		output_to_pipe;
@@ -84,11 +79,14 @@ static void	ft_child(t_input *input, t_pipex *pipex, int *fds, char **envp)
 		dup2(fds[1], STDERR_FILENO);
 	close(fds[1]);
 	args = (char **)vec_get(input->cmd, 0);
-	execve(args[0], args, envp);
+	if (shell->builtin == EXTERNAL)
+		execve(args[0], args, shell->envp);
+	else
+		builtin_commands(shell, args);	
 	// TODO: check for execve fail
 }
 
-static void	ft_last_child(t_input *input, t_pipex *pipex, char **envp)
+static void	ft_last_child(t_input *input, t_pipex *pipex, t_shell *shell)
 {
 	char	**args;
 	int		read_from_pipe;
@@ -105,10 +103,13 @@ static void	ft_last_child(t_input *input, t_pipex *pipex, char **envp)
 		close(pipex->infile);
 	}
 	args = (char **)vec_get(input->cmd, 0);
-	execve(args[0], args, envp);
+	if (shell->builtin == EXTERNAL)
+		execve(args[0], args, shell->envp);
+	else
+		builtin_commands(shell, args);	
 }
 
-void	ft_processes(t_input *input, t_pipex *pipex, char **envp)
+void	ft_processes(t_input *input, t_pipex *pipex, t_shell *shell)
 {
 	int	fds[2];
 	int	pid;
@@ -129,7 +130,7 @@ void	ft_processes(t_input *input, t_pipex *pipex, char **envp)
 	// 	// TODO: malloc fail
 	// }
 	if (pid == 0)
-		ft_child(input, pipex, fds, envp);
+		ft_child(input, pipex, fds, shell);
 	else
 	{
 		close(fds[1]);
@@ -137,7 +138,7 @@ void	ft_processes(t_input *input, t_pipex *pipex, char **envp)
 	}
 }
 
-int	ft_execute_last_cmd(t_input *input, t_pipex *pipex, char **envp)
+int	ft_execute_last_cmd(t_input *input, t_pipex *pipex, t_shell *shell)
 {
 	int	pid;
 
@@ -147,7 +148,7 @@ int	ft_execute_last_cmd(t_input *input, t_pipex *pipex, char **envp)
 		// TODO: Hanlde fork fail
 	}
 	if (pid == 0)
-		ft_last_child(input, pipex, envp);
+		ft_last_child(input, pipex, shell);
 	else
 		waitpid(pid, (int *)&pipex->status, 0);
 	pipex->status = ft_status(pipex->status);

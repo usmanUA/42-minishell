@@ -3,24 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   ft_toupper.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/24 16:22:20 by uahmed            #+#    #+#             */
-/*   Updated: 2023/10/31 20:09:31 by uahmed           ###   ########.fr       */
+/*   Created: 2023/10/25 15:41:31 by mkorpela          #+#    #+#             */
+/*   Updated: 2024/02/05 11:29:47 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 int	ft_toupper(int c)
 {
-	char	alpha;
-
-	if (c >= 'A' || (c <= 'Z' && c >= 'a') || c <= 'z')
+	if (c >= 'a' && c <= 'z')
 	{
-		if (c >= 'a' && c <= 'z')
-		{
-			alpha = c - 32;
-			return (alpha);
-		}
+		c -= 32;
 	}
 	return (c);
 }

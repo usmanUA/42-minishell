@@ -3,32 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lstclear_bonus.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/25 17:06:04 by uahmed            #+#    #+#             */
-/*   Updated: 2024/03/05 15:36:55 by uahmed           ###   ########.fr       */
+/*   Created: 2023/11/12 17:31:10 by mkorpela          #+#    #+#             */
+/*   Updated: 2024/02/05 11:17:44 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "libft.h" 
 
 void	ft_lstclear(t_list **lst, void (*del)(void *))
 {
-	t_list	*temp;
+	t_list	*prev_node;
+	t_list	*curr_node;
 
-	if (!del)
+	prev_node = *lst;
+	curr_node = NULL;
+	while (prev_node != NULL)
 	{
-		lst = NULL;
-		return ;
-	}
-	if (!lst)
-		return ;
-	while (*lst)
-	{
-		(*del)((*lst)->content);
-		temp = *lst;
-		*lst = temp->next;
-		free(temp);
+		del(prev_node->content);
+		curr_node = prev_node->next;
+		free(prev_node);
+		prev_node = curr_node;
 	}
 	*lst = NULL;
 }

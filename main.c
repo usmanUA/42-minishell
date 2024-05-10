@@ -9,16 +9,15 @@
 /*   Updated: 2024/04/15 14:02:11 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
 
 int	main(int argc, char **argv, char **envp)
 {
 	t_shell	shell;
-	char	**garbage;
 
 	(void)argc;
+	(void)argv;
 	shell.status = GREEN;
-	garbage = argv;
 	make_linked_list_of_envp(&shell, envp);
 	while (42)
 	{
@@ -41,6 +40,7 @@ int	main(int argc, char **argv, char **envp)
 			// TODO: WHAT TODO when malloc fails in subsequent funcitons
 		ft_free_vec(&shell);
 	}
+	free_all(&shell);
 	// TODO: FREE LINKED LIST
 	return (0);
 }

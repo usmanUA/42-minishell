@@ -9,7 +9,7 @@
 /*   Updated: 2024/05/07 16:34:50 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
 
 int	ft_valid_char(char next, int check_digits)
 {
@@ -35,7 +35,7 @@ int	ft_status_expansion(t_vars *vars, char c, int *ind)
 	if (c == '?')
 	{
 		(*ind) += 2;
-		if (ft_valid_char(vars->input_line[vars->ind + 2], NO) == VALID)
+		if (ft_valid_char(next, NO) == VALID)
 			vars->qontinue = YES;
 		return (YES);
 	}

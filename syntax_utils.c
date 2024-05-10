@@ -9,7 +9,7 @@
 /*   Updated: 2024/05/07 17:32:24 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
 
 static int	ft_special_char(char s, int pipe_flag, int redir_flag)
 {

@@ -9,7 +9,7 @@
 /*   Updated: 2024/04/24 09:40:14 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
 
 char	*ft_expand_variable(t_vars *vars, t_envp *env_vars, int op);
 int	ft_valid_char(char next, int check_digits);
@@ -25,8 +25,8 @@ static void	ft_unquoted_str_end(t_vars *vars, int *ind, char c)
 		return;
 	while (c != '\0' && c != '$')
 	{
-		if (vars->expand_it == YES && c != '?')
-			break;
+		// if (vars->expand_it == YES && c != '?')
+		// 	break;
 		if (c == '\'' || c == '\"')
 		{
 			vars->qontinue = YES;

@@ -9,7 +9,7 @@
 /*   Updated: 2024/05/06 16:07:38 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
 
 int	ft_valid_input(t_vars *vars, t_shell *shell)
 {

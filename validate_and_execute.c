@@ -9,18 +9,18 @@
 /*   Updated: 2024/04/30 15:45:54 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
-#include <stdio.h>
+#include "minishell.h"
 
 static	int	ft_validate_exec_last_child(t_pipex *pipex, t_shell *shell)
 {
 	if (ft_validate_commands(pipex->input, shell) == MALLOC_FAIL)
 		return (MALLOC_FAIL); // NOTE: malloc fail
-	pipex->cmd_flag = *(int *)vec_get(shell->info, pipex->idx);
+	if (shell->builtin == EXTERNAL)
+		pipex->cmd_flag = *(int *)vec_get(shell->info, pipex->idx);
 	shell->status = pipex->cmd_flag;
 	if (pipex->cmd_flag == GREEN)
 	{
-		ft_execute_last_cmd(pipex->input, pipex, shell->envp);
+		ft_execute_last_cmd(pipex->input, pipex, shell);
 		shell->status = (int)pipex->status;
 	}
 	return (MALLOC_SUCCESS);
@@ -33,9 +33,10 @@ static	int	ft_validate_exec_childs(t_pipex *pipex, t_shell *shell, int *file_fla
 		*file_flag = BROWN;
 	if (ft_validate_commands(pipex->input, shell) == MALLOC_FAIL)
 		return (MALLOC_FAIL); // NOTE: malloc fail
-	pipex->cmd_flag = *(int *)vec_get(shell->info, pipex->idx);
+	if (shell->builtin == EXTERNAL)
+		pipex->cmd_flag = *(int *)vec_get(shell->info, pipex->idx);
 	if (pipex->cmd_flag == GREEN)
-		ft_processes(pipex->input, pipex, shell->envp);
+		ft_processes(pipex->input, pipex, shell);
 	return (MALLOC_SUCCESS);
 }
 

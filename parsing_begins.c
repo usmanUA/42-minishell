@@ -9,8 +9,7 @@
 /*   Updated: 2024/04/16 13:55:05 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
-#include <stdio.h>
+#include "minishell.h"
 
 void	ft_index_after_spaces(t_vars *vars)
 {
@@ -69,12 +68,12 @@ static int	ft_parsing_action(t_input **input, t_vec *cmd, t_shell *shell)
 		if (ft_redirection(shell->vars) == YES)
 		{
 			if (!ft_handle_redirects(input, shell->vars,
-					shell->envp_linkedlist)) // TODO: look for error handling
+					shell->env_list)) // TODO: look for error handling
 				return (MALLOC_FAIL); // TODO: differentiate malloc_fail with file_failure, especially here_doc
 		}
 		else if (c != '\0' && c != '|')
 		{
-			if (!ft_save_cmd(cmd, shell->vars, shell->envp_linkedlist))
+			if (!ft_save_cmd(cmd, shell->vars, shell->env_list))
 			// TODO: look for error handling
 				return (MALLOC_FAIL);
 		}

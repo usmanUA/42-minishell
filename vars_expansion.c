@@ -9,7 +9,7 @@
 /*   Updated: 2024/05/07 16:31:13 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
 
 static	char	*ft_find_value(t_vars *vars, t_envp *env_vars, char *key, int len)
 {
@@ -20,10 +20,10 @@ static	char	*ft_find_value(t_vars *vars, t_envp *env_vars, char *key, int len)
 	envp = env_vars;
 	while (envp->next)
 	{
-		if (!ft_strncmp(key, envp->env_name, len))
+		if (!ft_strncmp(key, envp->key, len))
 		{
 			vars->expanded = YES;
-			value = ft_strdup(envp->env_value);
+			value = ft_strdup(envp->value);
 			break ;
 		}
 		envp = envp->next;
@@ -87,7 +87,7 @@ char	*ft_expand_variable(t_vars *vars, t_envp *env_vars, int op)
 			str = ft_itoa(vars->exit_status);
 		}
 		else
-			str = ft_expand_key(vars, env_vars, key, op);
+			str = ft_expand_key(vars, env_vars, ++key, op);
 	}
 	else
 		str = ft_join_str_expansion(vars, env_vars);

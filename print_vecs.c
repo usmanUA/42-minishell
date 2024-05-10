@@ -1,6 +1,4 @@
-#include "miniwell.h"
-#include <stdio.h>
-#include <unistd.h>
+#include "minishell.h"
 
 void	ft_print_vecs(t_vec *pipes)
 {

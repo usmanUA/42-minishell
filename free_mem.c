@@ -9,7 +9,7 @@
 /*   Updated: 2024/04/25 10:09:02 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "miniwell.h"
+#include "minishell.h"
 
 static void	ft_free_redirect(t_vec **redirect)
 {

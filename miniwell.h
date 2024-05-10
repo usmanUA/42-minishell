@@ -27,13 +27,13 @@
 
 #define PROMPT	"\x1b[32mMiniWell\x1b[0m😎:\x1b[31mV0.1\x1b[0m$ "
 
-typedef enum s_button
+typedef enum e_button
 {
 	ON,
 	OFF,
 }	t_button;
 
-typedef enum	s_status_flags
+typedef enum	e_status_flags
 {
 	GREEN = 0,
 	BROWN = 1,
@@ -41,7 +41,7 @@ typedef enum	s_status_flags
 	RED = 127,
 }	t_status_flags;
 
-typedef enum s_flags
+typedef enum e_flags
 {
 	NOFLAG,
 	REDIR,
@@ -57,7 +57,7 @@ typedef enum s_flags
 	MALLOC_SUCCESS,
 }	t_flags;
 
-typedef enum s_consants
+typedef enum e_consants
 {
 	COMMAND,
 	REDIRECT,
@@ -65,7 +65,7 @@ typedef enum s_consants
 	FILENAME,
 }	t_constants;
  
-typedef enum s_redir_types
+typedef enum e_redir_types
 {
 	INFILE,
 	OUTFILE,

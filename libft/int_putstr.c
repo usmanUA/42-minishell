@@ -1,21 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_bonus.h                                      :+:      :+:    :+:   */
+/*   int_putstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/22 10:49:17 by uahmed            #+#    #+#             */
-/*   Updated: 2024/03/12 12:16:08 by uahmed           ###   ########.fr       */
+/*   Created: 2023/11/22 15:36:09 by mkorpela          #+#    #+#             */
+/*   Updated: 2024/03/01 11:59:15 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_BONUS_H
-# define PIPEX_BONUS_H
+#include "libft.h"
 
-# include "get_next_line/get_next_line.h"
-# include "pipex.h"
-
-int	ft_execute_bonus(t_pipex *ppx, char **envp);
-
-#endif
+int	int_putstr(const char *s)
+{
+	if (s == NULL)
+	{
+		return (write(1, "(null)", 6));
+	}
+	return (write(1, s, ft_strlen(s)));
+}
