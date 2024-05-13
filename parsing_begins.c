@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <cstdio>
+#include <cstdlib>
 
 void	ft_index_after_spaces(t_vars *vars)
 {
@@ -154,6 +156,19 @@ void	ft_zero_redirects(t_redir_count *redir_count)
 	redir_count->in_redir = 0;
 }
 
+void	ft_free_parsed(t_input **input, t_vars *vars)
+{
+	if (vars->input_line)
+		free(vars->input_line);
+	if (*input)
+	{
+		ft_free_redirect(&(*input)->new_fds);
+		ft_free_redirect(&(*input)->orig_fds);
+		ft_free_redirect(&(*input)->fds_info);
+		free(*input);
+	}
+}
+
 int	ft_save_input(t_shell *shell)
 {
 	t_input			*input;
@@ -170,14 +185,21 @@ int	ft_save_input(t_shell *shell)
 		input = malloc(sizeof(t_input));
 			// NOTE: executed in the very beg. or the beg. of every pipe (|) if any
 		if (!input)
-			return (MALLOC_FAIL);
-		if (!ft_init_redirect_vecs(&input, &redir_count))
-			return (MALLOC_FAIL);
-		if (!ft_parse_command_line(&input, shell))
-		// TODO: Handle errors correctly
-			return (MALLOC_FAIL);                  // WARN: Handle malloc
+		{
+			ft_free_parsed(&input, shell->vars);
+			exit(EXIT_FAILURE);
+		}
+		ft_init_redirect_vecs(&input, &redir_count); // TODO: FREE vars->input_line if malloc fails
+		if (ft_parse_command_line(&input, shell) == MALLOC_FAIL)
+		{
+			ft_free_parsed(&input, shell->vars);
+			exit(EXIT_FAILURE);
+		}
 		if (!vec_push(shell->pipes, &input))
-			return (MALLOC_FAIL); // NOTE: malloc fail
+		{
+			ft_free_parsed(&input, shell->vars);
+			exit(EXIT_FAILURE);
+		}
 		ft_zero_redirects(&redir_count);
 	}
 	return (MALLOC_SUCCESS);

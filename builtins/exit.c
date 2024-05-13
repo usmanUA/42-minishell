@@ -274,7 +274,7 @@ int	error_handle_exit_argument(char **command)
 	return (0);
 }
 
-void	exit_command(t_shell *data, char **command)
+int	exit_command(t_shell *data, char **command)
 {
 	//consider edge case - exit " 2 " -> maybe parser gets rid of double quotes and spaces
 	int	exit_number;
@@ -289,6 +289,5 @@ void	exit_command(t_shell *data, char **command)
 			exit_number = ft_atoi(command[1]);
 		}
 	}
-	free_all(data);
-	exit(exit_number);
+	return (exit_number);
 }

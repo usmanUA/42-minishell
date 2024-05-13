@@ -19,7 +19,7 @@ char	*create_empty_string(t_shell *data, char *directory)
 	string = (char *)malloc(sizeof(char) * 1);
 	if (string == NULL)
 	{
-		free_all(data);
+		ft_free_all(data, YES);
 		free(directory);
 		exit (1);
 	}
@@ -43,7 +43,7 @@ void	change_oldpwd(t_shell *data, char *directory)
 			if (oldpwd->value == NULL)
 			{
 				free(directory);
-				free_all(data);
+				ft_free_all(data, YES);
 				exit (1);
 			}
 		}
@@ -67,7 +67,7 @@ void	change_oldpwd_and_pwd(t_shell *data, char *directory)
 		free(directory);
 		if (pwd->value == NULL)
 		{
-			free_all(data);
+			ft_free_all(data, YES);
 			exit (1);
 		}
 	}
@@ -138,7 +138,7 @@ char	*only_cd(t_shell *data)
 	directory = ft_strdup(node->value);
 	if (directory == NULL)
 	{
-		free_all(data);
+		ft_free_all(data, YES);
 		exit (1);
 	}
 	return (directory);
@@ -152,7 +152,7 @@ char	*absolute_path(t_shell *data, char *command)
 	directory = ft_strdup(command);
 	if (directory == NULL)
 	{
-		free_all(data);
+		ft_free_all(data, YES);
 		exit (1);
 	}
 	return (directory);
@@ -168,7 +168,7 @@ char	*make_relative_path(t_shell *data, char *command, char *cwd)
 	if (cwd_with_slash == NULL)
 	{
 		free(cwd);
-		free_all(data);
+		ft_free_all(data, YES);
 		exit (1);
 	}
 	free(cwd);
@@ -177,7 +177,7 @@ char	*make_relative_path(t_shell *data, char *command, char *cwd)
 	if (directory == NULL)
 	{
 		free(cwd_with_slash);
-		free_all(data);
+		ft_free_all(data, YES);
 		exit(1);
 	}
 	free(cwd_with_slash);
@@ -194,7 +194,7 @@ char	*relative_path(t_shell *data, char *command)
 	cwd = getcwd(buffer, sizeof(buffer));
 	if (cwd == NULL)
 	{
-		free_all(data);
+		ft_free_all(data, YES);
 		exit (errno);
 	}
 	// printf("4 - command = cd %s\n", command);

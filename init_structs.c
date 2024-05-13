@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <cstdio>
+#include <cstdlib>
 
 int	ft_init_shell(t_shell *shell, char **envp)
 {
@@ -30,6 +32,7 @@ int	ft_init_shell(t_shell *shell, char **envp)
 		return (MALLOC_FAIL);
 	shell->pipes = pipes;
 	shell->info = info;
+	shell->pids = NULL;
 	shell->vars = vars;
 	shell->envp = envp; // NOTE: shell->envp once gave segfault in ft_split, be careful carrying this pointer along
 	return (MALLOC_SUCCESS);
@@ -68,55 +71,55 @@ static int	ft_no_redirections(t_input **input, t_redir_count *redir_count)
 	int	redirections;
 
 	redirections = 0;
+	(*input)->new_fds = NULL;
+	(*input)->orig_fds = NULL;
+	(*input)->fds_info = NULL;
 	redirections = redir_count->in_redir + redir_count->out_redir;
 	if (redirections == 0)
-	{
-		(*input)->new_fds = NULL;
-		(*input)->orig_fds = NULL;
-		(*input)->fds_info = NULL;
 		return (YES);
-	}
 	return (NO);
 }
 
-int	ft_init_redirect_vecs(t_input **input, t_redir_count *redir_count)
+static	void	ft_free_exit(void **input)
+{
+	ft_free_input(input);
+	exit(EXIT_FAILURE);
+}
+
+void	ft_init_redirect_vecs(t_input **input, t_redir_count *redir_count)
 {
 	t_vec	*new_fds;
 	t_vec	*orig_fds;
 	t_vec	*fds_info;
 
 	if (ft_no_redirections(input, redir_count) == YES)
-		return (1);
+		return;
 	new_fds = (t_vec *)malloc(sizeof(t_vec));
 	if (!new_fds)
-		return (0);
+		ft_free_exit((void **)input);
 	(*input)->new_fds = new_fds;
+	if (!vec_new(new_fds, 2, sizeof(long))) 
+		ft_free_exit((void **)input);
 	orig_fds = (t_vec *)malloc(sizeof(t_vec));
 	if (!orig_fds)
-		return (0);
+		ft_free_exit((void **)input);
 	(*input)->orig_fds = orig_fds;
+	if (!vec_new(orig_fds, 2, sizeof(long)))
+		ft_free_exit((void **)input);
 	fds_info = (t_vec *)malloc(sizeof(t_vec));
 	if (!fds_info)
-		return (0);
+		ft_free_exit((void **)input);
 	(*input)->fds_info = fds_info;
-	if (!vec_new(new_fds, 2, sizeof(long))) 
-	// NOTE: Init a vec and allocate some mem for command
-		return (0);                          // NOTE: malloc fail
-	if (!vec_new(orig_fds, 2, sizeof(long)))
-	// NOTE: Init a vec and allocate some mem for command
-		return (0);                          // NOTE: malloc fail
 	if (!vec_new(fds_info, 2, sizeof(long)))
-	// NOTE: Init a vec and allocate some mem for command
-		return (0);                          // NOTE: malloc fail
-	return (1);
+		ft_free_exit((void **)input);
 }
 
-void	ft_init_pipex(t_pipex *pipex)
+void	ft_init_pipex(t_pipex *pipex, int tot_pipes)
 {
 	pipex->idx = -1;
-	pipex->status = 0;
 	pipex->infile = 42;
 	pipex->cmd_flag = GREEN;
 	pipex->exec_type = GREEN;
+	pipex->tot_pipes = tot_pipes;
 	pipex->input = NULL;
 }

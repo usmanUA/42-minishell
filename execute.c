@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <stdio.h>
 
 int	ft_status(int status)
 {
@@ -20,8 +21,52 @@ int	ft_status(int status)
 	return (1);
 }
 
-void	ft_io_redirections(t_input *input, int *read_from_pipe,
-		int *output_to_pipe, int *err_to_pipe)
+void	ft_wait_childs(t_shell *shell)
+{
+	int	*pids;
+	int	ind;
+
+	ind = -1;
+	pids = (int *)vec_get(shell->pids, 0);
+	while (++ind < shell->pids->len)
+		waitpid(pids[ind], NULL, 0);
+}
+
+void	ft_stderr_redirection(t_pipex *pipex, int orig_fd, int index, int err_to_pipe)
+{
+	int	new_fd;
+
+	new_fd = *(int *)vec_get(pipex->input->new_fds, index);
+	if (err_to_pipe == YES && orig_fd != STDERR_FILENO)
+		dup2(pipex->fds[1], STDERR_FILENO);
+	dup2(new_fd, orig_fd);
+}
+
+void	ft_stdout_redirection(t_pipex *pipex, int orig_fd, int index, int write_to_pipe)
+{
+	int	new_fd;
+
+	new_fd = *(int *)vec_get(pipex->input->new_fds, index);
+	if (write_to_pipe == YES && orig_fd != STDOUT_FILENO)
+		dup2(pipex->fds[1], STDOUT_FILENO);
+	dup2(new_fd, orig_fd);
+}
+
+void	ft_stdin_redirection(t_pipex *pipex, int orig_fd, int index)
+{
+	int	new_fd;
+
+	new_fd = *(int *)vec_get(pipex->input->new_fds, index);
+	if (pipex->infile != 42)
+	{
+		if (orig_fd != STDIN_FILENO)
+			dup2(pipex->infile, STDIN_FILENO);
+		close(pipex->infile);
+	}
+	dup2(new_fd, orig_fd);
+}
+
+void	ft_io_redirections(t_pipex *pipex, int write_to_pipe, int err_to_pipe)
 {
 	int	ind;
 	int	orig_fd;
@@ -30,127 +75,120 @@ void	ft_io_redirections(t_input *input, int *read_from_pipe,
 	ind = -1;
 	orig_fd = 42;
 	fds_info = 42;
-	while (input->new_fds && ++ind < (int)input->new_fds->len)
+	while (pipex->input->new_fds && ++ind < (int)pipex->input->new_fds->len)
 	{
-		fds_info = *(int *)vec_get(input->fds_info, ind);
-		orig_fd = *(int *)vec_get(input->orig_fds, ind);
+		fds_info = *(int *)vec_get(pipex->input->fds_info, ind);
+		orig_fd = *(int *)vec_get(pipex->input->orig_fds, ind);
 		if (fds_info == STDIN_FILENO)
-		{
-			if (orig_fd == STDIN_FILENO)
-				*read_from_pipe = NO;
-			dup2(*(int *)vec_get(input->new_fds, ind), orig_fd);
-		}
+			ft_stdin_redirection(pipex, orig_fd, ind);
 		else if (fds_info == STDOUT_FILENO)
-		{
-			if (output_to_pipe && orig_fd == STDOUT_FILENO)
-				*output_to_pipe = NO;
-			dup2(*(int *)vec_get(input->new_fds, ind), orig_fd);
-		}
+			ft_stdout_redirection(pipex, orig_fd, ind, write_to_pipe);
 		else if (fds_info == STDERR_FILENO)
-		{
-			if (err_to_pipe && orig_fd == STDERR_FILENO)
-				*err_to_pipe = NO;
-			dup2(*(int *)vec_get(input->new_fds, ind), orig_fd);
-		}
+			ft_stderr_redirection(pipex, orig_fd, ind, err_to_pipe);
 	}
 }
 
-static void	ft_child(t_input *input, t_pipex *pipex, int *fds, t_shell *shell)
+static void	ft_child(t_pipex *pipex, t_shell *shell)
 {
-	int		read_from_pipe;
-	int		output_to_pipe;
-	int		err_to_pipe;
 	char	**args;
 
-	read_from_pipe = YES;
-	output_to_pipe = YES;
-	err_to_pipe = YES;
-	ft_io_redirections(input, &read_from_pipe, &output_to_pipe, &err_to_pipe);
-	if (pipex->infile != 42)
-	{
-		if (read_from_pipe == YES)
-			dup2(pipex->infile, STDIN_FILENO);
-		close(pipex->infile);
-	}
-	close(fds[0]);
-	if (output_to_pipe == YES)
-		dup2(fds[1], STDOUT_FILENO);
-	if (err_to_pipe == YES)
-		dup2(fds[1], STDERR_FILENO);
-	close(fds[1]);
-	args = (char **)vec_get(input->cmd, 0);
+	close(pipex->fds[0]);
+	ft_io_redirections(pipex, YES, YES);
+	close(pipex->fds[1]);
+	args = (char **)vec_get(pipex->input->cmd, 0);
 	if (pipex->exec_type == EXTERNAL)
 		execve(args[0], args, shell->envp);
 	else
-		builtin_commands(shell, args, pipex->exec_type);	
-	exit(EXIT_SUCCESS);
+		exit(builtin_commands(shell, args, pipex->exec_type));	
 	// TODO: check for execve fail
 }
 
-static void	ft_last_child(t_input *input, t_pipex *pipex, t_shell *shell)
+void	ft_push_pid(t_shell *shell, int *pid)
 {
-	char	**args;
-	int		read_from_pipe;
+	if (!vec_push(shell->pids, pid))
+	{
+		ft_free_all(shell, YES);
+		ft_wait_childs(shell);
+		exit(EXIT_FAILURE);
+	}
+}
+
+void	ft_processes(t_pipex *pipex, t_shell *shell)
+{
+	int	pid;
+
+	if (pipe(pipex->fds) == -1)
+	{
+		ft_free_all(shell, YES);
+		exit(EXIT_FAILURE);
+	}
+	pid = fork();
+	if (pid == -1)
+	{
+		// NOTE: should we close the pipes here? fds[0] and fds[1]
+		ft_free_all(shell, YES);
+		exit(EXIT_FAILURE);
+	}
+	// TODO: save pids for all the childs (whatever there number is)
+	if (pid == 0)
+		ft_child(pipex, shell);
+	else
+	{
+		close(pipex->fds[1]);
+		pipex->infile = pipex->fds[0];
+		ft_push_pid(shell, &pid);
+	}
+}
+
+static	void	ft_last_chid(t_pipex *pipex, t_shell *shell, char **command)
+{
+
+	ft_io_redirections(pipex, NO, NO);
+	if (pipex->exec_type == EXTERNAL)
+		execve(command[0], command, shell->envp);
+	else
+		exit(builtin_commands(shell, command, pipex->exec_type));
+}
+
+static void	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
+{
+	int	pid;
 
 	// NOTE:
 	// 1. If there were pipe/s (> 0) STDIN is the previous pipes read end OR 0< file is new STDIN (if there's input redirection)
 	// 2. If no pipe/s (pipes == 0),STDIN is STDIN OR 0< file is new STDIN (if there's input redirection)
-	read_from_pipe = YES;
-	ft_io_redirections(input, &read_from_pipe, NULL, NULL);
-	if (pipex->infile != 42)
-	{
-		if (read_from_pipe == YES)
-			dup2(pipex->infile, STDIN_FILENO);
-		close(pipex->infile);
-	}
-	args = (char **)vec_get(input->cmd, 0);
-	if (pipex->exec_type == EXTERNAL)
-		execve(args[0], args, shell->envp);
-	else
-		builtin_commands(shell, args, pipex->exec_type);	
-	exit(EXIT_SUCCESS);
-}
-
-void	ft_processes(t_input *input, t_pipex *pipex, t_shell *shell)
-{
-	int	fds[2];
-	int	pid;
-
-	if (pipe(fds) == -1)
-	{
-		// TODO: bring back the prompt
-	}
 	pid = fork();
 	if (pid == -1)
 	{
-		// TODO: Handle fork fail
+		ft_free_all(shell, YES);
+		exit(EXIT_FAILURE);
 	}
-	// if (!vec_push(pipex->pids, &pid))
-	// {
-	// 	// TODO: malloc fail
-	// }
 	if (pid == 0)
-		ft_child(input, pipex, fds, shell);
+		ft_last_chid(pipex, shell, command);
 	else
-	{
-		close(fds[1]);
-		pipex->infile = fds[0];
-	}
+		waitpid(pid, &shell->status, 0);
+	shell->status = ft_status(shell->status);
 }
 
-int	ft_execute_last_cmd(t_input *input, t_pipex *pipex, t_shell *shell)
+void	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 {
 	int	pid;
+	char	**args;
 
-	pid = fork();
-	if (pid == -1)
-	{
-		// TODO: Hanlde fork fail
-	}
-	if (pid == 0)
-		ft_last_child(input, pipex, shell);
+	// TODO: wait for the prev. childs using their pids (if there are any)
+	args = (char **)vec_get(pipex->input->cmd, 0);
+	if (pipex->exec_type == EXTERNAL || (pipex->exec_type != EXTERNAL && pipex->tot_pipes > 0))
+		ft_execute_in_child(pipex, shell, args);
 	else
-		waitpid(pid, (int *)&pipex->status, 0);
-	pipex->status = ft_status(pipex->status);
-	return (1);
+		shell->status = builtin_commands(shell, args, pipex->exec_type);
+	if (pipex->tot_pipes > 0)
+		ft_wait_childs(shell);
+	if (pipex->exec_type != EXTERNAL && pipex->tot_pipes == 0)
+	{
+		if (pipex->exec_type == EXIT)
+		{
+			ft_free_all(shell, YES);
+			exit(EXIT_SUCCESS);
+		}
+	}
 }

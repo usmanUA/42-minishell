@@ -31,8 +31,6 @@ void	print_env_list(t_shell *data)
 
 int	env_command(t_shell *data, char **command)
 {
-	printf("inside env call: %s\n", command[0]);
-	printf("inside env call: %s\n", command[1]);
 	if (command[1] != NULL)//perhaps just use 
 	{
 		error_msg_hardcode("env", command[1], 3, false);

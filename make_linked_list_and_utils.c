@@ -45,7 +45,7 @@ t_envp *create_new_node(t_shell *data)
 	node = (t_envp *)malloc(sizeof(t_envp));
 	if (node == NULL)
 	{
-		free_all(data);
+		ft_free_all(data, YES);
 		exit(1);
 	}	
 	node->key = NULL;;

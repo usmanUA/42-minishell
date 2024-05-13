@@ -25,8 +25,7 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		if (!shell.vars->input_line)
 		{
-			ft_free_vec(&shell);
-			free_all(&shell);
+			ft_free_shell(&shell, YES);
 			break ; // NOTE: readlines malloc fail? error message | code?
 		}
 		ft_signals(CHILD, ON, &shell.status);
@@ -35,16 +34,14 @@ int	main(int argc, char **argv, char **envp)
 		if (ft_save_input(&shell) == MALLOC_FAIL)
 		{
 			free(shell.vars->input_line);
-			ft_free_vec(&shell);
+			ft_free_shell(&shell, NO);
 			continue ; // NOTE: [malloc fail, what else could fail there?], error message | code?
 		}
 		free((char *)shell.vars->input_line);
 			// NOTE: everything saved to vector pipes
 		ft_validate_execute(&shell);         
 			// TODO: WHAT TODO when malloc fails in subsequent funcitons
-		ft_free_vec(&shell);
+		ft_free_shell(&shell, NO);
 	}
-	free_all(&shell);
-	// TODO: FREE LINKED LIST
-	return (0);
+	return (shell.status);
 }

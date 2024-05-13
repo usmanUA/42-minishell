@@ -11,6 +11,16 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
+void	ft_free_splitted_paths(char **paths)
+{
+	int	ind;
+
+	ind = -1;
+	while (paths[++ind])
+		free(paths[ind]);
+	free(paths);
+}
+
 char	*ft_join_path(char *path, char *command)
 {
 	char	*path_to_cmd;
@@ -90,7 +100,7 @@ static int	ft_check_command(char *command, int check_dir, int *cmd_flag)
 	return (VALID);
 }
 
-int	ft_handle_absolute(char *command, t_vec *info)
+void	ft_handle_absolute(char *command, t_shell *shell, char ***paths)
 {
 	int	fd;
 	int	cmd_flag;
@@ -103,9 +113,12 @@ int	ft_handle_absolute(char *command, t_vec *info)
 	{
 		ft_cmd_error(command, 0, 0); // TODO: define MACROS for const. values
 	}
-	if (!vec_push(info, &cmd_flag))
-		return (MALLOC_FAIL); // NOTE: malloc fail
-	return (MALLOC_SUCCESS);
+	if (!vec_push(shell->info, &cmd_flag))
+	{
+		ft_free_splitted_paths(*paths);
+		ft_free_all(shell, YES);
+		exit(EXIT_FAILURE);
+	}
 }
 
 static int	ft_make_command(t_vec *cmd, char **command, char **paths,
@@ -139,20 +152,27 @@ static int	ft_make_command(t_vec *cmd, char **command, char **paths,
 	return (MALLOC_SUCCESS);
 }
 
-int	ft_handle_relative(t_vec *cmd, char **command, t_vec *info, char **paths)
+void	ft_handle_relative(t_vec *cmd, char **command, t_shell *shell, char ***paths)
 {
 	int	cmd_flag;
 
 	cmd_flag = RED;
-	if (ft_make_command(cmd, command, paths, &cmd_flag) == MALLOC_FAIL)
-		return (MALLOC_FAIL);
+	if (ft_make_command(cmd, command, *paths, &cmd_flag) == MALLOC_FAIL)
+	{
+		ft_free_splitted_paths(*paths);
+		ft_free_all(shell, YES);
+		exit(EXIT_FAILURE);
+	}
 	// NOTE: if it gets here it means command does not exits
 	// TODO: return exit status 127
 	if (cmd_flag != GREEN)
 		ft_cmd_error(*command, 1, 1);
-	if (!vec_push(info, &cmd_flag))
-		return (MALLOC_FAIL); // NOTE: malloc fail
-	return (MALLOC_SUCCESS);
+	if (!vec_push(shell->info, &cmd_flag))
+	{
+		ft_free_splitted_paths(*paths);
+		ft_free_all(shell, YES);
+		exit(EXIT_FAILURE);
+	}
 }
 
 void	ft_check_builtin(t_shell *shell, char *command, t_pipex *pipex)
@@ -177,34 +197,25 @@ void	ft_check_builtin(t_shell *shell, char *command, t_pipex *pipex)
 	pipex->exec_type = executable_info;
 }
 
-int	ft_validate_commands(t_pipex *pipex, t_shell *shell)
+void	ft_validate_commands(t_pipex *pipex, t_shell *shell)
 {
 	char	**paths;
 	char	*command;
-	int	ind;
 
-	ind = -1;
 	paths = ft_split(ft_give_path(shell->envp), ':');
 	if (!paths)
-		return (0); // TODO: check malloc error handling
+	{
+		ft_free_all(shell, YES);
+		exit(EXIT_FAILURE);
+	}
 	command = *(char **)vec_get(pipex->input->cmd, 0);
 	if (ft_ispresent(command, '/'))
-	{
-		if (ft_handle_absolute(command, shell->info) == MALLOC_FAIL)
-			return (MALLOC_FAIL);
-	}
+		ft_handle_absolute(command, shell, &paths);
 	else
 	{
 		ft_check_builtin(shell, command, pipex);
 		if (pipex->exec_type == EXTERNAL) 
-		{
-			if (ft_handle_relative(pipex->input->cmd, &command, shell->info,
-					paths) == MALLOC_FAIL)
-				return (MALLOC_FAIL);
-		}
+			ft_handle_relative(pipex->input->cmd, &command, shell, &paths);
 	}
-	while (paths[++ind])
-		free(paths[ind]);
-	free(paths);
-	return (MALLOC_SUCCESS);
+	ft_free_splitted_paths(paths);
 }

@@ -17,7 +17,6 @@ FILES = \
 			errors_2.c \
 			execute.c \
 			free_mem.c \
-			free.c \
 			init_structs.c \
 			minishell_utils.c \
 			next_string.c \

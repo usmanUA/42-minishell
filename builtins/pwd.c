@@ -21,7 +21,7 @@ int	pwd_command(t_shell *data)
 	cwd = getcwd(buffer, sizeof(buffer));
 	if (cwd == NULL)
 	{
-		free_all(data);
+		ft_free_all(data, YES);
 		exit (errno);
 	}
 	printf("%s\n", cwd);// DO I have to take dup2 into account?
