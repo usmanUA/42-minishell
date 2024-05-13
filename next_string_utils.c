@@ -31,10 +31,10 @@ int	ft_status_expansion(t_vars *vars, char c, int *ind)
 {
 	char	next;
 
-	next = vars->input_line[vars->ind + 2];
+	next = vars->input_line[vars->ind + 1];
 	if (c == '?')
 	{
-		(*ind) += 2;
+		++(*ind);
 		if (ft_valid_char(next, NO) == VALID)
 			vars->qontinue = YES;
 		return (YES);

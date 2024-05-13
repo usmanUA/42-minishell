@@ -79,10 +79,11 @@ static void	ft_child(t_input *input, t_pipex *pipex, int *fds, t_shell *shell)
 		dup2(fds[1], STDERR_FILENO);
 	close(fds[1]);
 	args = (char **)vec_get(input->cmd, 0);
-	if (shell->builtin == EXTERNAL)
+	if (pipex->exec_type == EXTERNAL)
 		execve(args[0], args, shell->envp);
 	else
-		builtin_commands(shell, args);	
+		builtin_commands(shell, args, pipex->exec_type);	
+	exit(EXIT_SUCCESS);
 	// TODO: check for execve fail
 }
 
@@ -103,19 +104,18 @@ static void	ft_last_child(t_input *input, t_pipex *pipex, t_shell *shell)
 		close(pipex->infile);
 	}
 	args = (char **)vec_get(input->cmd, 0);
-	if (shell->builtin == EXTERNAL)
+	if (pipex->exec_type == EXTERNAL)
 		execve(args[0], args, shell->envp);
 	else
-		builtin_commands(shell, args);	
+		builtin_commands(shell, args, pipex->exec_type);	
+	exit(EXIT_SUCCESS);
 }
 
 void	ft_processes(t_input *input, t_pipex *pipex, t_shell *shell)
 {
 	int	fds[2];
 	int	pid;
-	int	ind;
 
-	ind = -1;
 	if (pipe(fds) == -1)
 	{
 		// TODO: bring back the prompt

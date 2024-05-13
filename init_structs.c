@@ -20,13 +20,14 @@ int	ft_init_shell(t_shell *shell, char **envp)
 	pipes = (t_vec *)malloc(sizeof(t_vec));
 	if (!pipes)
 		return (MALLOC_FAIL);
+	vec_new(pipes, 0, sizeof(t_input **));
 	info = (t_vec *)malloc(sizeof(t_vec));
 	if (!info)
 		return (MALLOC_FAIL);
+	vec_new(info, 0, sizeof(int));
 	vars = (t_vars *)malloc(sizeof(t_vars));
 	if (!vars)
 		return (MALLOC_FAIL);
-	shell->builtin = EXTERNAL;
 	shell->pipes = pipes;
 	shell->info = info;
 	shell->vars = vars;
@@ -66,8 +67,8 @@ static int	ft_no_redirections(t_input **input, t_redir_count *redir_count)
 {
 	int	redirections;
 
-	redirections = redir_count->in_redir + redir_count->err_redir
-		+ redir_count->out_redir;
+	redirections = 0;
+	redirections = redir_count->in_redir + redir_count->out_redir;
 	if (redirections == 0)
 	{
 		(*input)->new_fds = NULL;
@@ -116,5 +117,6 @@ void	ft_init_pipex(t_pipex *pipex)
 	pipex->status = 0;
 	pipex->infile = 42;
 	pipex->cmd_flag = GREEN;
+	pipex->exec_type = GREEN;
 	pipex->input = NULL;
 }

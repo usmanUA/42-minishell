@@ -100,8 +100,9 @@ int	ft_handle_absolute(char *command, t_vec *info)
 	ft_check_command(command, YES, &cmd_flag);
 	// NOTE: if absolute command (given) does not exist
 	if (cmd_flag == RED)
+	{
 		ft_cmd_error(command, 0, 0); // TODO: define MACROS for const. values
-	// TODO: return exit status 127
+	}
 	if (!vec_push(info, &cmd_flag))
 		return (MALLOC_FAIL); // NOTE: malloc fail
 	return (MALLOC_SUCCESS);
@@ -154,44 +155,56 @@ int	ft_handle_relative(t_vec *cmd, char **command, t_vec *info, char **paths)
 	return (MALLOC_SUCCESS);
 }
 
-void	ft_check_builtin(t_shell *shell, char *command)
+void	ft_check_builtin(t_shell *shell, char *command, t_pipex *pipex)
 {
+	int	executable_info;
+
+	executable_info = EXTERNAL;
 	if (ft_strcmp(command, "cd") == 0)
-		shell->builtin = CD;
+		executable_info = CD;
 	if (ft_strcmp(command, "echo") == 0)
-		shell->builtin = MY_ECHO;
+		executable_info = MY_ECHO;
 	if (ft_strcmp(command, "env") == 0)
-		shell->builtin = ENV;
+		executable_info = ENV;
 	if (ft_strcmp(command, "exit") == 0)
-		shell->builtin = EXIT;
+		executable_info = EXIT;
 	if (ft_strcmp(command, "export") == 0)
-		shell->builtin = EXPORT;
+		executable_info = EXPORT;
 	if (ft_strcmp(command, "pwd") == 0)
-		shell->builtin = PWD;
+		executable_info = PWD;
 	if (ft_strcmp(command, "unset") == 0)
-		shell->builtin = UNSET;
+		executable_info = UNSET;
+	pipex->exec_type = executable_info;
 }
 
-int	ft_validate_commands(t_input *input, t_shell *shell)
+int	ft_validate_commands(t_pipex *pipex, t_shell *shell)
 {
 	char	**paths;
 	char	*command;
+	int	ind;
 
+	ind = -1;
 	paths = ft_split(ft_give_path(shell->envp), ':');
 	if (!paths)
 		return (0); // TODO: check malloc error handling
-	command = *(char **)vec_get(input->cmd, 0);
+	command = *(char **)vec_get(pipex->input->cmd, 0);
 	if (ft_ispresent(command, '/'))
 	{
 		if (ft_handle_absolute(command, shell->info) == MALLOC_FAIL)
 			return (MALLOC_FAIL);
 	}
-	ft_check_builtin(shell, command);
-	if (shell->builtin == EXTERNAL) 
+	else
 	{
-		if (ft_handle_relative(input->cmd, &command, shell->info,
-				paths) == MALLOC_FAIL)
-			return (MALLOC_FAIL);
+		ft_check_builtin(shell, command, pipex);
+		if (pipex->exec_type == EXTERNAL) 
+		{
+			if (ft_handle_relative(pipex->input->cmd, &command, shell->info,
+					paths) == MALLOC_FAIL)
+				return (MALLOC_FAIL);
+		}
 	}
+	while (paths[++ind])
+		free(paths[ind]);
+	free(paths);
 	return (MALLOC_SUCCESS);
 }

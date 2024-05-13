@@ -130,7 +130,6 @@ int	export_command(t_shell *data, char **command)
 		}
 		return (0);
 	}
-
 	if (command[1] != NULL)
 	{
 		i = 1;

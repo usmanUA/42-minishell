@@ -11,20 +11,20 @@
 /* ************************************************************************** */
 #include "miniwell.h"
 
-void	builtin_commands(t_shell *shell, char **command)
+void	builtin_commands(t_shell *shell, char **command, int exec_type)
 {
-	if (shell->builtin == CD)
+	if (exec_type == CD)
 		shell->status = cd_command(shell, command);
-	else if (shell->builtin == MY_ECHO)
+	else if (exec_type == MY_ECHO)
 		shell->status = echo_command(command);
-	else if (shell->builtin == ENV)
+	else if (exec_type == ENV)
 		shell->status = env_command(shell, command);
-	else if (shell->builtin == EXIT)
+	else if (exec_type == EXIT)
 		exit_command(shell, command);//IS IT OK that EXIT already exited? (NOTE: there is no return value for this function.)
-	else if (shell->builtin == EXPORT)
+	else if (exec_type == EXPORT)
 		shell->status = export_command(shell, command);
-	else if (shell->builtin == PWD)
+	else if (exec_type == PWD)
 		shell->status = pwd_command(shell);
-	else if (shell->builtin == UNSET)
+	else if (exec_type == UNSET)
 		shell->status = unset_command(shell, command);
 }

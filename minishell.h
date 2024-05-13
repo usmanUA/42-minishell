@@ -20,6 +20,7 @@
 #include <sys/wait.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+# include "stdbool.h"
 
 #define PROMPT	"\x1b[32mMiniWell\x1b[0m😎:\x1b[31mV0.1\x1b[0m$ "
 
@@ -92,7 +93,6 @@ typedef struct s_redirect
 typedef struct s_redir_count
 {
 	int in_redir;
-	int err_redir;
 	int out_redir;
 }	t_redir_count;
 
@@ -139,6 +139,7 @@ typedef struct s_pipex
 	unsigned	long		status;
 	unsigned	long		cmd_flag;
 	unsigned	long		*fds;
+	int	exec_type;
 	t_vec		*pids;
 	t_input		*input;
 }			t_pipex;
@@ -153,7 +154,6 @@ typedef struct envp_list
 typedef struct s_shell
 {
 	int	status;
-	int	builtin;
 	char    **envp;
 	t_envp	*env_list;
 	t_vec	*pipes;
@@ -161,6 +161,7 @@ typedef struct s_shell
 	t_vars	*vars;
 
 } t_shell;
+
 
 void	ft_init_vars(t_vars *vars);
 int ft_space_until_end(t_vars *vars);
@@ -183,7 +184,7 @@ void	ft_cmd_error(char *cmd, int permission, int file_exist);
 
 void	ft_print_vecs(t_vec *pipes);
 
-int	ft_validate_commands(t_input *input, t_shell *shell);
+int	ft_validate_commands(t_pipex *pipex, t_shell *shell);
 
 int    ft_validate_execute(t_shell *shell);
 int	ft_execute(t_shell *shell);
@@ -215,12 +216,13 @@ void	error_msg_hardcode(char *command, char *argument, int error_number, bool qu
 int		cd_command(t_shell *data, char **command);
 int		echo_command(char **command);
 int		env_command(t_shell *data, char **command);
-void		builtin_commands(t_shell *data, char **command);
+void	builtin_commands(t_shell *shell, char **command, int exec_type);
 void	exit_command(t_shell *data, char **command);
 int		export_command(t_shell *data, char **command);
 void	free_all(t_shell *data);
 int		pwd_command(t_shell *data);
 t_envp	*search_for_envp(t_shell *data, char *command);
 int		unset_command(t_shell *data, char **command);
+
 
 #endif

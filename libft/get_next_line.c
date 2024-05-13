@@ -107,7 +107,7 @@ static char	*make_string(int fd, char *string)
 
 char	*get_next_line(int fd)
 {
-	char static	*string;
+	static	char *string;
 	char		*line;
 
 	line = NULL;

@@ -15,7 +15,7 @@ int	vec_new(t_vec *dst, size_t len, size_t size)
 {
 	if (!size)
 		return (0);
-	if (len)
+	if (len > 0)
 	{
 		dst->mem = (unsigned char *)malloc(len * size);
 		if (!dst->mem)

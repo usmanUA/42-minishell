@@ -24,7 +24,11 @@ int	main(int argc, char **argv, char **envp)
 		if (ft_prompt(&shell, envp) == MALLOC_FAIL)
 			continue ;
 		if (!shell.vars->input_line)
+		{
+			ft_free_vec(&shell);
+			free_all(&shell);
 			break ; // NOTE: readlines malloc fail? error message | code?
+		}
 		ft_signals(CHILD, ON, &shell.status);
 		if (ft_valid_input(shell.vars, &shell) == NO)
 			continue ;

@@ -15,7 +15,7 @@ int	vec_push(t_vec *dst, void *src)
 {
 	if (!dst || !src)
 		return (0);
-	if (!dst->mem)
+	if (dst->mem == NULL)
 	{
 		if (!vec_new(dst, 1, dst->size))
 			return (0);

@@ -15,18 +15,18 @@ char	*ft_expand_variable(t_vars *vars, t_envp *env_vars, int op);
 int	ft_valid_char(char next, int check_digits);
 int	ft_status_expansion(t_vars *vars, char c, int *ind);
 
-static void	ft_unquoted_str_end(t_vars *vars, int *ind, char c)
+static void	ft_unquoted_str_end(t_vars *vars, int *ind)
 {
 	char	next;
+	char	c;
 
 	// NOTE: finds the index where the command ends
 	// updates vars->qontinue based on the presence/absence of quotes right next to where command ends
+	c = vars->input_line[vars->ind + *ind];
 	if (ft_status_expansion(vars, c, ind) == YES)	
 		return;
 	while (c != '\0' && c != '$')
 	{
-		// if (vars->expand_it == YES && c != '?')
-		// 	break;
 		if (c == '\'' || c == '\"')
 		{
 			vars->qontinue = YES;
@@ -37,18 +37,19 @@ static void	ft_unquoted_str_end(t_vars *vars, int *ind, char c)
 			break ;
 		c = vars->input_line[vars->ind + ++(*ind)];
 	}
-	next = vars->input_line[vars->ind + (*ind + 1)];
+	if (c != '\0')
+		next = vars->input_line[vars->ind + (*ind + 1)];
 	if (c == '$' && ft_valid_char(next, YES) == VALID)
 		vars->qontinue = YES;
 }
 
-void	ft_quoted_str_end(t_vars *vars, int quote, int *ind, int *dollar)
+static	void	ft_quoted_str_end(t_vars *vars, int quote, int *ind, int *dollar)
 {
 	char	c;
 	char	next;
 
-	c = vars->input_line[vars->ind];
-	next = vars->input_line[vars->ind + 1];
+	c = vars->input_line[vars->ind + *ind];
+	next = vars->input_line[vars->ind + *ind + 1];
 	while (c && c != quote)
 	{
 		if (c == '$' && ft_valid_char(next, YES) == VALID && vars->s_quote == 0)
@@ -57,13 +58,18 @@ void	ft_quoted_str_end(t_vars *vars, int quote, int *ind, int *dollar)
 			*dollar = YES;
 			break ;
 		}
+		else if (vars->expand_it == YES && c != '\"' && c != '_' && !ft_isalnum(c))
+		{
+			vars->qontinue = YES;
+			return;
+		}
 		(*ind)++;
 		c = next;
 		next = vars->input_line[vars->ind+(*ind+1)];
 	}
 	if (*dollar == NO)
 	{
-		if (!ft_isspace(vars->input_line[vars->ind+(*ind+1)]))
+		if (!ft_isspace(next) && c != '\"')
 			vars->qontinue = YES;
 		vars->s_quote = 0;
 		vars->d_quote = 0;
@@ -83,10 +89,10 @@ static void	ft_commands_end(t_vars *vars, int quote, int *ind)
 	dollar = NO;
 	c = vars->input_line[vars->ind];
 	next = vars->input_line[vars->ind + 1];
-	if (c == '$' && ft_valid_char(next, YES) == VALID)
+	if (c == '$' && ft_valid_char(next, YES) == VALID && !vars->s_quote)
 	{
 		vars->expand_it = YES;
-		c = next;
+		++(*ind);
 	}
 	if (vars->d_quote || vars->s_quote)
 	{
@@ -95,7 +101,7 @@ static void	ft_commands_end(t_vars *vars, int quote, int *ind)
 		ft_quoted_str_end(vars, quote, ind, &dollar);
 		return;
 	}
-	ft_unquoted_str_end(vars, ind, c);
+	ft_unquoted_str_end(vars, ind);
 }
 
 static void	ft_strings_end(t_vars *vars, int operator)

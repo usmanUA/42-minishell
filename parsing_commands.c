@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
-#include <stdio.h>
 
 int	ft_quote_skipped(t_vars *vars, char quo)
 {
@@ -54,8 +53,7 @@ static int	ft_cont_parsing(t_vars *vars, char **s, t_envp *env_vars, int op)
 	char	*new;
 
 	temp = NULL;
-	if (vars->input_line[vars->ind] == '\"'
-		|| vars->input_line[vars->ind] == '\'')
+	if ((!vars->s_quote && !vars->d_quote) && (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\''))
 		ft_skip_quotes(vars);
 	// WARN: make sure the stop thing (space after quotes end case) works
 	if (vars->stop)
@@ -70,9 +68,11 @@ static int	ft_cont_parsing(t_vars *vars, char **s, t_envp *env_vars, int op)
 		temp = *s;
 		*s = ft_strjoin(*s, new);
 		free(temp);
+		free(new);
 		if (!*s)
 			return (MALLOC_FAIL);
 	}
+	// TODO: check the mem leaks for string new
 	if (vars->increment == YES)
 		vars->end++;
 	vars->ind = vars->end;
@@ -82,7 +82,6 @@ static int	ft_cont_parsing(t_vars *vars, char **s, t_envp *env_vars, int op)
 int	ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars, int op)
 {
 	*s = ft_next_string(vars, op, env_vars);
-	printf("str: %s\n", *s);
 	if (vars->malloc_flag == RED && !*s)
 		return (MALLOC_FAIL); // NOTE: Either malloc fail or all spaces until '\0'
 	if (vars->increment == YES) // WARN: adding 1 here works for all cases?

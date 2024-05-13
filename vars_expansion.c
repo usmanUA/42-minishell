@@ -11,11 +11,13 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-static	char	*ft_find_value(t_vars *vars, t_envp *env_vars, char *key, int len)
+static	char	*ft_find_value(t_vars *vars, t_envp *env_vars, char *key)
 {
 	char	*value;
 	t_envp	*envp;
+	int	len;
 
+	len = ft_strlen(key);
 	value = NULL;
 	envp = env_vars;
 	while (envp->next)
@@ -31,37 +33,12 @@ static	char	*ft_find_value(t_vars *vars, t_envp *env_vars, char *key, int len)
 	return (value);
 }
 
-static	char	*ft_join_str_expansion(t_vars *vars, t_envp *env_vars)
-{
-	char	*str;
-	int		len;
-	char	*key;
-	char	*value;
-
-	str = NULL;
-	len = vars->ind - 1;
-	while (++len < vars->end)
-	{
-		if (vars->input_line[len] == '$')
-			break ;
-	}
-	str = ft_substr(vars->input_line, vars->ind, len);
-	if (!str)
-		return (NULL);
-	++len;
-	key = &vars->input_line[len];
-	value = ft_find_value(vars, env_vars, key, vars->end - len);
-	if (value)
-		str = ft_strjoin(str, value);
-	return (str);
-}
-
 static	char	*ft_expand_key(t_vars *vars, t_envp *env_vars, char *key, int op)
 {
 	char	*str;
 
 	str = NULL;
-	str = ft_find_value(vars, env_vars, key, vars->end-(vars->ind+1));
+	str = ft_find_value(vars, env_vars, key);
 	if (op == FILENAME && vars->expand_it == YES && vars->expanded == NO)
 	{
 		key = ft_substr(vars->input_line, vars->ind, vars->end - vars->ind);
@@ -73,24 +50,43 @@ static	char	*ft_expand_key(t_vars *vars, t_envp *env_vars, char *key, int op)
 	return (str);
 }
 
+char	*ft_parse_key(t_vars *vars, int *end)
+{
+	char	*key;
+	char	c;
+	int	start;
+
+	start = *end;
+	c = vars->input_line[*end];
+	while (c == '_' || ft_isalnum(c))
+	{
+		++(*end);
+		c = vars->input_line[*end];
+	}
+	key = ft_substr(vars->input_line, start, *end);
+	return (key);	
+}
+
 char	*ft_expand_variable(t_vars *vars, t_envp *env_vars, int op)
 {
 	char	*str;
 	char	*key;
+	int	end;
 
-	if (vars->input_line[vars->ind] == '$')
+	end = vars->ind + 1;
+	if (vars->input_line[end] == '?')
 	{
-		key = &vars->input_line[vars->ind];
-		if (!ft_strncmp(key, "$?", 2))
-		{
-			vars->expanded = YES;
-			str = ft_itoa(vars->exit_status);
-		}
-		else
-			str = ft_expand_key(vars, env_vars, ++key, op);
+		str = ft_itoa(vars->exit_status);
+		++end;
 	}
 	else
-		str = ft_join_str_expansion(vars, env_vars);
+	{
+		key = ft_substr(vars->input_line, vars->ind+1, vars->end - (vars->ind + 1));
+		str = ft_expand_key(vars, env_vars, key, op);
+		free(key);
+	}
+	// if (end < vars->end - vars->ind)
+	// 	vars->qontinue = YES;
 	return (str);
 }
 

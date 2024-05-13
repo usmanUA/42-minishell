@@ -1,3 +1,4 @@
+asan = -fsanitize=address
 flags = -Wall -Wextra -Werror
 READLINE_LIB = ~/.brew/Cellar/readline/8.2.10/lib
 READLINE_HEADER = ~/.brew/Cellar/readline/8.2.10/include
@@ -32,15 +33,16 @@ FILES = \
 			validate_and_execute.c \
 			validate_commands.c \
 
+
 OBJS = $(FILES:.c=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJS) $(LIBVEC) $(BUILTIN_LIB) $(LIBFT)
-	@(echo "$(GREEN)Creating The Executable:   $(NAME)$(RESET)" && cc $(OBJS) $(LIBVEC) $(BUILTIN_LIB) $(LIBFT) -L ${READLINE_LIB} -lreadline -I ${READLINE_HEADER} -g -fsanitize=address -o $(NAME))
+$(NAME): $(OBJS) $(LIBVEC) $(BUILTIN_LIB) $(LIBFT)	
+	@(echo "$(GREEN)Creating The Executable:   $(NAME)$(RESET)" && cc $(OBJS) $(LIBVEC) $(BUILTIN_LIB) $(LIBFT) $(LIBVEC) -L ${READLINE_LIB} -lreadline -I ${READLINE_HEADER} -g -o $(NAME))
 	
 %.o: %.c
-	@(echo "$(GREEN)Creating Object File: $@$(RESET)" && cc $(flags) -I ${READLINE_HEADER} -c $< -o $@)
+	@(echo "$(GREEN)Creating Object File: $@$(RESET)" && cc -g -I ${READLINE_HEADER} -c $< -o $@)
 	
 $(BUILTIN_LIB):
 	@$(MAKE) -C builtins

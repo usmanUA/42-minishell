@@ -21,7 +21,7 @@ int	vec_remove(t_vec *src, size_t index)
 		return (1);
 	}
 	ft_memmove(vec_get(src, index), &src->mem[(index + 1) * src->size],
-			(src->len - index) * src->size);
+			(src->len - (index+1)) * src->size);
 	src->len--;
 	return (1);
 }
