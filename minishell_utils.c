@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <time.h>
 
 int	ft_valid_input(t_vars *vars, t_shell *shell)
 {
@@ -19,21 +20,24 @@ int	ft_valid_input(t_vars *vars, t_shell *shell)
 	if (vars->input_line[0] == '\0')
 	{
 		shell->status = GREEN;
+		ft_free_prompt(shell, NO);
 		return (NO);
 	}
 	if (ft_syntax_error(vars) == YES)
 	{
 		shell->status = 258;
-		free((char *)vars->input_line);
+		ft_free_prompt(shell, NO);
 		return (NO);
 	}
-	if (!vec_new(shell->pipes, 1, sizeof(t_input **)))
-		return (NO); // NOTE: malloc fail, error message | code?
 	return (YES);
 }
 
 int	ft_prompt(t_shell *shell, char **envp)
 {
+	shell->pipes = NULL;
+	shell->pids = NULL;
+	shell->vars = NULL;
+	shell->envp = NULL;
 	if (ft_init_shell(shell, envp) == MALLOC_FAIL)
 		return (MALLOC_FAIL);
 	ft_init_vars(shell->vars);

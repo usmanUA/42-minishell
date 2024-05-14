@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
-#include <cstdio>
-#include <cstdlib>
 
 void	ft_index_after_spaces(t_vars *vars)
 {
@@ -57,7 +55,7 @@ int	ft_redirection(t_vars *vars)
 	return (NO);
 }
 
-static int	ft_parsing_action(t_input **input, t_vec *cmd, t_shell *shell)
+static int	ft_parsing_action(t_shell *shell)
 {
 	char	c;
 
@@ -69,14 +67,12 @@ static int	ft_parsing_action(t_input **input, t_vec *cmd, t_shell *shell)
 	{
 		if (ft_redirection(shell->vars) == YES)
 		{
-			if (!ft_handle_redirects(input, shell->vars,
-					shell->env_list)) // TODO: look for error handling
-				return (MALLOC_FAIL); // TODO: differentiate malloc_fail with file_failure, especially here_doc
+			if (ft_handle_redirects(shell) == MALLOC_FAIL)
+				return (MALLOC_FAIL);
 		}
 		else if (c != '\0' && c != '|')
 		{
-			if (!ft_save_cmd(cmd, shell->vars, shell->env_list))
-			// TODO: look for error handling
+			if (ft_save_cmd(shell) == MALLOC_FAIL)
 				return (MALLOC_FAIL);
 		}
 		ft_index_after_spaces(shell->vars);
@@ -90,32 +86,30 @@ static int	ft_parsing_action(t_input **input, t_vec *cmd, t_shell *shell)
 	return (MALLOC_SUCCESS);
 }
 
-static int	ft_parse_command_line(t_input **input, t_shell *shell)
+static int	ft_parse_command_line(t_shell *shell)
 {
 	int		*file_flag;
 	t_vec	*cmd;
 	char	*null;
+	t_input	**input;
 
 	// NOTE: PARSES the WHOLE command line into the following two vectors
 	null = NULL;
+	input = shell->input;
 	cmd = (t_vec *)malloc(sizeof(t_vec));
 	if (!cmd)
-		return (MALLOC_FAIL);
-	if (!vec_new(cmd, 2, sizeof(char **)))
-	// NOTE: Init a vec and allocate some mem for command
-		return (MALLOC_FAIL);              // NOTE: malloc fail
+		return (ft_free_prompt(shell, YES));;
+	(*input)->cmd = cmd;
+	vec_new(cmd, 0, sizeof(char **));
 	file_flag = (int *)malloc(sizeof(int));
 	if (!file_flag)
-		return (MALLOC_FAIL);
+		return (ft_free_prompt(shell, YES));;
 	*file_flag = GREEN;
 	(*input)->file_flag = file_flag;
-	if (ft_parsing_action(input, cmd, shell) == MALLOC_FAIL) // TODO: Handle errors correctly
-		return (MALLOC_FAIL);                           
-		// NOTE: other error than malloc fail?
+	if (ft_parsing_action(shell) == MALLOC_FAIL)
+		return (MALLOC_FAIL);
 	if (!vec_push(cmd, &null))
-		return (MALLOC_FAIL); // NOTE: malloc fail
-	// NOTE: saving addresses of cmd and redirect to input
-	(*input)->cmd = cmd;
+		return (ft_free_prompt(shell, YES));;
 	return (MALLOC_SUCCESS);
 }
 
@@ -156,19 +150,6 @@ void	ft_zero_redirects(t_redir_count *redir_count)
 	redir_count->in_redir = 0;
 }
 
-void	ft_free_parsed(t_input **input, t_vars *vars)
-{
-	if (vars->input_line)
-		free(vars->input_line);
-	if (*input)
-	{
-		ft_free_redirect(&(*input)->new_fds);
-		ft_free_redirect(&(*input)->orig_fds);
-		ft_free_redirect(&(*input)->fds_info);
-		free(*input);
-	}
-}
-
 int	ft_save_input(t_shell *shell)
 {
 	t_input			*input;
@@ -185,21 +166,14 @@ int	ft_save_input(t_shell *shell)
 		input = malloc(sizeof(t_input));
 			// NOTE: executed in the very beg. or the beg. of every pipe (|) if any
 		if (!input)
-		{
-			ft_free_parsed(&input, shell->vars);
-			exit(EXIT_FAILURE);
-		}
-		ft_init_redirect_vecs(&input, &redir_count); // TODO: FREE vars->input_line if malloc fails
-		if (ft_parse_command_line(&input, shell) == MALLOC_FAIL)
-		{
-			ft_free_parsed(&input, shell->vars);
-			exit(EXIT_FAILURE);
-		}
+			return (ft_free_prompt(shell, NO));
+		shell->input = &input;
+		if (ft_init_redirect_vecs(shell, &redir_count) == MALLOC_FAIL) // TODO: FREE vars->input_line if malloc fails
+			return (MALLOC_FAIL);
+		if (ft_parse_command_line(shell) == MALLOC_FAIL)
+			return (MALLOC_FAIL);
 		if (!vec_push(shell->pipes, &input))
-		{
-			ft_free_parsed(&input, shell->vars);
-			exit(EXIT_FAILURE);
-		}
+			return (ft_free_prompt(shell, YES));
 		ft_zero_redirects(&redir_count);
 	}
 	return (MALLOC_SUCCESS);

@@ -140,6 +140,7 @@ typedef struct s_pipex
 	int	fds[2];
 	int	exec_type;
 	int	tot_pipes;
+	char	**command;
 	t_input		*input;
 }			t_pipex;
 
@@ -154,9 +155,9 @@ typedef struct s_shell
 {
 	int	status;
 	char    **envp;
+	t_input    **input;
 	t_envp	*env_list;
 	t_vec	*pipes;
-	t_vec	*info;
 	t_vec	*pids;
 	t_vars	*vars;
 
@@ -166,14 +167,14 @@ typedef struct s_shell
 void	ft_init_vars(t_vars *vars);
 int ft_space_until_end(t_vars *vars);
 int ft_save_input(t_shell *shell);
-int	ft_handle_redirects(t_input **input, t_vars *vars, t_envp *env_vars);
-char *ft_next_string(t_vars *vars, int op, t_envp *env_vars);
+int	ft_handle_redirects(t_shell *shell);
+char	*ft_next_string(t_shell *shell, int op);
 void	ft_shift_pointer(t_vars *vars);
 void	ft_next_pipe_null(t_vars *vars);
 int ft_operator_first(t_input *input, t_vars *vars);
 int ft_command_first(t_input *input, t_vars *vars);
-int ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars, int op);
-int ft_save_cmd(t_vec *cmd, t_vars *vars, t_envp *env_vars);
+int	ft_save_cmd_filename(t_shell *shell, char **s, int op);
+int	ft_save_cmd(t_shell *shell);
 int ft_token_error(char c, int sgle);
 void ft_index_after_spaces(t_vars *vars);
 int ft_redirection(t_vars *vars);
@@ -187,12 +188,12 @@ void	ft_validate_commands(t_pipex *pipex, t_shell *shell);
 
 void    ft_validate_execute(t_shell *shell);
 int	ft_execute(t_shell *shell);
-void	ft_processes(t_pipex *pipex, t_shell *shell);
-void	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell);
+int	ft_processes(t_pipex *pipex, t_shell *shell);
+int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell);
 
 int ft_init_shell(t_shell *shell, char **envp);
 void	ft_init_vars(t_vars *vars);
-void ft_init_redirect_vecs(t_input **input, t_redir_count *redir_count);
+int	ft_init_redirect_vecs(t_shell *shell, t_redir_count *redir_count);
 void	ft_init_pipex(t_pipex *pipex, int tot_pipes);
 
 
@@ -218,7 +219,8 @@ int		env_command(t_shell *data, char **command);
 int	builtin_commands(t_shell *shell, char **command, int exec_type);
 int	exit_command(t_shell *data, char **command);
 int		export_command(t_shell *data, char **command);
-void	ft_free_shell(t_shell *shell, int free_env);
+int	ft_free_prompt(t_shell *shell, int input_separate);
+void	free_env_list(t_shell *data);
 int		pwd_command(t_shell *data);
 t_envp	*search_for_envp(t_shell *data, char *command);
 int		unset_command(t_shell *data, char **command);

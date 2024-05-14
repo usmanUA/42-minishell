@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <stdio.h>
 
 void	free_env_list(t_shell *data)
 {
@@ -44,6 +45,7 @@ static	void	ft_free_redirect(t_vec **redirect)
 		}
 		vec_free(*redirect);
 		free(*redirect);
+		redirect = NULL;
 	}
 }
 
@@ -58,11 +60,14 @@ static void	ft_free_cmd(t_vec *cmd)
 		while (++ind < (int)cmd->len)
 		{
 			str = *(char **)vec_get(cmd, ind);
+			printf("freeing: %s\n", str);
 			if (str)
 				free(str);
+			printf("freed command\n");
 		}
 		vec_free(cmd);
 		free(cmd);
+		cmd = NULL;
 	}
 }
 
@@ -79,34 +84,41 @@ void	ft_free_input(void **inpt)
 		ft_free_redirect(&input->fds_info);
 		free(input->file_flag);
 		free(input);
+		input = NULL;
 	}
 }
 
-void	ft_free_shell(t_shell *shell, int free_env)
+int	ft_free_prompt(t_shell *shell, int input_separate)
 {
+	// TODO: FREE 3 char * coming from handle_redirect function
 	int	ind;
 
-	if (free_env == YES)
-		free_env_list(shell);
-	if (shell->info)
+	if (input_separate == YES)
 	{
-		vec_free(shell->info);
-		free(shell->info);
+		printf("freeing input\n");
+		ft_free_input((void **)shell->input);
 	}
 	ind = -1;
 	if (shell->pipes)
 	{
 		while (++ind < (int)shell->pipes->len)
 			ft_free_input(vec_get(shell->pipes, ind));
+		printf("freeing pipes\n");
 		vec_free(shell->pipes);
 		free(shell->pipes);
+		shell->pipes = NULL;
 	}
-	if (shell->pids)
-	{
-		vec_free(shell->pids);
-		free(shell->pids);
-	}
+	printf("freeing pids\n");
+	vec_free(shell->pids);
+	free(shell->pids);
+	shell->pids = NULL;
 	if (shell->vars->unlink_here_doc == YES)
 		unlink(".here_doc");
+	printf("freeing input_line\n");
+	free(shell->vars->input_line);
+	shell->vars->input_line = NULL;
+	printf("freeing vars\n");
 	free(shell->vars);
+	shell->vars = NULL;
+	return (MALLOC_FAIL);
 }

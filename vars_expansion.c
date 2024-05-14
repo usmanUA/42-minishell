@@ -11,21 +11,26 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-static	char	*ft_find_value(t_vars *vars, t_envp *env_vars, char *key)
+static	char	*ft_find_value(t_shell *shell, char **key)
 {
 	char	*value;
 	t_envp	*envp;
 	int	len;
 
-	len = ft_strlen(key);
+	len = ft_strlen(*key);
 	value = NULL;
-	envp = env_vars;
+	envp = shell->env_list;
 	while (envp->next)
 	{
-		if (!ft_strncmp(key, envp->key, len))
+		if (!ft_strncmp(*key, envp->key, len))
 		{
-			vars->expanded = YES;
+			shell->vars->expanded = YES;
 			value = ft_strdup(envp->value);
+			if (value == NULL)
+			{
+				free(*key);
+				ft_free_prompt(shell, YES);
+			}
 			break ;
 		}
 		envp = envp->next;
@@ -33,19 +38,25 @@ static	char	*ft_find_value(t_vars *vars, t_envp *env_vars, char *key)
 	return (value);
 }
 
-static	char	*ft_expand_key(t_vars *vars, t_envp *env_vars, char *key, int op)
+static	char	*ft_expand_key(t_shell *shell, char **key, int op)
 {
 	char	*str;
 
 	str = NULL;
-	str = ft_find_value(vars, env_vars, key);
-	if (op == FILENAME && vars->expand_it == YES && vars->expanded == NO)
+	str = ft_find_value(shell, key);
+	free(*key);
+	key = NULL;
+	if (op == FILENAME && shell->vars->expand_it == YES && shell->vars->expanded == NO)
 	{
-		key = ft_substr(vars->input_line, vars->ind, vars->end - vars->ind);
-		if (!key)
-			return (NULL);
-		ft_filerror(0, key, YES);
-		free(key);
+		*key = ft_substr(shell->vars->input_line, shell->vars->ind, shell->vars->end - shell->vars->ind);
+		if (!(*key))
+		{
+			if (str)
+				free(str);
+			return (NULL); // NOTE: free str before exit?
+		}
+		ft_filerror(0, *key, YES);
+		free(*key);
 	}
 	return (str);
 }
@@ -67,23 +78,24 @@ char	*ft_parse_key(t_vars *vars, int *end)
 	return (key);	
 }
 
-char	*ft_expand_variable(t_vars *vars, t_envp *env_vars, int op)
+char	*ft_expand_variable(t_shell *shell, int op)
 {
 	char	*str;
 	char	*key;
 	int	end;
 
-	end = vars->ind + 1;
-	if (vars->input_line[end] == '?')
+	end = shell->vars->ind + 1;
+	if (shell->vars->input_line[end] == '?')
 	{
-		str = ft_itoa(vars->exit_status);
+		str = ft_itoa(shell->vars->exit_status); // NOTE: can itoa return NULL in cases other than malloc fail?
 		++end;
 	}
 	else
 	{
-		key = ft_substr(vars->input_line, vars->ind+1, vars->end - (vars->ind + 1));
-		str = ft_expand_key(vars, env_vars, key, op);
-		free(key);
+		key = ft_substr(shell->vars->input_line, shell->vars->ind+1, shell->vars->end - (shell->vars->ind + 1));
+		if (key == NULL)
+			return (NULL);
+		str = ft_expand_key(shell, &key, op);
 	}
 	// if (end < vars->end - vars->ind)
 	// 	vars->qontinue = YES;

@@ -25,23 +25,16 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		if (!shell.vars->input_line)
 		{
-			ft_free_shell(&shell, YES);
+			ft_free_prompt(&shell, YES);
 			break ; // NOTE: readlines malloc fail? error message | code?
 		}
 		ft_signals(CHILD, ON, &shell.status);
 		if (ft_valid_input(shell.vars, &shell) == NO)
 			continue ;
 		if (ft_save_input(&shell) == MALLOC_FAIL)
-		{
-			free(shell.vars->input_line);
-			ft_free_shell(&shell, NO);
-			continue ; // NOTE: [malloc fail, what else could fail there?], error message | code?
-		}
-		free((char *)shell.vars->input_line);
-			// NOTE: everything saved to vector pipes
-		ft_validate_execute(&shell);         
-			// TODO: WHAT TODO when malloc fails in subsequent funcitons
-		ft_free_shell(&shell, NO);
+			continue;
+		ft_validate_execute(&shell);
 	}
+	free_env_list(&shell);
 	return (shell.status);
 }

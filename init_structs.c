@@ -10,31 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
-#include <cstdio>
-#include <cstdlib>
 
 int	ft_init_shell(t_shell *shell, char **envp)
 {
 	t_vec	*pipes;
-	t_vec	*info;
 	t_vars	*vars;
 
+	shell->envp = envp; // NOTE: shell->envp once gave segfault in ft_split, be careful carrying this pointer along
 	pipes = (t_vec *)malloc(sizeof(t_vec));
 	if (!pipes)
 		return (MALLOC_FAIL);
+	shell->pipes = pipes;
 	vec_new(pipes, 0, sizeof(t_input **));
-	info = (t_vec *)malloc(sizeof(t_vec));
-	if (!info)
-		return (MALLOC_FAIL);
-	vec_new(info, 0, sizeof(int));
 	vars = (t_vars *)malloc(sizeof(t_vars));
 	if (!vars)
-		return (MALLOC_FAIL);
-	shell->pipes = pipes;
-	shell->info = info;
-	shell->pids = NULL;
+		return (ft_free_prompt(shell, YES));
 	shell->vars = vars;
-	shell->envp = envp; // NOTE: shell->envp once gave segfault in ft_split, be careful carrying this pointer along
 	return (MALLOC_SUCCESS);
 }
 
@@ -80,38 +71,30 @@ static int	ft_no_redirections(t_input **input, t_redir_count *redir_count)
 	return (NO);
 }
 
-static	void	ft_free_exit(void **input)
-{
-	ft_free_input(input);
-	exit(EXIT_FAILURE);
-}
-
-void	ft_init_redirect_vecs(t_input **input, t_redir_count *redir_count)
+int	ft_init_redirect_vecs(t_shell *shell, t_redir_count *redir_count)
 {
 	t_vec	*new_fds;
 	t_vec	*orig_fds;
 	t_vec	*fds_info;
 
-	if (ft_no_redirections(input, redir_count) == YES)
-		return;
+	if (ft_no_redirections(shell->input, redir_count) == YES)
+		return (1);
 	new_fds = (t_vec *)malloc(sizeof(t_vec));
 	if (!new_fds)
-		ft_free_exit((void **)input);
-	(*input)->new_fds = new_fds;
-	if (!vec_new(new_fds, 2, sizeof(long))) 
-		ft_free_exit((void **)input);
+		return (ft_free_prompt(shell, YES));
+	(*shell->input)->new_fds = new_fds;
+	vec_new(new_fds, 0, sizeof(long));
 	orig_fds = (t_vec *)malloc(sizeof(t_vec));
 	if (!orig_fds)
-		ft_free_exit((void **)input);
-	(*input)->orig_fds = orig_fds;
-	if (!vec_new(orig_fds, 2, sizeof(long)))
-		ft_free_exit((void **)input);
+		return (ft_free_prompt(shell, YES));
+	(*shell->input)->orig_fds = orig_fds;
+	vec_new(orig_fds, 0, sizeof(long));
 	fds_info = (t_vec *)malloc(sizeof(t_vec));
 	if (!fds_info)
-		ft_free_exit((void **)input);
-	(*input)->fds_info = fds_info;
-	if (!vec_new(fds_info, 2, sizeof(long)))
-		ft_free_exit((void **)input);
+		return (ft_free_prompt(shell, YES));
+	(*shell->input)->fds_info = fds_info;
+	vec_new(fds_info, 0, sizeof(long));
+	return (MALLOC_SUCCESS);
 }
 
 void	ft_init_pipex(t_pipex *pipex, int tot_pipes)
@@ -120,6 +103,7 @@ void	ft_init_pipex(t_pipex *pipex, int tot_pipes)
 	pipex->infile = 42;
 	pipex->cmd_flag = GREEN;
 	pipex->exec_type = GREEN;
+	pipex->command = NULL;
 	pipex->tot_pipes = tot_pipes;
 	pipex->input = NULL;
 }

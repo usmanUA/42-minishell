@@ -10,64 +10,49 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <stdio.h>
 
-static	void	ft_validate_exec_last_child(t_pipex *pipex, t_shell *shell)
+static	int	ft_validate_exec_last_child(t_pipex *pipex, t_shell *shell)
 {
-	int	cmd_flag;
-
-	cmd_flag = GREEN;
+	shell->vars->malloc_flag = GREEN;
+	pipex->cmd_flag = GREEN;
 	ft_validate_commands(pipex, shell);
-	if (pipex->exec_type != EXTERNAL)
-	{
-		if (!vec_push(shell->info, &cmd_flag))
-		{
-			ft_free_all(shell, YES);
-			exit(EXIT_FAILURE);
-		}
-	}
-	if (pipex->exec_type == EXTERNAL)
-		pipex->cmd_flag = *(int *)vec_get(shell->info, pipex->idx);
+	if (shell->vars->malloc_flag == RED)
+		return (MALLOC_FAIL);
 	shell->status = pipex->cmd_flag;
 	if (pipex->cmd_flag == GREEN)
-		ft_execute_last_cmd(pipex, shell);
+	{
+		if (ft_execute_last_cmd(pipex, shell) == MALLOC_FAIL)
+			return (MALLOC_FAIL);
+	}
+	return (MALLOC_SUCCESS);
 }
 
-void	ft_init_pids(t_shell *shell)
+int	ft_init_pids(t_shell *shell)
 {
 	t_vec	*pids;
 
 	pids = (t_vec *)malloc(sizeof(t_vec));
 	if (!pids)
-	{
-		ft_free_all(shell, YES);
-		exit(EXIT_FAILURE);
-	}
-	if (!vec_new(pids, 1, sizeof(int)))
-	{
-		ft_free_all(shell, YES);
-		exit(EXIT_FAILURE);
-	}
+		return (ft_free_prompt(shell, NO));
+	vec_new(pids, 0, sizeof(int));
 	shell->pids = pids;
+	return (MALLOC_SUCCESS);
 }
 
-static	void	ft_validate_exec_childs(t_pipex *pipex, t_shell *shell)
+static	int	ft_validate_exec_childs(t_pipex *pipex, t_shell *shell)
 {
-	int	cmd_flag;
-
-	cmd_flag = GREEN;
+	pipex->cmd_flag = GREEN;
+	shell->vars->malloc_flag = GREEN;
 	ft_validate_commands(pipex, shell);
-	if (pipex->exec_type != EXTERNAL)
-	{
-		if (!vec_push(shell->info, &cmd_flag))
-		{
-			ft_free_all(shell, YES);
-			exit(EXIT_FAILURE);
-		}
-	}
-	if (pipex->exec_type == EXTERNAL)
-		pipex->cmd_flag = *(int *)vec_get(shell->info, pipex->idx);
+	if (shell->vars->malloc_flag == RED)
+		return (MALLOC_FAIL);
 	if (pipex->cmd_flag == GREEN)
-		ft_processes(pipex, shell);
+	{
+		if (ft_processes(pipex, shell) == MALLOC_FAIL)
+			return (MALLOC_FAIL);
+	}
+	return (MALLOC_SUCCESS);
 }
 
 void	ft_validate_execute(t_shell *shell)
@@ -76,18 +61,27 @@ void	ft_validate_execute(t_shell *shell)
 
 	ft_init_pipex(&pipex, shell->pipes->len - 1);
 	if (pipex.tot_pipes > 0)
-		ft_init_pids(shell);
+	{
+		if (ft_init_pids(shell) == MALLOC_FAIL)
+			return;
+	}
 	while (++pipex.idx < shell->pipes->len - 1)
 	{
 		pipex.input = *(t_input **)vec_get(shell->pipes, pipex.idx);
 		if (*pipex.input->file_flag == BROWN)
 			continue;
-		ft_validate_exec_childs(&pipex, shell);
+		if (ft_validate_exec_childs(&pipex, shell) == MALLOC_FAIL)
+			return;
 	}
 	pipex.input = *(t_input **)vec_get(shell->pipes, pipex.idx);
 	shell->status = *pipex.input->file_flag;
 	if (shell->status == BROWN)
+	{
+		ft_free_prompt(shell, NO);
 		return;
+	}
 	ft_validate_exec_last_child(&pipex, shell);
+	ft_free_prompt(shell, NO);
+	printf("here\n");
 }
 

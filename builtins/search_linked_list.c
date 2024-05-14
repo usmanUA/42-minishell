@@ -37,7 +37,7 @@ char	*get_name_of_env_variable(t_shell *data, char *envp_string)
 	name = (char *)malloc(sizeof(char) * (name_length + 1));
 	if (name == NULL)
 	{
-		ft_free_all(data, YES);
+		free_env_list(data);
 		exit (1);
 	}
 	name = string_n_copy(name, envp_string, name_length);
@@ -57,7 +57,7 @@ char	*get_value_of_env_variable(t_shell *data, char *envp_string)
 	value_string = (char *)malloc(sizeof(char) * (value_length + 1));
 	if (value_string == NULL)
 	{
-		ft_free_all(data, YES);
+		free_env_list(data);
 		exit (1);
 	}
 	value_string = string_n_copy(value_string, value, value_length);

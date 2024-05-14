@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
-#include <stdio.h>
 
 int	ft_status(int status)
 {
@@ -103,41 +102,35 @@ static void	ft_child(t_pipex *pipex, t_shell *shell)
 	// TODO: check for execve fail
 }
 
-void	ft_push_pid(t_shell *shell, int *pid)
+int	ft_push_pid(t_shell *shell, int *pid)
 {
 	if (!vec_push(shell->pids, pid))
 	{
-		ft_free_all(shell, YES);
 		ft_wait_childs(shell);
-		exit(EXIT_FAILURE);
+		return (ft_free_prompt(shell, NO));
 	}
+	return (MALLOC_SUCCESS);
 }
 
-void	ft_processes(t_pipex *pipex, t_shell *shell)
+int	ft_processes(t_pipex *pipex, t_shell *shell)
 {
 	int	pid;
 
 	if (pipe(pipex->fds) == -1)
-	{
-		ft_free_all(shell, YES);
-		exit(EXIT_FAILURE);
-	}
+		return (ft_free_prompt(shell, NO));
 	pid = fork();
 	if (pid == -1)
-	{
-		// NOTE: should we close the pipes here? fds[0] and fds[1]
-		ft_free_all(shell, YES);
-		exit(EXIT_FAILURE);
-	}
-	// TODO: save pids for all the childs (whatever there number is)
+		return (ft_free_prompt(shell, NO));
 	if (pid == 0)
 		ft_child(pipex, shell);
 	else
 	{
 		close(pipex->fds[1]);
 		pipex->infile = pipex->fds[0];
-		ft_push_pid(shell, &pid);
+		if (ft_push_pid(shell, &pid) == MALLOC_FAIL)
+			return (ft_free_prompt(shell, NO));
 	}
+	return (MALLOC_SUCCESS);
 }
 
 static	void	ft_last_chid(t_pipex *pipex, t_shell *shell, char **command)
@@ -148,9 +141,10 @@ static	void	ft_last_chid(t_pipex *pipex, t_shell *shell, char **command)
 		execve(command[0], command, shell->envp);
 	else
 		exit(builtin_commands(shell, command, pipex->exec_type));
+	exit(EXIT_FAILURE);
 }
 
-static void	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
+static int	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
 {
 	int	pid;
 
@@ -159,18 +153,22 @@ static void	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
 	// 2. If no pipe/s (pipes == 0),STDIN is STDIN OR 0< file is new STDIN (if there's input redirection)
 	pid = fork();
 	if (pid == -1)
-	{
-		ft_free_all(shell, YES);
-		exit(EXIT_FAILURE);
-	}
+		return (ft_free_prompt(shell, NO));
 	if (pid == 0)
 		ft_last_chid(pipex, shell, command);
 	else
 		waitpid(pid, &shell->status, 0);
 	shell->status = ft_status(shell->status);
+	return (MALLOC_SUCCESS);
 }
 
-void	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
+void	ft_free_shell(t_shell *shell)
+{
+	free_env_list(shell);
+	ft_free_prompt(shell, NO);
+}
+
+int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 {
 	int	pid;
 	char	**args;
@@ -178,17 +176,24 @@ void	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 	// TODO: wait for the prev. childs using their pids (if there are any)
 	args = (char **)vec_get(pipex->input->cmd, 0);
 	if (pipex->exec_type == EXTERNAL || (pipex->exec_type != EXTERNAL && pipex->tot_pipes > 0))
-		ft_execute_in_child(pipex, shell, args);
+	{
+		if (ft_execute_in_child(pipex, shell, args) == MALLOC_FAIL)
+			return (MALLOC_FAIL);
+	}
 	else
-		shell->status = builtin_commands(shell, args, pipex->exec_type);
+	{
+		if (builtin_commands(shell, args, pipex->exec_type) == MALLOC_FAIL)
+			return (MALLOC_FAIL);
+	}
 	if (pipex->tot_pipes > 0)
 		ft_wait_childs(shell);
 	if (pipex->exec_type != EXTERNAL && pipex->tot_pipes == 0)
 	{
 		if (pipex->exec_type == EXIT)
 		{
-			ft_free_all(shell, YES);
+			ft_free_shell(shell);
 			exit(EXIT_SUCCESS);
 		}
 	}
+	return (MALLOC_SUCCESS);
 }

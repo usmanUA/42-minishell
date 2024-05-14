@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-char	*ft_expand_variable(t_vars *vars, t_envp *env_vars, int op);
+char	*ft_expand_variable(t_shell *shell, int op);
 int	ft_valid_char(char next, int check_digits);
 int	ft_status_expansion(t_vars *vars, char c, int *ind);
 
@@ -131,22 +131,26 @@ static void	ft_strings_end(t_vars *vars, int operator)
 	vars->end = vars->ind + ind; // NOTE: END updates here
 }
 
-char	*ft_next_string(t_vars *vars, int op, t_envp *env_vars)
+char	*ft_next_string(t_shell *shell, int op)
 {
 	char	*s;
+	t_vars	*vars;
 
 	// NOTE: returns the next string
+	vars = shell->vars;
 	vars->expand_it = NO;
 	vars->expanded = NO;
 	vars->qontinue = NO;
 	vars->increment = NO;
+	vars->malloc_flag = GREEN;
 	ft_strings_end(vars, op); // NOTE: vars->end now points to the end of string
 	if (vars->expand_it == YES)
-		s = ft_expand_variable(vars, env_vars, op);
+		s = ft_expand_variable(shell, op);
 	else
+	{
 		s = ft_substr(vars->input_line, vars->ind, vars->end
 				- vars->ind);                       
-			// NOTE: malloc that string in heap and point str to it
+	}
 	if ((vars->expand_it == NO && !s) || (vars->expand_it == YES
 			&& vars->expanded == YES && !s)) // TODO: look back to the condition
 		vars->malloc_flag = RED;

@@ -47,12 +47,14 @@ void	ft_skip_quotes(t_vars *vars)
 	}
 }
 
-static int	ft_cont_parsing(t_vars *vars, char **s, t_envp *env_vars, int op)
+static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 {
 	char	*temp;
 	char	*new;
+	t_vars	*vars;
 
 	temp = NULL;
+	vars = shell->vars;
 	if ((!vars->s_quote && !vars->d_quote) && (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\''))
 		ft_skip_quotes(vars);
 	// WARN: make sure the stop thing (space after quotes end case) works
@@ -61,7 +63,9 @@ static int	ft_cont_parsing(t_vars *vars, char **s, t_envp *env_vars, int op)
 		vars->end = vars->ind;
 		vars->qontinue = NO;
 	}
-	new = ft_next_string(vars, op, env_vars);
+	new = ft_next_string(shell, op);
+	if (shell->vars->malloc_flag == RED && new == NULL)
+		return (ft_free_prompt(shell, YES));
 	if (vars->expand_it == NO || (vars->expand_it == YES
 			&& vars->expanded == YES))
 	{
@@ -69,8 +73,8 @@ static int	ft_cont_parsing(t_vars *vars, char **s, t_envp *env_vars, int op)
 		*s = ft_strjoin(*s, new);
 		free(temp);
 		free(new);
-		if (!*s)
-			return (MALLOC_FAIL);
+		if (*s == NULL)
+			return (ft_free_prompt(shell, YES));
 	}
 	// TODO: check the mem leaks for string new
 	if (vars->increment == YES)
@@ -79,40 +83,40 @@ static int	ft_cont_parsing(t_vars *vars, char **s, t_envp *env_vars, int op)
 	return (MALLOC_SUCCESS);
 }
 
-int	ft_save_cmd_filename(t_vars *vars, char **s, t_envp *env_vars, int op)
+int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
 {
-	*s = ft_next_string(vars, op, env_vars);
-	if (vars->malloc_flag == RED && !*s)
-		return (MALLOC_FAIL); // NOTE: Either malloc fail or all spaces until '\0'
-	if (vars->increment == YES) // WARN: adding 1 here works for all cases?
-		vars->end++;
-	vars->ind = vars->end;
-	while (vars->qontinue == YES)
+	*s = ft_next_string(shell, op);
+	if (shell->vars->malloc_flag == RED && *s == NULL)
+		return (ft_free_prompt(shell, YES));
+	if (shell->vars->increment == YES) // WARN: adding 1 here works for all cases?
+		shell->vars->end++;
+	shell->vars->ind = shell->vars->end;
+	while (shell->vars->qontinue == YES)
 	{
-		if (ft_cont_parsing(vars, s, env_vars, op) == MALLOC_FAIL)
+		if (ft_cont_parsing(shell, s, op) == MALLOC_FAIL)
 			return (MALLOC_FAIL);
 	}
 	return (MALLOC_SUCCESS);
 }
 
-int	ft_save_cmd(t_vec *cmd, t_vars *vars, t_envp *env_vars)
+int	ft_save_cmd(t_shell *shell)
 {
 	char	*s;
+	char	*input_line;
+	int	ind;
 
 	// NOTE: PARSE command and its options if there are any
-	if (vars->input_line[vars->ind] == '\"'
-		|| vars->input_line[vars->ind] == '\'')
-		ft_skip_quotes(vars);
-	if (ft_save_cmd_filename(vars, &s, env_vars, COMMAND) == MALLOC_FAIL)
+	input_line = shell->vars->input_line;
+	ind = shell->vars->ind;
+	if (input_line[ind] == '\"' || input_line[ind] == '\'')
+		ft_skip_quotes(shell->vars);
+	if (ft_save_cmd_filename(shell, &s, COMMAND) == MALLOC_FAIL)
 		return (MALLOC_FAIL);
-	if (s)
+	if (!vec_push((*shell->input)->cmd, &s))
 	{
-		if (!vec_push(cmd, &s))
-		{
-			if (s)
-				free(s);
-			return (MALLOC_FAIL);
-		}
+		if (s)
+			free(s);
+		return (ft_free_prompt(shell, YES));
 	}
 	return (MALLOC_SUCCESS);
 }

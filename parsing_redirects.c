@@ -11,135 +11,102 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-int	ft_push_fds(t_input **input, t_vars *vars)
+int	ft_push_fds(t_shell *shell)
 {
 	int	redirect;
 	int	fd_info;
 	int	file_fd;
 
-	redirect = vars->redirection_type;
-	fd_info = vars->redirection_type;
-	if (vars->fd)
-		redirect = ft_atoi(*vars->f_des);
-	file_fd = vars->file_fd;
-	if (!vec_push((*input)->new_fds, &file_fd))
+	redirect = shell->vars->redirection_type;
+	fd_info = shell->vars->redirection_type;
+	if (shell->vars->fd)
+		redirect = ft_atoi(*shell->vars->f_des);
+	file_fd = shell->vars->file_fd;
+	if (!vec_push((*shell->input)->new_fds, &file_fd))
+		return (ft_free_prompt(shell, YES));
+	if (!vec_push((*shell->input)->orig_fds, &redirect))
+		return (ft_free_prompt(shell, YES));
 	// NOTE: fd_in is in stack mem of this function, be careful
-		return (0);
-	if (!vec_push((*input)->orig_fds, &redirect))
-	// NOTE: fd_in is in stack mem of this function, be careful
-		return (0);
 	if (redirect == STDERR_FILENO)
 		fd_info = STDERR_FILENO;
-	if (!vec_push((*input)->fds_info, &fd_info))
+	if (!vec_push((*shell->input)->fds_info, &fd_info))
+		return (ft_free_prompt(shell, YES));
 	// NOTE: fd_in is in stack mem of this function, be careful
-		return (0);
-	return (1);
+	return (MALLOC_SUCCESS);
 }
 
 // TODO: check if decrementing redir_count with correct logic
-int	ft_input_redir(t_input **input, t_vars *vars)
+int	ft_input_redir(t_shell *shell)
 {
 	// NOTE: UPDATES redirect based on the possible input redirection
-	vars->redirection_type = STDIN_FILENO;
-	vars->file_fd = open(*vars->file, O_RDONLY);
-	if (vars->file_fd == -1)
+	shell->vars->redirection_type = STDIN_FILENO;
+	shell->vars->file_fd = open(*shell->vars->file, O_RDONLY);
+	if (shell->vars->file_fd == -1)
 	{
-		ft_filerror(errno, *vars->file, YES);
-		*(*input)->file_flag = BROWN;
-		free(*vars->f_des);
-		return (MALLOC_SUCCESS);
+		ft_filerror(errno, *shell->vars->file, YES);
+		*(*shell->input)->file_flag = BROWN;
+		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
-	if (vars->redir_count->in_redir == 1)
-	{
-		if (!ft_push_fds(input, vars))
-		{
-			if (vars->fd && *vars->f_des)
-				free(*vars->f_des);
-			return (MALLOC_FAIL);
-		}
-	}
-	else if (vars->redir_count->in_redir > 1)
-		vars->redir_count->in_redir--;
-	if (vars->fd && *vars->f_des)
-		free(*vars->f_des);
+	if (shell->vars->redir_count->in_redir == 1)
+		return (ft_push_fds(shell));
+	else if (shell->vars->redir_count->in_redir > 1)
+		shell->vars->redir_count->in_redir--;
 	return (MALLOC_SUCCESS);
 }
 
-int	ft_output_redir(t_input **input, t_vars *vars)
+int	ft_output_redir(t_shell *shell)
 {
 	// NOTE: UPDATES fds based on the possible output redirection
-	vars->redirection_type = STDOUT_FILENO;
-	vars->file_fd = open(*vars->file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (vars->file_fd == -1)
+	shell->vars->redirection_type = STDOUT_FILENO;
+	shell->vars->file_fd = open(*shell->vars->file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (shell->vars->file_fd == -1)
 	{
-		ft_filerror(errno, *vars->file, YES);
+		ft_filerror(errno, *shell->vars->file, YES);
 			// NOTE: write error when there's no permission for the output file
-		*(*input)->file_flag = BROWN;
-		free(*vars->f_des);
-		return (MALLOC_SUCCESS);
+		*(*shell->input)->file_flag = BROWN;
+		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
-	if (vars->redir_count->out_redir == 1)
-	{
-		if (!ft_push_fds(input, vars))
-		{
-			if (vars->fd && *vars->f_des)
-				free(*vars->f_des);
-			return (MALLOC_FAIL);
-		}
-	}
-	else if (vars->redir_count->out_redir > 1)
-		vars->redir_count->out_redir--;
-	if (vars->fd && *vars->f_des)
-		free(*vars->f_des);
+	if (shell->vars->redir_count->out_redir == 1)
+		return (ft_push_fds(shell));
+	else if (shell->vars->redir_count->out_redir > 1)
+		shell->vars->redir_count->out_redir--;
 	return (MALLOC_SUCCESS);
 }
 
-int	ft_output_append(t_input **input, t_vars *vars)
+int	ft_output_append(t_shell *shell)
 {
 	// NOTE: UPDATES fds based on the possible output append redirection
-	vars->redirection_type = STDOUT_FILENO;
-	vars->file_fd = open(*vars->file, O_WRONLY | O_CREAT | O_APPEND, 0644);
-	if (vars->file_fd == -1)
+	shell->vars->redirection_type = STDOUT_FILENO;
+	shell->vars->file_fd = open(*shell->vars->file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if (shell->vars->file_fd == -1)
 	{
-		ft_filerror(errno, *vars->file, YES);
-		*(*input)->file_flag = BROWN;
-		free(*vars->f_des);
-		vars->f_des = NULL;
-		return (MALLOC_SUCCESS);
+		ft_filerror(errno, *shell->vars->file, YES);
+		*(*shell->input)->file_flag = BROWN;
+		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
-	if (vars->redir_count->out_redir == 1)
-	{
-		if (!ft_push_fds(input, vars))
-		{
-			if (vars->fd && *vars->f_des)
-				free(*vars->f_des);
-			return (MALLOC_FAIL);
-		}
-	}
-	else if (vars->redir_count->out_redir > 1)
-		vars->redir_count->out_redir--;
-	if (vars->fd && *vars->f_des)
-		free(*vars->f_des);
+	if (shell->vars->redir_count->out_redir == 1)
+		return (ft_push_fds(shell));
+	else if (shell->vars->redir_count->out_redir > 1)
+		shell->vars->redir_count->out_redir--;
 	return (MALLOC_SUCCESS);
 }
 
-int	ft_get_here_doc(t_vars *vars)
+int	ft_get_here_doc(t_shell *shell)
 {
 	char	*line;
 	char	*eof;
 	int		fd_here_doc;
 
-	eof = *vars->file;
+	eof = *shell->vars->file;
 	fd_here_doc = open(".here_doc", O_WRONLY | O_TRUNC | O_CREAT, 0666);
 	if (fd_here_doc == -1)
 	{
 		ft_filerror(errno, ".here_doc", NO);
-		free(*vars->f_des);
-		vars->f_des = NULL;
-		vars->unlink_here_doc = NO;
+		shell->vars->unlink_here_doc = NO;
+		*(*shell->input)->file_flag = BROWN;
 		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
@@ -147,7 +114,7 @@ int	ft_get_here_doc(t_vars *vars)
 	while (42)
 	{
 		if (line == NULL)
-			return (MALLOC_FAIL);
+			return (ft_free_prompt(shell, YES));;
 		if (((ft_strlen(line) - 1) == ft_strlen(eof) && !strncmp(line, eof,
 					strlen(eof))) || !line)
 			break ;
@@ -165,103 +132,79 @@ int	ft_open_here_doc(t_input **input, t_vars *vars)
 	{
 		ft_filerror(errno, ".here_doc", NO);
 		*(*input)->file_flag = BROWN;
-		free(*vars->f_des);
-		vars->f_des = NULL;
 		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
-	return (MALLOC_SUCCESS);
+	return (1);
 }
 
-int	ft_here_doc(t_input **input, t_vars *vars)
+int	ft_here_doc(t_shell *shell)
 {
+	int	flag;
 	// NOTE:UPDATES the fds and reads STDIN and saves the input to hidden file .here_doc
-	vars->redirection_type = STDIN_FILENO;
-	if (ft_get_here_doc(vars) != MALLOC_SUCCESS)
-		return (MALLOC_FAIL);
-	if (vars->redir_count->in_redir == 1)
+	shell->vars->redirection_type = STDIN_FILENO;
+	flag = ft_get_here_doc(shell);
+	if (flag != MALLOC_SUCCESS)
+		return (flag);
+	if (shell->vars->redir_count->in_redir == 1)
 	{
-		if (ft_open_here_doc(input, vars) != MALLOC_SUCCESS)
-			return (MALLOC_FAIL);
-		vars->unlink_here_doc = YES;
-		if (!ft_push_fds(input, vars))
-		{
-			if (vars->fd && *vars->f_des)
-				free(*vars->f_des);
-			return (MALLOC_FAIL);
-		}
+		if (ft_open_here_doc(shell->input, shell->vars) == FILE_FAIL)
+			return (FILE_FAIL); 
+		shell->vars->unlink_here_doc = YES;
+		return (ft_push_fds(shell));
 	}
-	else if (vars->redir_count->in_redir > 1)
+	else if (shell->vars->redir_count->in_redir > 1)
 	{
 		unlink(".here_doc");
-		vars->redir_count->in_redir--;
+		shell->vars->redir_count->in_redir--;
 	}
-	if (vars->fd && *vars->f_des)
-		free(*vars->f_des);
 	return (MALLOC_SUCCESS);
 }
 
-int	ft_parse_redirect_fds(t_input **input, t_vars *vars)
+int	ft_parse_redirect_fds(t_shell *shell)
 {
-	if (!ft_strncmp(*vars->redir, "<<", 2))
-	{
-		if (ft_here_doc(input, vars) != MALLOC_SUCCESS)
-			return (MALLOC_FAIL); // NOTE: could be malloc error or file opening error
-	}
-	else if (!ft_strncmp(*vars->redir, ">>", 2))
-	{
-		if (ft_output_append(input, vars) != MALLOC_SUCCESS)
-			return (MALLOC_FAIL); // NOTE: could be malloc error or file opening error
-	}
-	else if (!ft_strncmp(*vars->redir, "<", 1))
-	{
-		if (ft_input_redir(input, vars) != MALLOC_SUCCESS)
-			return (MALLOC_FAIL); // NOTE: could be malloc error or file opening error
-	}
-	else if (!ft_strncmp(*vars->redir, ">", 1))
-	{
-		if (ft_output_redir(input, vars) != MALLOC_SUCCESS)
-			return (MALLOC_FAIL); // NOTE: could be malloc error or file opening error
-	}
-	if (*vars->file)
-		free(*vars->file);
-	if (*vars->redir)
-		free(*vars->redir);
+	if (!ft_strncmp(*shell->vars->redir, "<<", 2))
+		return (ft_here_doc(shell));
+	else if (!ft_strncmp(*shell->vars->redir, ">>", 2))
+		return (ft_output_append(shell));
+	else if (!ft_strncmp(*shell->vars->redir, "<", 1))
+		return (ft_input_redir(shell));
+	else if (!ft_strncmp(*shell->vars->redir, ">", 1))
+		return (ft_output_redir(shell));
 	return (MALLOC_SUCCESS);
 }
 
-char	*ft_parse_filename(t_input **input, t_vars *vars, t_envp *env_vars)
+char	*ft_parse_filename(t_shell *shell)
 {
 	char	*file;
 
-	if (ft_save_cmd_filename(vars, &file, env_vars, FILENAME) == MALLOC_FAIL)
-		return (NULL); // NOTE: malloc fail
-	// WARNING: make sure to differentiate malloc fail or file open fail if needed be
-	if (vars->expand_it == YES && vars->expanded == NO)
+	shell->vars->malloc_flag = GREEN;
+	if (ft_save_cmd_filename(shell, &file, FILENAME) == MALLOC_FAIL)
 	{
-		*(*input)->file_flag = BROWN;
-		if (file)
-			free(file);
-		if (*vars->redir)
-			free(*vars->redir);
+		shell->vars->malloc_flag = RED;
+		return (NULL);
+	}
+	if (shell->vars->expand_it == YES && shell->vars->expanded == NO)
+	{
+		*(*shell->input)->file_flag = BROWN;
 		return (NULL);
 	}
 	return (file);
 }
 
-int	ft_parse_fd(t_vars *vars, char **fd, t_envp *env_vars)
+int	ft_parse_fd(t_shell *shell, char **fd)
 {
-	if (vars->fd)
+	if (shell->vars->fd)
 	{
-		*fd = ft_next_string(vars, FD, env_vars); // NOTE: str in heap, vars->ind points ->FD)<-vars->end
+		*fd = ft_next_string(shell, FD); // NOTE: str in heap, vars->ind points ->FD)<-vars->end
 		if (!*fd)
-			return (MALLOC_FAIL);
+			return (ft_free_prompt(shell, YES));
 	}
-	vars->ind = vars->end;
+	shell->vars->ind = shell->vars->end;
 	return (MALLOC_SUCCESS);
 }
 
-int	ft_handle_redirects(t_input **input, t_vars *vars, t_envp *env_vars)
+int	ft_handle_redirects(t_shell *shell)
 {
 	char	*redir;
 	char	*fd;
@@ -269,20 +212,20 @@ int	ft_handle_redirects(t_input **input, t_vars *vars, t_envp *env_vars)
 
 	// NOTE: checks the string right after the redirect operator is not an invalid operator and if so returns 1
 	// OTHERWISE tries to open the files and save their file descriptors and moves the pointer to the next string after filename
-	if (ft_parse_fd(vars, &fd, env_vars) == MALLOC_FAIL)
+	if (ft_parse_fd(shell, &fd) == MALLOC_FAIL)
 		return (MALLOC_FAIL);
-	redir = ft_next_string(vars, REDIRECT, env_vars); // NOTE: str in heap, vars->ind points ->opertr)<-vars->end
-	if (!redir)
-		return (MALLOC_FAIL);
-	vars->ind = vars->end;
-	ft_index_after_spaces(vars);
-	vars->f_des = &fd;
-	vars->redir = &redir;
-	file = ft_parse_filename(input, vars, env_vars);
-	if (file == NULL)
-		return (MALLOC_FAIL);
-	vars->file = &file;
-	if (ft_parse_redirect_fds(input, vars) == MALLOC_FAIL)
-		return (MALLOC_FAIL);
-	return (MALLOC_SUCCESS);
+	shell->vars->f_des = &fd;
+	redir = ft_next_string(shell, REDIRECT);
+	if (redir == NULL)
+		return (ft_free_prompt(shell, YES));
+	shell->vars->redir = &redir;
+	shell->vars->ind = shell->vars->end;
+	ft_index_after_spaces(shell->vars);
+	file = ft_parse_filename(shell);
+	if (shell->vars->malloc_flag == RED && file == NULL)
+		return (ft_free_prompt(shell, YES)); 
+	else if (shell->vars->file_error == BROWN && file == NULL)
+		return (FILE_FAIL);
+	shell->vars->file = &file;
+	return (ft_parse_redirect_fds(shell));
 }
