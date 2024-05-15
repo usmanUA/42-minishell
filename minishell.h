@@ -80,6 +80,8 @@ typedef enum e_redir_types
 	OUTFILE,
 	APPEND,
 	HERE_DOC,
+	INPUT,
+	OUTPUT,
 }	t_redir_types;
 
 typedef struct s_redirect
@@ -116,6 +118,7 @@ typedef struct s_vars
 	int stop;
 	int file_error;
 	int unlink_here_doc;
+	int redirections;
 	char **f_des;
 	char **file;
 	char **redir;
@@ -134,14 +137,18 @@ typedef struct s_input
 
 typedef struct s_pipex
 {
-	unsigned	long		idx;
-	unsigned	long		infile;
-	unsigned	long		cmd_flag;
-	int	fds[2];
+	int	idx;
+	int	cmd_flag;
 	int	exec_type;
 	int	tot_pipes;
-	char	**command;
-	t_input		*input;
+	int	infile;
+	int	read_end;
+	int	write_end;
+	int	read_from_pipe;
+	int	output_to_pipe;
+	int	err_to_pipe;
+	char	*command;
+	t_input		**input;
 }			t_pipex;
 
 typedef struct envp_list

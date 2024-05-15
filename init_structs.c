@@ -49,6 +49,7 @@ void	ft_init_vars(t_vars *vars)
 	vars->stop = NO;
 	vars->file_error = 0;
 	vars->unlink_here_doc = NO;
+	vars->redirections = NO;
 	vars->f_des = NULL;
 	vars->file = NULL;
 	vars->redir = NULL;
@@ -79,6 +80,7 @@ int	ft_init_redirect_vecs(t_shell *shell, t_redir_count *redir_count)
 
 	if (ft_no_redirections(shell->input, redir_count) == YES)
 		return (1);
+	shell->vars->redirections = YES;
 	new_fds = (t_vec *)malloc(sizeof(t_vec));
 	if (!new_fds)
 		return (ft_free_prompt(shell, YES));
@@ -101,6 +103,11 @@ void	ft_init_pipex(t_pipex *pipex, int tot_pipes)
 {
 	pipex->idx = -1;
 	pipex->infile = 42;
+	pipex->read_end = 100;
+	pipex->write_end = 101;
+	pipex->read_from_pipe = YES;
+	pipex->output_to_pipe = YES;
+	pipex->err_to_pipe = YES;
 	pipex->cmd_flag = GREEN;
 	pipex->exec_type = GREEN;
 	pipex->command = NULL;

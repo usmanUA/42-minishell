@@ -67,14 +67,14 @@ void	ft_validate_execute(t_shell *shell)
 	}
 	while (++pipex.idx < shell->pipes->len - 1)
 	{
-		pipex.input = *(t_input **)vec_get(shell->pipes, pipex.idx);
-		if (*pipex.input->file_flag == BROWN)
+		pipex.input = (t_input **)vec_get(shell->pipes, pipex.idx);
+		if (*(*pipex.input)->file_flag == BROWN)
 			continue;
 		if (ft_validate_exec_childs(&pipex, shell) == MALLOC_FAIL)
 			return;
 	}
-	pipex.input = *(t_input **)vec_get(shell->pipes, pipex.idx);
-	shell->status = *pipex.input->file_flag;
+	pipex.input = (t_input **)vec_get(shell->pipes, pipex.idx);
+	shell->status = *(*pipex.input)->file_flag;
 	if (shell->status == BROWN)
 	{
 		ft_free_prompt(shell, NO);
@@ -82,6 +82,5 @@ void	ft_validate_execute(t_shell *shell)
 	}
 	ft_validate_exec_last_child(&pipex, shell);
 	ft_free_prompt(shell, NO);
-	printf("here\n");
 }
 

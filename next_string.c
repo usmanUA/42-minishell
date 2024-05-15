@@ -147,10 +147,8 @@ char	*ft_next_string(t_shell *shell, int op)
 	if (vars->expand_it == YES)
 		s = ft_expand_variable(shell, op);
 	else
-	{
 		s = ft_substr(vars->input_line, vars->ind, vars->end
 				- vars->ind);                       
-	}
 	if ((vars->expand_it == NO && !s) || (vars->expand_it == YES
 			&& vars->expanded == YES && !s)) // TODO: look back to the condition
 		vars->malloc_flag = RED;

@@ -25,7 +25,7 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		if (!shell.vars->input_line)
 		{
-			ft_free_prompt(&shell, YES);
+			ft_free_prompt(&shell, NO);
 			break ; // NOTE: readlines malloc fail? error message | code?
 		}
 		ft_signals(CHILD, ON, &shell.status);

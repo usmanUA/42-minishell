@@ -11,6 +11,19 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
+void	ft_free_redirect_strs(char **fd, char **redir, char **file)
+{
+	free(*fd);
+	free(*redir);
+	free(*file);
+}
+
+int	ft_free_redirect_strs_prompt(char **fd, char **redir, char **file, t_shell *shell)
+{
+	ft_free_redirect_strs(fd, redir, file);
+	return (ft_free_prompt(shell, YES));
+}
+
 int	ft_push_fds(t_shell *shell)
 {
 	int	redirect;
@@ -23,15 +36,16 @@ int	ft_push_fds(t_shell *shell)
 		redirect = ft_atoi(*shell->vars->f_des);
 	file_fd = shell->vars->file_fd;
 	if (!vec_push((*shell->input)->new_fds, &file_fd))
-		return (ft_free_prompt(shell, YES));
+		return (ft_free_redirect_strs_prompt(shell->vars->f_des, shell->vars->redir, shell->vars->file, shell));
 	if (!vec_push((*shell->input)->orig_fds, &redirect))
-		return (ft_free_prompt(shell, YES));
+		return (ft_free_redirect_strs_prompt(shell->vars->f_des, shell->vars->redir, shell->vars->file, shell));
 	// NOTE: fd_in is in stack mem of this function, be careful
 	if (redirect == STDERR_FILENO)
 		fd_info = STDERR_FILENO;
 	if (!vec_push((*shell->input)->fds_info, &fd_info))
-		return (ft_free_prompt(shell, YES));
+		return (ft_free_redirect_strs_prompt(shell->vars->f_des, shell->vars->redir, shell->vars->file, shell));
 	// NOTE: fd_in is in stack mem of this function, be careful
+	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 	return (MALLOC_SUCCESS);
 }
 
@@ -45,6 +59,7 @@ int	ft_input_redir(t_shell *shell)
 	{
 		ft_filerror(errno, *shell->vars->file, YES);
 		*(*shell->input)->file_flag = BROWN;
+		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
@@ -52,6 +67,7 @@ int	ft_input_redir(t_shell *shell)
 		return (ft_push_fds(shell));
 	else if (shell->vars->redir_count->in_redir > 1)
 		shell->vars->redir_count->in_redir--;
+	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 	return (MALLOC_SUCCESS);
 }
 
@@ -65,6 +81,7 @@ int	ft_output_redir(t_shell *shell)
 		ft_filerror(errno, *shell->vars->file, YES);
 			// NOTE: write error when there's no permission for the output file
 		*(*shell->input)->file_flag = BROWN;
+		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
@@ -72,6 +89,7 @@ int	ft_output_redir(t_shell *shell)
 		return (ft_push_fds(shell));
 	else if (shell->vars->redir_count->out_redir > 1)
 		shell->vars->redir_count->out_redir--;
+	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 	return (MALLOC_SUCCESS);
 }
 
@@ -84,6 +102,7 @@ int	ft_output_append(t_shell *shell)
 	{
 		ft_filerror(errno, *shell->vars->file, YES);
 		*(*shell->input)->file_flag = BROWN;
+		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
@@ -91,6 +110,7 @@ int	ft_output_append(t_shell *shell)
 		return (ft_push_fds(shell));
 	else if (shell->vars->redir_count->out_redir > 1)
 		shell->vars->redir_count->out_redir--;
+	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 	return (MALLOC_SUCCESS);
 }
 
@@ -145,11 +165,17 @@ int	ft_here_doc(t_shell *shell)
 	shell->vars->redirection_type = STDIN_FILENO;
 	flag = ft_get_here_doc(shell);
 	if (flag != MALLOC_SUCCESS)
+	{
+		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 		return (flag);
+	}
 	if (shell->vars->redir_count->in_redir == 1)
 	{
 		if (ft_open_here_doc(shell->input, shell->vars) == FILE_FAIL)
+		{
+			ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 			return (FILE_FAIL); 
+		}
 		shell->vars->unlink_here_doc = YES;
 		return (ft_push_fds(shell));
 	}
@@ -158,6 +184,7 @@ int	ft_here_doc(t_shell *shell)
 		unlink(".here_doc");
 		shell->vars->redir_count->in_redir--;
 	}
+	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 	return (MALLOC_SUCCESS);
 }
 
@@ -171,6 +198,7 @@ int	ft_parse_redirect_fds(t_shell *shell)
 		return (ft_input_redir(shell));
 	else if (!ft_strncmp(*shell->vars->redir, ">", 1))
 		return (ft_output_redir(shell));
+	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 	return (MALLOC_SUCCESS);
 }
 
@@ -187,6 +215,7 @@ char	*ft_parse_filename(t_shell *shell)
 	if (shell->vars->expand_it == YES && shell->vars->expanded == NO)
 	{
 		*(*shell->input)->file_flag = BROWN;
+		shell->vars->file_error = BROWN;
 		return (NULL);
 	}
 	return (file);
@@ -204,6 +233,13 @@ int	ft_parse_fd(t_shell *shell, char **fd)
 	return (MALLOC_SUCCESS);
 }
 
+void	ft_init_strs(char **redir, char **fd, char **file)
+{
+	*redir = NULL;
+	*fd = NULL;
+	*file = NULL;
+}
+
 int	ft_handle_redirects(t_shell *shell)
 {
 	char	*redir;
@@ -212,20 +248,24 @@ int	ft_handle_redirects(t_shell *shell)
 
 	// NOTE: checks the string right after the redirect operator is not an invalid operator and if so returns 1
 	// OTHERWISE tries to open the files and save their file descriptors and moves the pointer to the next string after filename
+	ft_init_strs(&redir, &fd, &file);
 	if (ft_parse_fd(shell, &fd) == MALLOC_FAIL)
 		return (MALLOC_FAIL);
 	shell->vars->f_des = &fd;
 	redir = ft_next_string(shell, REDIRECT);
 	if (redir == NULL)
-		return (ft_free_prompt(shell, YES));
+		return (ft_free_redirect_strs_prompt(&fd, &redir, &file, shell));
 	shell->vars->redir = &redir;
 	shell->vars->ind = shell->vars->end;
 	ft_index_after_spaces(shell->vars);
 	file = ft_parse_filename(shell);
 	if (shell->vars->malloc_flag == RED && file == NULL)
-		return (ft_free_prompt(shell, YES)); 
+		return (ft_free_redirect_strs_prompt(&fd, &redir, &file, shell));
 	else if (shell->vars->file_error == BROWN && file == NULL)
+	{
+		ft_free_redirect_strs_prompt(&fd, &redir, &file, shell);
 		return (FILE_FAIL);
+	}
 	shell->vars->file = &file;
 	return (ft_parse_redirect_fds(shell));
 }
