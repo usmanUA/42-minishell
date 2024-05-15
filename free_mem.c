@@ -3,13 +3,32 @@
 /*                                                        :::      ::::::::   */
 /*   free_mem.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/25 10:09:00 by uahmed            #+#    #+#             */
-/*   Updated: 2024/04/25 10:09:02 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/05/15 15:01:28 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
+
+void	free_env_array(t_shell *data)
+{
+	int	i;
+	
+	if (data->envp == NULL)
+	{
+		return;
+	}
+	i = 0;
+	while (data->envp[i])//does this work?
+	{
+		free(data->envp[i]);
+		i++;
+	}
+	free(data->envp);
+	data->envp = NULL;
+}
 
 void	free_env_list(t_shell *data)
 {

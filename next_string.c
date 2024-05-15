@@ -13,7 +13,7 @@
 
 char	*ft_expand_variable(t_shell *shell, int op);
 int	ft_valid_char(char next, int check_digits);
-int	ft_status_expansion(t_vars *vars, char c, int *ind);
+int	ft_special_expansions(t_vars *vars, char c, int *ind);
 
 static void	ft_unquoted_str_end(t_vars *vars, int *ind)
 {
@@ -23,7 +23,7 @@ static void	ft_unquoted_str_end(t_vars *vars, int *ind)
 	// NOTE: finds the index where the command ends
 	// updates vars->qontinue based on the presence/absence of quotes right next to where command ends
 	c = vars->input_line[vars->ind + *ind];
-	if (ft_status_expansion(vars, c, ind) == YES)	
+	if (ft_special_expansions(vars, c, ind) == YES)	
 		return;
 	while (c != '\0' && c != '$')
 	{
@@ -89,10 +89,15 @@ static void	ft_commands_end(t_vars *vars, int quote, int *ind)
 	dollar = NO;
 	c = vars->input_line[vars->ind];
 	next = vars->input_line[vars->ind + 1];
-	if (c == '$' && ft_valid_char(next, YES) == VALID && !vars->s_quote)
+	if (c == '$')
 	{
-		vars->expand_it = YES;
-		++(*ind);
+		if (ft_valid_char(next, YES) == INVALID)
+		{
+			++(*ind);
+			return;
+		}
+		else if (!vars->s_quote)
+			vars->expand_it = YES;
 	}
 	if (vars->d_quote || vars->s_quote)
 	{

@@ -6,7 +6,7 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 13:25:01 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/09 13:37:39 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/15 11:15:16 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,54 @@ void	delete_from_middle_of_list(t_shell *data, t_envp *unset_node)
 	node->next = temp;
 }
 
+// int	ft_array_length(char **envp)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	while (envp[i])
+// 	{
+// 		i++;
+// 	}
+// 	return (i);
+// }
+
+void	delete_env_from_array(t_shell *data, char *command, t_envp *node)//get rid of command?
+{
+	char	**envp;
+	int		num_of_envs;
+	int		i;
+	int		j;
+	
+	num_of_envs = ft_array_length(data->envp);
+	num_of_envs--;
+	envp = malloc(sizeof(char *) * (num_of_envs + 1));
+	if (envp == NULL)
+	{
+		//free all
+		exit (1);
+	}
+	i = 0;
+	j = 0;
+	while (data->envp[j] != NULL)
+	{
+		if (ft_strcmp(node->key, data->envp[j]) == 0)
+		{
+			free(data->envp[j]);
+			j++;
+		}
+		else
+		{
+			envp[i] = data->envp[j];
+			i++;
+			j++;
+		}
+	}
+	envp[j] = NULL;
+	free(data->envp);
+	data->envp = envp;
+}
+
 void	delete_environmental_variable(t_shell *data, char *command)
 {
 	t_envp	*node;	
@@ -104,6 +152,10 @@ void	delete_environmental_variable(t_shell *data, char *command)
 	{
 		delete_from_middle_of_list(data, node);
 		// printf("Deleted node from MIDDLE of list\n");	
+	}
+	if (node != NULL && node->value != NULL)
+	{
+		delete_env_from_array(data, command, node);
 	}
 }
 
@@ -139,6 +191,7 @@ int	unset_command(t_shell *data, char **command)
 	int		i;
 	bool	error;
 
+
 	if (command[1] == NULL)
 	{
 		return (0);
@@ -148,7 +201,7 @@ int	unset_command(t_shell *data, char **command)
 	{
 		error = false;
 		error = check_unset_syntax(command[i]);//check for error value
-		if (error == true)
+		if (error == false)
 		{
 			delete_environmental_variable(data, command[i]);
 		}

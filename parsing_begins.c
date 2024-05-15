@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <stdio.h>
 
 void	ft_index_after_spaces(t_vars *vars)
 {
@@ -58,25 +59,36 @@ int	ft_redirection(t_vars *vars)
 static int	ft_parsing_action(t_shell *shell)
 {
 	char	c;
+	char	next;
 
 	// NOTE: Loops until either '\0' or '|'
 	// parses everything in between
 	// moves the pointer next to '|' if encountered
 	c = shell->vars->input_line[shell->vars->ind];
+	next = shell->vars->input_line[shell->vars->ind+1];
 	while (c != '\0' && c != '|')
 	{
-		if (ft_redirection(shell->vars) == YES)
+		if (c == '$' && (next == '\"' || next == '\''))
 		{
-			if (ft_handle_redirects(shell) == MALLOC_FAIL)
-				return (MALLOC_FAIL);
+			++shell->vars->ind;
+			++shell->vars->end;
 		}
-		else if (c != '\0' && c != '|')
+		else
 		{
-			if (ft_save_cmd(shell) == MALLOC_FAIL)
-				return (MALLOC_FAIL);
+			if (ft_redirection(shell->vars) == YES)
+			{
+				if (ft_handle_redirects(shell) == MALLOC_FAIL)
+					return (MALLOC_FAIL);
+			}
+			else if (c != '\0' && c != '|')
+			{
+				if (ft_save_cmd(shell) == MALLOC_FAIL)
+					return (MALLOC_FAIL);
+			}
 		}
 		ft_index_after_spaces(shell->vars);
 		c = shell->vars->input_line[shell->vars->ind];
+		next = shell->vars->input_line[shell->vars->ind+1];
 	}
 	if (shell->vars->input_line[shell->vars->ind] == '|')
 	{
@@ -172,6 +184,11 @@ int	ft_save_input(t_shell *shell)
 			return (MALLOC_FAIL);
 		if (ft_parse_command_line(shell) == MALLOC_FAIL)
 			return (MALLOC_FAIL);
+		if (shell->vars->ind == 6)
+		{
+			printf("here\n");
+			break;
+		}
 		if (!vec_push(shell->pipes, &input))
 			return (ft_free_prompt(shell, YES));
 		ft_zero_redirects(&redir_count);

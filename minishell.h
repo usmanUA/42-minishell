@@ -1,14 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   miniwell.h                                         :+:      :+:    :+:   */
+/*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/15 13:07:37 by uahmed            #+#    #+#             */
-/*   Updated: 2024/04/15 13:07:39 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/05/15 15:06:26 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #ifndef MINISELL_H
 #define MINISELL_H
 
@@ -218,7 +219,11 @@ char	*get_value_of_env_variable(t_shell *data, char *envp_string);
 int	make_linked_list_of_envp(t_shell *data, char **envp);
 t_envp	*create_new_node(t_shell *data);
 
+int	ft_array_length(char **envp);;
+
 void	error_msg_hardcode(char *command, char *argument, int error_number, bool quotes);
+void	error_msg_2(int error_number);
+
 // NOTE: builtin functions prototypes
 int		cd_command(t_shell *data, char **command);
 int		echo_command(char **command);
@@ -233,5 +238,8 @@ t_envp	*search_for_envp(t_shell *data, char *command);
 int		unset_command(t_shell *data, char **command);
 
 void	ft_free_input(void **inpt);
+void	free_env_array(t_shell *data);
+
+void	ft_skip_quotes(t_vars *vars);
 
 #endif

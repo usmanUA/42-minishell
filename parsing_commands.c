@@ -1,15 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   after_command.c                                    :+:      :+:    :+:   */
+/*   parsing_commands.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 14:54:20 by uahmed            #+#    #+#             */
-/*   Updated: 2024/04/18 14:54:22 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/05/13 16:38:48 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
+#include <stdio.h>
 
 int	ft_quote_skipped(t_vars *vars, char quo)
 {
@@ -85,6 +87,13 @@ static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 
 int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
 {
+	char	*input_line;
+	int	ind;
+
+	input_line = shell->vars->input_line;
+	ind = shell->vars->ind;
+	if (input_line[ind] == '\"' || input_line[ind] == '\'')
+		ft_skip_quotes(shell->vars);
 	*s = ft_next_string(shell, op);
 	if (shell->vars->malloc_flag == RED && *s == NULL)
 		return (ft_free_prompt(shell, YES));
@@ -102,21 +111,18 @@ int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
 int	ft_save_cmd(t_shell *shell)
 {
 	char	*s;
-	char	*input_line;
-	int	ind;
 
 	// NOTE: PARSE command and its options if there are any
-	input_line = shell->vars->input_line;
-	ind = shell->vars->ind;
-	if (input_line[ind] == '\"' || input_line[ind] == '\'')
-		ft_skip_quotes(shell->vars);
 	if (ft_save_cmd_filename(shell, &s, COMMAND) == MALLOC_FAIL)
 		return (MALLOC_FAIL);
-	if (!vec_push((*shell->input)->cmd, &s))
+	if (s != NULL)
 	{
-		if (s)
-			free(s);
-		return (ft_free_prompt(shell, YES));
+		if (!vec_push((*shell->input)->cmd, &s))
+		{
+			if (s)
+				free(s);
+			return (ft_free_prompt(shell, YES));
+		}
 	}
 	return (MALLOC_SUCCESS);
 }

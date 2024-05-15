@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <stdio.h>
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -33,6 +34,7 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		if (ft_save_input(&shell) == MALLOC_FAIL)
 			continue;
+//		ft_print_vecs(shell.pipes);
 		ft_validate_execute(&shell);
 	}
 	free_env_list(&shell);

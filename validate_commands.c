@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   validate_commands.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 14:15:13 by uahmed            #+#    #+#             */
-/*   Updated: 2024/04/29 14:15:24 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/05/14 10:08:04 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 #include <stdio.h>
 

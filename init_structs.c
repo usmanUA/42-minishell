@@ -3,13 +3,66 @@
 /*                                                        :::      ::::::::   */
 /*   init_structs.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/02 13:15:30 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/02 13:15:31 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/05/15 14:58:21 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
+
+void	free_failed_2d_array(t_shell *shell, char **envp, int i)
+{
+	i--;
+	while (i >= 0)
+	{
+		free(envp[i]);
+		i--;
+	}
+	free(envp);
+	shell->envp = NULL;
+}
+
+int	ft_array_length(char **envp)
+{
+	int	i;
+
+	i = 0;
+	while (envp[i])
+	{
+		i++;
+	}
+	return (i);
+}
+
+char	**malloc_envp(t_shell *shell, char **envp)
+{
+	char	**new_envp;
+	int		i;
+	int		num_of_envs;
+
+	num_of_envs = ft_array_length(envp);
+	new_envp = malloc(sizeof(char *) * (num_of_envs + 1));
+	if (!new_envp)
+	{
+		//free all
+		exit (1);
+	}
+	i = 0;
+	while (envp[i])
+	{
+		new_envp[i] = ft_strdup(envp[i]);
+		if (new_envp[i] == NULL)
+		{
+			free_failed_2d_array(shell, envp, i);
+			//free all
+			exit (1);
+		}
+		i++;
+	}
+	return (new_envp);
+}
 
 int	ft_init_shell(t_shell *shell, char **envp)
 {
@@ -26,6 +79,13 @@ int	ft_init_shell(t_shell *shell, char **envp)
 	if (!vars)
 		return (ft_free_prompt(shell, YES));
 	shell->vars = vars;
+	// shell->envp = envp; // NOTE: shell->envp once gave segfault in ft_split, be careful carrying this pointer along
+	shell->envp = malloc_envp(shell, envp);
+	if (!shell->envp)// is this the same as shell->envp == NULL? or should there be parenthesis -> !(shell->envp)
+	{
+		//free all
+		exit(1);//Should ths be done with return(MALLOC_FAIL);
+	}
 	return (MALLOC_SUCCESS);
 }
 

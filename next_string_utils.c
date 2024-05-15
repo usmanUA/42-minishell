@@ -22,12 +22,14 @@ int	ft_valid_char(char next, int check_digits)
 	}
 	if (next == '-')
 		return (INVALID);
+	if (next == '\"' || next == '\'')
+		return (INVALID);
 	if (ft_isspace(next))
 		return (INVALID);
 	return (VALID);
 }
 
-int	ft_status_expansion(t_vars *vars, char c, int *ind)
+int	ft_special_expansions(t_vars *vars, char c, int *ind)
 {
 	char	next;
 
@@ -37,6 +39,12 @@ int	ft_status_expansion(t_vars *vars, char c, int *ind)
 		++(*ind);
 		if (ft_valid_char(next, NO) == VALID)
 			vars->qontinue = YES;
+		return (YES);
+	}
+	// NOTE: We need this in handle_quoted_str
+	if (c == '\"' || c == '\'')
+	{
+		vars->expand_it = NO;
 		return (YES);
 	}
 	return (NO);

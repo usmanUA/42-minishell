@@ -25,6 +25,14 @@ int	get_name_length(char *envp_string)
 	{
 		i++;
 	}
+	if (envp_string[i] == '+')
+	{
+		i--;
+	}
+	// ft_putendl_fd(envp_string, 2);
+	// ft_putnbr_fd(i, 2);
+	// printf("envp_string: %s\n", envp_string);
+	// printf("name_length: %d\n", i);	
 	return (i);
 }
 
@@ -76,7 +84,7 @@ t_envp	*search_for_envp(t_shell *data, char *command)
 	{
 		if (ft_strncmp(command, temp->key, name_length) == 0)
 		{
-			if (temp->key[name_length] == '\0')
+			if (temp->key[name_length] == '\0' || temp->key[name_length] == '+')
 			{
 				// printf("envp exists: %s\n", command);
 				return (temp);
@@ -84,6 +92,6 @@ t_envp	*search_for_envp(t_shell *data, char *command)
 		}
 		temp = temp->next;
 	}
-	printf("envp does not exist\n");
+	// printf("envp does not exist\n");
 	return (NULL);
 }

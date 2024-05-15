@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 14:38:35 by uahmed            #+#    #+#             */
-/*   Updated: 2024/04/29 14:38:40 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/05/15 15:02:30 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
 int	ft_status(int status)
@@ -187,6 +188,7 @@ static int	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
 void	ft_free_shell(t_shell *shell)
 {
 	free_env_list(shell);
+	free_env_array(shell);
 	ft_free_prompt(shell, NO);
 }
 

@@ -6,12 +6,12 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 13:46:09 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/09 14:20:55 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/15 15:03:01 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	free_all(t_shell *data)
-{
-}
+// void	free_all(t_shell *data)
+// {
+// }

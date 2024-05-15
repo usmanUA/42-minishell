@@ -6,7 +6,7 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 10:54:12 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/09 13:40:24 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/13 13:18:35 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ void	error_msg_hardcode(char *command, char *argument, int error_number, bool qu
 	if (error_number == 0)
 	{
 		perror("");
+		return ;
 	}
 	if (error_number == 1)
 	{
@@ -56,4 +57,15 @@ void	error_msg_hardcode(char *command, char *argument, int error_number, bool qu
 		ft_putstr_fd("not a valid identifier", 2);
 	}
 	ft_putstr_fd("\n", 2);
+}
+
+void	error_msg_2(int error_number)
+{
+	if (error_number == 1)
+	{
+		ft_putstr_fd("cd: ", 2);
+		ft_putstr_fd("error retrieving current directory: ", 2);
+		ft_putstr_fd("getcwd: cannot access parent directories: ", 2);
+		perror("");
+	}
 }

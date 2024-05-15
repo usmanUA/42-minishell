@@ -6,7 +6,7 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 13:37:56 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/09 14:26:47 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/15 15:05:36 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,20 @@ char	*create_empty_string(t_shell *data, char *directory)
 	{
 		free_env_list(data);
 		free(directory);
+		exit (1);
+	}
+	string[0] = '\0';
+	return (string);
+}
+
+char	*create_empty_str(t_shell *data)
+{
+	char	*string;
+
+	string = (char *)malloc(sizeof(char) * 1);
+	if (string == NULL)
+	{
+		free_env_list(data);
 		exit (1);
 	}
 	string[0] = '\0';
@@ -84,6 +98,8 @@ int	 change_to_directory(t_shell *data, char *directory, char *command)
 		// printf("errno: %d\n", errno);
 		if (command == NULL)	// Figure this edge case later... It's obscure and not super important.
 		{
+			// printf("errno: %d\n", errno);
+			error_msg_hardcode("cd", home_node->value, 0, false);
 			// // home_error = get_value_of_env_variable(data, command);
 			
 			// home_error = malloc(sizeof(char) * (f_strlen(home_node->value) + 1));
@@ -97,6 +113,7 @@ int	 change_to_directory(t_shell *data, char *directory, char *command)
 			// //perror
 			// printf("bash: cd: %s: No such file or directory\n", home_error);// - something like this
 			// free(home_error);//free(home_error);
+			return (1);
 		}
 		else
 		{
@@ -189,13 +206,28 @@ char	*relative_path(t_shell *data, char *command)
 	char	*cwd;
 	char	*buffer;
 	char	*directory;
+	char	*empty_string;
 	
 	buffer = NULL;
 	cwd = getcwd(buffer, sizeof(buffer));
 	if (cwd == NULL)
 	{
-		free_env_list(data);
-		exit (errno);
+		error_msg_2(1);
+		empty_string = create_empty_str(data);
+		if (empty_string == NULL)
+		{
+			free_env_list(data);
+			exit(1);
+		}
+		change_oldpwd_and_pwd(data, empty_string);
+		// pwd = search_for_envp(data, "PWD");
+		// if (pwd != NULL && pwd->value != NULL)
+		// {
+		// 	free(pwd->value);
+		// 	pwd->value = create_empty_str(data);
+		// }
+		//PWD = NULL / "";
+		return (NULL);
 	}
 	// printf("4 - command = cd %s\n", command);
 	directory = make_relative_path(data, command, cwd);	
