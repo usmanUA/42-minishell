@@ -25,7 +25,7 @@ static void	ft_unquoted_str_end(t_vars *vars, int *ind)
 	c = vars->input_line[vars->ind + *ind];
 	if (ft_status_expansion(vars, c, ind) == YES)	
 		return;
-	while (c != '\0' && c != '$')
+	while (c != '\0' && c != '$' && c != '|')
 	{
 		if (c == '\'' || c == '\"')
 		{

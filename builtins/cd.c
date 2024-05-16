@@ -6,7 +6,7 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 13:37:56 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/15 15:05:36 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/16 11:14:43 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,6 +267,7 @@ int	cd_command(t_shell *data, char **command)
 		return (1);
 	}
 	change_oldpwd_and_pwd(data, directory);
+	
 	// pwd_command(data);//This is to print the current directory ( -- JUST FOR CONFIRMATION -- I promise)
 	return (0);
 }

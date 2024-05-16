@@ -23,7 +23,7 @@
 #include <readline/history.h>
 # include "stdbool.h"
 
-#define PROMPT	"\x1b[32mMiniWell\x1b[0m😎:\x1b[31mV0.1\x1b[0m$ "
+#define PROMPT	"\001\x1b[32mMiniWell\002\x1b[0m😎:\001\x1b[31mV0.1\002\x1b[0m$ "
 
 typedef enum e_button
 {
@@ -177,7 +177,7 @@ int ft_space_until_end(t_vars *vars);
 int ft_save_input(t_shell *shell);
 int	ft_handle_redirects(t_shell *shell);
 char	*ft_next_string(t_shell *shell, int op);
-void	ft_shift_pointer(t_vars *vars);
+void	ft_shift_pointer(t_shell *shell);
 void	ft_next_pipe_null(t_vars *vars);
 int ft_operator_first(t_input *input, t_vars *vars);
 int ft_command_first(t_input *input, t_vars *vars);

@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
-#include <stdio.h>
 
 void	ft_index_after_spaces(t_vars *vars)
 {
@@ -23,19 +22,17 @@ void	ft_index_after_spaces(t_vars *vars)
 }
 
 // NOTE: NOT USED function
-void	ft_shift_pointer(t_vars *vars)
+void	ft_shift_pointer(t_shell *shell)
 {
+	char	*input_line;
+	int	ind;
 	// NOTE: moves the pointer either to the next | or null-terminator whatever comes first in the char *
-	vars->ind = vars->end;
-	while (vars->ind < vars->len)
-	{
-		if (vars->input_line[vars->ind] == '|') // NOTE: if encounters | stops.
-		{
-			vars->ind++;
-			return ;
-		}
-		vars->ind++;
-	}
+	ind = shell->vars->end;
+	input_line = shell->vars->input_line;
+	while (input_line[ind] != '\0' && input_line[ind] != '|')
+		ind++;
+	shell->vars->ind = ind;
+	shell->vars->end = ind;
 }
 
 int	ft_redirection(t_vars *vars)

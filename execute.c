@@ -6,7 +6,7 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 14:38:35 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/15 15:02:30 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/16 12:47:38 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ int	ft_push_pid(t_shell *shell, int *pid, int read_end)
 	}
 	return (MALLOC_SUCCESS);
 }
-
+// cat <bigfile | ls
 int	ft_processes(t_pipex *pipex, t_shell *shell)
 {
 	int	pid;
@@ -153,7 +153,6 @@ int	ft_processes(t_pipex *pipex, t_shell *shell)
 
 static	void	ft_last_chid(t_pipex *pipex, t_shell *shell, char **command)
 {
-
 	ft_io_redirections(pipex, INPUT);
 	if (pipex->infile != 42)
 	{
@@ -181,8 +180,12 @@ static int	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
 	if (pid == 0)
 		ft_last_chid(pipex, shell, command);
 	else
+	{
 		waitpid(pid, &shell->status, 0);
-	shell->status = ft_status(shell->status);
+		shell->status = ft_status(shell->status);
+		if (pipex->infile != 42)
+			close(pipex->infile);
+	}
 	return (MALLOC_SUCCESS);
 }
 
@@ -197,6 +200,7 @@ int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 {
 	int	pid;
 	char	**args;
+	int	status;
 
 	// TODO: wait for the prev. childs using their pids (if there are any)
 	args = (char **)vec_get((*pipex->input)->cmd, 0);
@@ -207,7 +211,8 @@ int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 	}
 	else
 	{
-		if (builtin_commands(shell, args, pipex->exec_type) == MALLOC_FAIL)
+		status = builtin_commands(shell, args, pipex->exec_type);
+		if (status == MALLOC_FAIL)
 			return (MALLOC_FAIL);
 	}
 	if (pipex->tot_pipes > 0)
@@ -217,7 +222,7 @@ int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 		if (pipex->exec_type == EXIT)
 		{
 			ft_free_shell(shell);
-			exit(EXIT_SUCCESS);
+			exit(status);
 		}
 	}
 	return (MALLOC_SUCCESS);

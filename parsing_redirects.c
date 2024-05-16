@@ -60,6 +60,7 @@ int	ft_input_redir(t_shell *shell)
 		ft_filerror(errno, *shell->vars->file, YES);
 		*(*shell->input)->file_flag = BROWN;
 		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
+		ft_shift_pointer(shell);
 		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
@@ -82,6 +83,7 @@ int	ft_output_redir(t_shell *shell)
 			// NOTE: write error when there's no permission for the output file
 		*(*shell->input)->file_flag = BROWN;
 		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
+		ft_shift_pointer(shell);
 		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
@@ -103,6 +105,7 @@ int	ft_output_append(t_shell *shell)
 		ft_filerror(errno, *shell->vars->file, YES);
 		*(*shell->input)->file_flag = BROWN;
 		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
+		ft_shift_pointer(shell);
 		return (FILE_FAIL);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}

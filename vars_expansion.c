@@ -1,28 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   var_expansion.c                                    :+:      :+:    :+:   */
+/*   vars_expansion.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 16:31:10 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/07 16:31:13 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/05/16 11:31:12 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
 static	char	*ft_find_value(t_shell *shell, char **key)
 {
 	char	*value;
 	t_envp	*envp;
-	int	len;
+	// int	len;
 
-	len = ft_strlen(*key);
+	// len = ft_strlen(*key);
 	value = NULL;
 	envp = shell->env_list;
 	while (envp->next)
 	{
-		if (!ft_strncmp(*key, envp->key, len))
+		if (!ft_strcmp(*key, envp->key))
 		{
 			shell->vars->expanded = YES;
 			value = ft_strdup(envp->value);

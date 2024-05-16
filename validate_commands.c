@@ -97,7 +97,10 @@ static int	ft_check_command(char *command, t_pipex *pipex, int check_dir)
 		}
 	}
 	else
+	{
+		pipex->cmd_flag = RED;
 		return (INVALID);
+	}
 	return (VALID);
 }
 
@@ -183,6 +186,12 @@ void	ft_validate_commands(t_pipex *pipex, t_shell *shell)
 {
 	char	**paths;
 
+	pipex->command = *(char **)vec_get((*pipex->input)->cmd, 0);
+	if (pipex->command == NULL)
+	{
+		shell->vars->malloc_flag = RED;
+		return;
+	}
 	paths = ft_split(ft_give_path(shell->envp), ':');
 	if (!paths)
 	{
@@ -190,7 +199,6 @@ void	ft_validate_commands(t_pipex *pipex, t_shell *shell)
 		ft_free_prompt(shell, NO);
 		return;
 	}
-	pipex->command = *(char **)vec_get((*pipex->input)->cmd, 0);
 	if (ft_ispresent(pipex->command, '/'))
 		ft_handle_absolute(shell, pipex);
 	else

@@ -22,7 +22,6 @@ FILES = \
 			next_string.c \
 			next_string_utils.c \
 			vars_expansion.c \
-			print_vecs.c \
 			parsing_begins.c \
 			parsing_commands.c \
 			parsing_redirects.c \
@@ -31,7 +30,7 @@ FILES = \
 			syntax_utils.c \
 			validate_and_execute.c \
 			validate_commands.c \
-			#print_vecs.c \			
+			print_vecs.c \
 
 
 OBJS = $(FILES:.c=.o)

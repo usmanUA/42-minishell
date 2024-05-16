@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
+/*   util_funcs.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 10:26:15 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/09 14:18:05 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/16 11:17:02 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,5 +30,6 @@ int	builtin_commands(t_shell *shell, char **command, int exec_type)
 		status = pwd_command(shell);
 	else if (exec_type == UNSET)
 		status = unset_command(shell, command);
+	shell->status = status;
 	return (status);
 }

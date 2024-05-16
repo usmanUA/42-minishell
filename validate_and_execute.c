@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
-#include <stdio.h>
 
 static	int	ft_validate_exec_last_child(t_pipex *pipex, t_shell *shell)
 {
