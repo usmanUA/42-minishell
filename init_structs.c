@@ -46,8 +46,8 @@ char	**malloc_envp(t_shell *shell, char **envp)
 	new_envp = malloc(sizeof(char *) * (num_of_envs + 1));
 	if (!new_envp)
 	{
-		//free all
-		exit (1);
+		ft_free_prompt(shell, YES);
+		exit (EXIT_FAILURE);
 	}
 	i = 0;
 	while (envp[i])
@@ -56,11 +56,12 @@ char	**malloc_envp(t_shell *shell, char **envp)
 		if (new_envp[i] == NULL)
 		{
 			free_failed_2d_array(shell, envp, i);
-			//free all
-			exit (1);
+			ft_free_prompt(shell, YES);
+			exit (EXIT_FAILURE);
 		}
 		i++;
 	}
+	new_envp[i] = NULL;
 	return (new_envp);
 }
 
@@ -69,7 +70,6 @@ int	ft_init_shell(t_shell *shell, char **envp)
 	t_vec	*pipes;
 	t_vars	*vars;
 
-	shell->envp = envp; // NOTE: shell->envp once gave segfault in ft_split, be careful carrying this pointer along
 	pipes = (t_vec *)malloc(sizeof(t_vec));
 	if (!pipes)
 		return (MALLOC_FAIL);
@@ -79,13 +79,7 @@ int	ft_init_shell(t_shell *shell, char **envp)
 	if (!vars)
 		return (ft_free_prompt(shell, YES));
 	shell->vars = vars;
-	// shell->envp = envp; // NOTE: shell->envp once gave segfault in ft_split, be careful carrying this pointer along
 	shell->envp = malloc_envp(shell, envp);
-	if (!shell->envp)// is this the same as shell->envp == NULL? or should there be parenthesis -> !(shell->envp)
-	{
-		//free all
-		exit(1);//Should ths be done with return(MALLOC_FAIL);
-	}
 	return (MALLOC_SUCCESS);
 }
 

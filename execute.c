@@ -40,7 +40,6 @@ void	ft_stderr_redirection(t_pipex *pipex, int orig_fd, int index, int redir_typ
 	dup2(new_fd, orig_fd);
 	if (redir_type == OUTPUT && orig_fd == STDERR_FILENO)
 		pipex->err_to_pipe = NO;
-	dup2(pipex->write_end, STDERR_FILENO);
 }
 
 void	ft_stdout_redirection(t_pipex *pipex, int orig_fd, int index, int redir_type)
@@ -50,7 +49,9 @@ void	ft_stdout_redirection(t_pipex *pipex, int orig_fd, int index, int redir_typ
 	new_fd = *(int *)vec_get((*pipex->input)->new_fds, index);
 	dup2(new_fd, orig_fd);
 	if (redir_type == OUTPUT && orig_fd == STDOUT_FILENO)
+	{
 		pipex->output_to_pipe = NO;
+	}
 }
 
 void	ft_stdin_redirection(t_pipex *pipex, int orig_fd, int index)
@@ -101,7 +102,7 @@ static void	ft_child(t_pipex *pipex, t_shell *shell)
 	if (pipex->output_to_pipe == YES)
 		dup2(pipex->write_end, STDOUT_FILENO);
 	if (pipex->err_to_pipe == YES)
-		dup2(pipex->write_end, STDOUT_FILENO);
+		dup2(pipex->write_end, STDERR_FILENO);
 	close(pipex->write_end);
 	args = (char **)vec_get((*pipex->input)->cmd, 0);
 	if (pipex->exec_type == EXTERNAL)

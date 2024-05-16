@@ -49,25 +49,16 @@ void	ft_skip_quotes(t_vars *vars)
 	}
 }
 
-static int	ft_cont_parsing(t_shell *shell, char **s, int op)
+int	ft_further_join_return(t_shell *shell, char **s, int op)
 {
 	char	*temp;
 	char	*new;
 	t_vars	*vars;
 
-	temp = NULL;
 	vars = shell->vars;
-	if ((!vars->s_quote && !vars->d_quote) && (vars->input_line[vars->ind] == '\"' || vars->input_line[vars->ind] == '\''))
-		ft_skip_quotes(vars);
-	// WARN: make sure the stop thing (space after quotes end case) works
-	if (vars->stop)
-	{
-		vars->end = vars->ind;
-		vars->qontinue = NO;
-	}
 	new = ft_next_string(shell, op);
 	if (shell->vars->malloc_flag == RED && new == NULL)
-		return (ft_free_prompt(shell, YES));
+		return (YES);
 	if (vars->expand_it == NO || (vars->expand_it == YES
 			&& vars->expanded == YES))
 	{
@@ -76,9 +67,31 @@ static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 		free(temp);
 		free(new);
 		if (*s == NULL)
-			return (ft_free_prompt(shell, YES));
+			return (YES);
 	}
+	return (NO);
 	// TODO: check the mem leaks for string new
+}
+
+static int	ft_cont_parsing(t_shell *shell, char **s, int op)
+{
+	t_vars	*vars;
+	int	ind;
+	char	*input_line;
+
+	vars = shell->vars;
+	ind = vars->ind;
+	input_line = vars->input_line;
+	if ((!vars->s_quote && !vars->d_quote) && (input_line[ind] == '\"' || input_line[ind] == '\''))
+		ft_skip_quotes(vars);
+	// WARN: make sure the stop thing (space after quotes end case) works
+	if (vars->stop)
+	{
+		vars->end = vars->ind;
+		vars->qontinue = NO;
+	}
+	if (ft_further_join_return(shell, s, op) == YES)
+		return (ft_free_prompt(shell, YES));
 	if (vars->increment == YES)
 		vars->end++;
 	vars->ind = vars->end;

@@ -56,6 +56,26 @@ int	ft_redirection(t_vars *vars)
 	return (NO);
 }
 
+void	ft_skip_special_expansions(t_shell *shell)
+{
+	char	next;
+
+	next = shell->vars->input_line[shell->vars->ind+1];
+	if (ft_isdigit(next) || next == '-')
+	{
+		shell->vars->ind += 2;
+		shell->vars->end += 2;
+	}
+	else if (next == '\"' || next == '\'')
+	{
+		++shell->vars->ind;
+		++shell->vars->end;
+	}
+	else
+		return;
+	ft_index_after_spaces(shell->vars);
+}
+
 static int	ft_parsing_action(t_shell *shell)
 {
 	char	c;
@@ -65,30 +85,22 @@ static int	ft_parsing_action(t_shell *shell)
 	// parses everything in between
 	// moves the pointer next to '|' if encountered
 	c = shell->vars->input_line[shell->vars->ind];
-	next = shell->vars->input_line[shell->vars->ind+1];
 	while (c != '\0' && c != '|')
 	{
-		if (c == '$' && (next == '\"' || next == '\''))
+		if (c == '$')
+			ft_skip_special_expansions(shell);
+		if (ft_redirection(shell->vars) == YES)
 		{
-			++shell->vars->ind;
-			++shell->vars->end;
+			if (ft_handle_redirects(shell) == MALLOC_FAIL)
+				return (MALLOC_FAIL);
 		}
-		else
+		else if (c != '\0' && c != '|')
 		{
-			if (ft_redirection(shell->vars) == YES)
-			{
-				if (ft_handle_redirects(shell) == MALLOC_FAIL)
-					return (MALLOC_FAIL);
-			}
-			else if (c != '\0' && c != '|')
-			{
-				if (ft_save_cmd(shell) == MALLOC_FAIL)
-					return (MALLOC_FAIL);
-			}
+			if (ft_save_cmd(shell) == MALLOC_FAIL)
+				return (MALLOC_FAIL);
 		}
 		ft_index_after_spaces(shell->vars);
 		c = shell->vars->input_line[shell->vars->ind];
-		next = shell->vars->input_line[shell->vars->ind+1];
 	}
 	if (shell->vars->input_line[shell->vars->ind] == '|')
 	{
@@ -184,11 +196,6 @@ int	ft_save_input(t_shell *shell)
 			return (MALLOC_FAIL);
 		if (ft_parse_command_line(shell) == MALLOC_FAIL)
 			return (MALLOC_FAIL);
-		if (shell->vars->ind == 6)
-		{
-			printf("here\n");
-			break;
-		}
 		if (!vec_push(shell->pipes, &input))
 			return (ft_free_prompt(shell, YES));
 		ft_zero_redirects(&redir_count);
