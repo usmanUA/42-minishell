@@ -1,69 +1,157 @@
-asan = -fsanitize=address
-flags = -Wall -Wextra -Werror
-READLINE_LIB = ~/.brew/Cellar/readline/8.2.10/lib
-READLINE_HEADER = ~/.brew/Cellar/readline/8.2.10/include
-LIBVEC = vec/libvec.a
-BUILTIN_LIB = builtins/builtins_lib.a
-LIBFT = libft/libft.a
-NAME = minishell
-GREEN = \033[0;32m
-RED = \033[0;31m
-RESET = \033[0m
 
-FILES = \
-			main.c \
-			make_linked_list_and_utils.c \
-			errors.c \
-			errors_2.c \
-			execute.c \
-			free_mem.c \
-			init_structs.c \
-			minishell_utils.c \
-			next_string.c \
-			next_string_utils.c \
-			vars_expansion.c \
-			parsing_begins.c \
-			parsing_commands.c \
-			parsing_redirects.c \
+NAME 		:=	minishell
+ERRTXT		:=	error.txt
+OBJSDIR		:=	build
+INCSDIR		:=	include
+SRCSDIR		:=	src
+DEPSDIR		:=	.deps
+LIBFTDIR	:=	libft
+LIBVECDIR 	:=	vec
+LIBFT		:=	$(LIBFTDIR)/libft.a
+LIBVEC		:=	$(LIBVECDIR)/libvec.a
+
+RM			:=	rm -rf
+AR			:=	ar -rcs
+CC			:=	cc
+CFLAGS		:=	-Wall -Werror -Wextra
+DEBUGFLAGS	=	-g -fsanitize=address
+DEPFLAGS	=	-c -MT $$@ -MMD -MP -MF $(DEPSDIR)/$$*.d
+SCREENCLR	:=	printf "\033c"
+SLEEP		:=	sleep .1
+
+RL_FLG		:=	-lreadline
+RL_LIB		:=	-L ~/.brew/Cellar/readline/8.2.10/lib
+RL_INC		:=	-I ~/.brew/Cellar/readline/8.2.10/include
+
+MODULES		:=	main \
+				builtins \
+				parser \
+				exec \
+				free \
+				syntax_checker \
+				init \
+				error 
+
+SOURCES 	= 	main.c \
+			main_helpers.c \
+			print_vecs.c \
 			signals.c \
+			init_structs.c \
+			make_linked_list_and_utils.c \
+			parse_envp.c \
 			syntax_check.c \
 			syntax_utils.c \
+			commands.c \
+			files_opening.c \
+			files_opening_helpers.c \
+			next_string.c \
+			next_string_helpers.c \
+			parsing_begins.c \
+			quotes.c \
+			redirects.c \
+			redirects_helpers.c \
+			vars_expansion.c \
+			cd.c \
+			echo.c \
+			env.c \
+			exit.c \
+			export.c \
+			pwd.c \
+			search_linked_list.c \
+			unset.c \
+			util_funcs.c \
+			utils.c \
+			command_validation_helpers.c \
+			execute.c \
 			validate_and_execute.c \
 			validate_commands.c \
-			print_vecs.c \
+			errors_2.c \
+			errors.c \
+			free_mem.c \
 
 
-OBJS = $(FILES:.c=.o)
+SOURCEDIR	:=	$(addprefix $(SRCSDIR)/, $(MODULES))
+BUILDDIR	:=	$(addprefix $(OBJSDIR)/, $(MODULES))
+DEPENDDIR	:=	$(addprefix $(DEPSDIR)/, $(MODULES))
+SRCS		:=	$(foreach file, $(SOURCES), $(shell find $(SOURCEDIR) -name $(file)))
+OBJS		:=	$(patsubst $(SRCSDIR)/%.c, $(OBJSDIR)/%.o, $(SRCS))
+DEPS		:=	$(patsubst $(SRCSDIR)/%.c, $(DEPSDIR)/%.d, $(SRCS))
+INCS	 	:=	$(foreach header, $(INCSDIR), -I $(header))
+INCS	 	+=	$(foreach header, $(LIBVECDIR)/$(INCSDIR), -I $(header))
+INCS	 	+=	$(foreach header, $(LIBFTDIR)/$(INCSDIR), -I $(header))
 
-all: $(NAME)
+F			=	=====================================
+B			=	\033[1m
+T			=	\033[0m
+G			=	\033[32m
+V			=	\033[35m
+C			=	\033[36m
+R			=	\033[31m
+Y			=	\033[33m
 
-$(NAME): $(OBJS) $(LIBVEC) $(BUILTIN_LIB) $(LIBFT)	
-	@(echo "$(GREEN)Creating The Executable:   $(NAME)$(RESET)" && cc $(OBJS) $(LIBVEC) $(BUILTIN_LIB) $(LIBFT) $(LIBVEC) -L ${READLINE_LIB} -lreadline -I ${READLINE_HEADER} -g -o $(NAME))
-	
-%.o: %.c
-	@(echo "$(GREEN)Creating Object File: $@$(RESET)" && cc -g -I ${READLINE_HEADER} -c $< -o $@)
-	
-$(BUILTIN_LIB):
-	@$(MAKE) -C builtins
+vpath %.c $(SOURCEDIR)
 
-$(LIBVEC):
-	@$(MAKE) -C vec
+define cc_cmd
+$1/%.o: %.c | $(BUILDDIR) $(DEPENDDIR)
+	@if ! $(CC) $(INCS) $(RL_INC) $(DEPFLAGS) $$< -o $$@ 2> $(ERRTXT); then \
+		printf "$(R)$(B)\nERROR!\n$(F)$(T)\n"; \
+		printf "$(V)Unable to create object file:$(T)\n\n"; \
+		printf "$(R)$(B)$$@$(T)\n"; \
+		printf "$(Y)\n"; sed '$$d' $(ERRTXT); \
+		printf "$(R)$(B)\n$(F)\nExiting...$(T)\n"; exit 1 ; \
+	else \
+		printf "$(C)$(B)☑$(T)$(V) $$<$ \n    $(C)⮑\t$(G)$(B)$$@$(T) \t\n"; \
+	fi
+endef
+
+all: $(LIBFT) $(LIBVEC) $(NAME)
 
 $(LIBFT):
-	@$(MAKE) -C libft
+	@make --quiet -C $(LIBFTDIR) all
+	@make title
+
+$(LIBVEC):
+	@make --quiet -C $(LIBVECDIR) all
+	@make title
+
+$(NAME): $(OBJS)
+	@$(CC) $(INCS) $(RL_INC) $^ $(LIBVEC) $(LIBFT) $(RL_LIB) $(RL_FLG) -o $@
+	@make finish
+
+debug: CFLAGS += $(DEBUGFLAGS)
+debug: all
 
 clean:
-	@echo "$(RED)Cleaning Object Files for builtins and push_swap$(RESET)"
-	@$(MAKE) -C builtins clean
-	@$(MAKE) -C vec clean
-	@$(MAKE) -C libft clean
-	@rm -rf $(OBJS) 
+	@make --quiet -C $(LIBFTDIR) clean
+	@make --quiet -C $(LIBVECDIR) clean
+	@$(RM) $(OBJSDIR) $(DEPSDIR) $(ERRTXT)
 
 fclean: clean
-	@echo "$(RED)Removing   $(BUILTIN_LIB) and $(NAME)$(RESET)"
-	@rm -rf $(BUILTIN_LIB) $(LIBVEC) $(LIBFT)
-	@rm -rf $(NAME)
+	@make --quiet -C $(LIBFTDIR) fclean
+	@make --quiet -C $(LIBVECDIR) fclean
+	@$(RM) $(NAME)
 
 re: fclean all
 
-.PHONY: all clean fclean re
+title:
+	@$(SCREENCLR) && printf "\n"
+	@printf "$(C)╔╦╗╦╔╗╔╦╔═╗╦ ╦╔═╗╦  ╦$(T)\n"
+	@printf "$(C)║║║║║║║║╚═╗╠═╣║╣ ║  ║   by mkorpela$(T)\n"
+	@printf "$(C)╩ ╩╩╝╚╝╩╚═╝╩ ╩╚═╝╩═╝╩═╝  & uahmed$(T)\n"
+	@printf "$(G)$(B)$(F)\n$(T)\n"
+
+finish:
+	@printf "\n$(G)$(B)$(F)$(T)\n"
+	@printf "$(C)╔═╗╦╔╗╔╦╔═╗╦ ╦╔═╗╔╦╗        $(V)$(B)$(NAME)$(T)\n"
+	@printf "$(C)╠╣ ║║║║║╚═╗╠═╣║╣  ║║$(T)\n"
+	@printf "$(C)╚  ╩╝╚╝╩╚═╝╩ ╩╚═╝═╩╝$(T)\n\n"
+
+$(BUILDDIR) $(DEPENDDIR):
+	@mkdir -p $@
+
+$(DEPS):
+	include $(wildcard $(DEPS))
+
+$(foreach build, $(BUILDDIR), $(eval $(call cc_cmd, $(build))))
+
+.PHONY: all debug clean fclean re title finish
