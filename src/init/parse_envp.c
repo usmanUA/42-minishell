@@ -1,5 +1,6 @@
 
 #include "minishell.h"
+#include <stdio.h>
 
 static	void	free_failed_2d_array(t_shell *shell, char **envp, int i)
 {

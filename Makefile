@@ -51,14 +51,19 @@ SOURCES 	= 	main.c \
 			redirects.c \
 			redirects_helpers.c \
 			vars_expansion.c \
-			cd.c \
+			cd_1.c \
+			cd_2.c \
+			cd_3.c \
 			echo.c \
 			env.c \
 			exit.c \
-			export.c \
+			export_1.c\
+			export_2.c \
+			export_3.c \
 			pwd.c \
 			search_linked_list.c \
-			unset.c \
+			unset_1.c\
+			unset_2.c\
 			util_funcs.c \
 			utils.c \
 			command_validation_helpers.c \

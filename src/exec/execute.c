@@ -207,10 +207,10 @@ int	ft_exec_in_child(int exec_type, int tot_pipes)
 		return (YES);
 	if (exec_type == EXTERNAL || exec_type == MY_ECHO)
 		return (YES);
-	if (exec_type == CD)
-		return (YES);
-	if (exec_type == UNSET || exec_type == EXPORT)
-		return (YES);
+	// if (exec_type == CD)
+	// 	return (YES);
+	// if (exec_type == UNSET || exec_type == EXPORT)
+	// 	return (YES);
 	return (NO);
 }
 

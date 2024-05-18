@@ -29,7 +29,9 @@ int	builtin_commands(t_shell *shell, char **command, int exec_type)
 	else if (exec_type == PWD)
 		status = pwd_command(shell);
 	else if (exec_type == UNSET)
+	{
 		status = unset_command(shell, command);
+	}
 	shell->status = status;
 	return (status);
 }
