@@ -12,6 +12,18 @@
 
 #include "minishell.h"
 
+int    ft_return_value(int error_flag)
+{
+    if (error_flag == true)
+    {
+        return (1);
+    }
+    else
+    {
+        return (0);
+    }
+}
+
 char	*string_n_copy(char *dest, char *source, int len)//This is a util in another place
 {
 	int	i;

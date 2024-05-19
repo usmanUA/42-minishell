@@ -9,7 +9,7 @@
 /*   Updated: 2024/05/06 15:46:01 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "minishell.h"
+#include <minishell.h>
 
 int sigint_status;
 
@@ -37,7 +37,7 @@ static void	ft_ctrl_c_handler_main(int num)
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-	sigint_status = BROWN; 
+	sigint_status = num; 
 	(void)num;
 }
 
@@ -68,14 +68,16 @@ void	ft_signals(int place, int button, int *status)
 	struct sigaction	sa;
 
 	sigint_status = *status;
+	printf("global status (prev. status): %d\n", sigint_status);
 	ft_switch_echo(button);
 	if (place == PARENT)
 		sa.sa_handler = ft_ctrl_c_handler_main;
 	else if (place == CHILD)
 		sa.sa_handler = ft_ctrl_c_handler_exec;
 	sigemptyset(&sa.sa_mask);
-	*status = sigint_status;
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
+	printf("global status (sig status): %d\n", sigint_status);
+	*status = sigint_status;
 	ft_sigquit(place);
 }
