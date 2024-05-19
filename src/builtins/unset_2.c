@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniwell.h"
+#include "minishell.h"
 
 static t_envp	*delete_orphan_node(t_shell *data)
 {

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniwell.h"
+#include "minishell.h"
 
 void	print_in_alphabetical_order(t_shell *data, char *j)
 {

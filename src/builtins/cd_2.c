@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniwell.h"
+#include "minishell.h"
 
 char	*create_empty_str(t_shell *data)
 {

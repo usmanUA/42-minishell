@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniwell.h"
+#include "minishell.h"
 
 static void	if_env_var_does_not_exist(t_shell *data, char *command)
 {

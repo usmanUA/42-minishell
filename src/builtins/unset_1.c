@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniwell.h"
+#include "minishell.h"
 
 t_envp	*go_to_node_above_unset_node(t_shell *data, t_envp *unset_node)
 {
