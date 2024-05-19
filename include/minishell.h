@@ -13,6 +13,7 @@
 #ifndef MINISELL_H
 #define MINISELL_H
 
+#include "macros.h"
 #include "vec.h"
 #include "libft.h"
 #include <stdlib.h>
@@ -29,68 +30,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <stdbool.h>
-
-#define PROMPT	"\001\x1b[32mMiniWell\002\x1b[0m😎:\001\x1b[31mV0.1\002\x1b[0m$ "
-
-typedef enum e_button
-{
-	ON,
-	OFF,
-}	t_button;
-
-typedef enum	e_status_flags
-{
-	GREEN = 0,
-	BROWN = 1,
-	YELLOW = 126,
-	RED = 127,
-}	t_status_flags;
-
-typedef enum e_builtins
-{
-	EXTERNAL,
-	CD,
-	MY_ECHO,
-	ENV,
-	EXPORT,
-	EXIT,
-	PWD,
-	UNSET,
-}	t_builtins;
-
-typedef enum e_flags
-{
-	NOFLAG,
-	REDIR,
-	PIPE,
-	YES,
-	NO,
-	PARENT,
-	CHILD,
-	VALID,
-	INVALID,
-	FILE_FAIL,
-	MALLOC_FAIL,
-	MALLOC_SUCCESS,
-}	t_flags;
-
-typedef enum e_consants
-{
-	COMMAND,
-	REDIRECT,
-	FD,
-	FILENAME,
-}	t_constants;
- 
-typedef enum e_redir_types
-{
-	INFILE,
-	OUTFILE,
-	APPEND,
-	HERE_DOC,
-	INPUT,
-	OUTPUT,
-}	t_redir_types;
 
 typedef struct s_redirect
 {
@@ -206,7 +145,7 @@ int	ft_execute(t_shell *shell);
 int	ft_processes(t_pipex *pipex, t_shell *shell);
 int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell);
 
-int ft_init_shell(t_shell *shell, char **envp);
+int ft_init_shell(t_shell *shell);
 void	ft_init_vars(t_vars *vars);
 int	ft_init_redirect_vecs(t_shell *shell, t_redir_count *redir_count);
 void	ft_init_pipex(t_pipex *pipex, int tot_pipes);
@@ -218,7 +157,7 @@ int ft_prohibited_chars(t_vars *vars);
 void	ft_signals(int place, int button, int *status);
 
 int	ft_valid_input(t_vars *vars, t_shell *shell);
-int ft_prompt(t_shell *shell, char **envp);
+int ft_prompt(t_shell *shell);
 
 void	ft_listadd_back(t_envp **lst, t_envp *new_list);
 char	*get_name_of_env_variable(t_shell *data, char *envp_string);
@@ -250,4 +189,5 @@ void	free_env_array(t_shell *data);
 void	ft_skip_quotes(t_vars *vars);
 int		ft_strcmp(char *s1, char *s2);
 char	*string_n_copy(char *dest, char *source, int len);
+char	**malloc_envp(t_shell *shell, char **envp);
 #endif

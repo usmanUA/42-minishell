@@ -12,17 +12,17 @@ static	int	ft_here_doc(t_shell *shell)
 	// NOTE:UPDATES the fds and reads STDIN and saves the input to hidden file .here_doc
 	shell->vars->redirection_type = STDIN_FILENO;
 	flag = ft_get_here_doc(shell);
-	if (flag != MALLOC_SUCCESS)
+	if (flag != SUCCESS)
 	{
 		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 		return (flag);
 	}
 	if (shell->vars->redir_count->in_redir == 1)
 	{
-		if (ft_open_here_doc(shell->input, shell->vars) == FILE_FAIL)
+		if (ft_open_here_doc(shell->input, shell->vars) == NOFILE)
 		{
 			ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
-			return (FILE_FAIL); 
+			return (NOFILE); 
 		}
 		shell->vars->unlink_here_doc = YES;
 		return (ft_push_fds(shell));
@@ -33,7 +33,7 @@ static	int	ft_here_doc(t_shell *shell)
 		shell->vars->redir_count->in_redir--;
 	}
 	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 static	int	ft_input_redir(t_shell *shell)
@@ -47,7 +47,7 @@ static	int	ft_input_redir(t_shell *shell)
 		*(*shell->input)->file_flag = BROWN;
 		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 		ft_shift_pointer(shell);
-		return (FILE_FAIL);
+		return (NOFILE);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
 	if (shell->vars->redir_count->in_redir == 1)
@@ -55,7 +55,7 @@ static	int	ft_input_redir(t_shell *shell)
 	else if (shell->vars->redir_count->in_redir > 1)
 		shell->vars->redir_count->in_redir--;
 	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 static	int	ft_output_redir(t_shell *shell)
@@ -70,7 +70,7 @@ static	int	ft_output_redir(t_shell *shell)
 		*(*shell->input)->file_flag = BROWN;
 		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 		ft_shift_pointer(shell);
-		return (FILE_FAIL);
+		return (NOFILE);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
 	if (shell->vars->redir_count->out_redir == 1)
@@ -78,7 +78,7 @@ static	int	ft_output_redir(t_shell *shell)
 	else if (shell->vars->redir_count->out_redir > 1)
 		shell->vars->redir_count->out_redir--;
 	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 static	int	ft_output_append(t_shell *shell)
@@ -92,7 +92,7 @@ static	int	ft_output_append(t_shell *shell)
 		*(*shell->input)->file_flag = BROWN;
 		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
 		ft_shift_pointer(shell);
-		return (FILE_FAIL);
+		return (NOFILE);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
 	if (shell->vars->redir_count->out_redir == 1)
@@ -100,7 +100,7 @@ static	int	ft_output_append(t_shell *shell)
 	else if (shell->vars->redir_count->out_redir > 1)
 		shell->vars->redir_count->out_redir--;
 	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 int	ft_parse_redirect_fds(t_shell *shell)
@@ -114,6 +114,6 @@ int	ft_parse_redirect_fds(t_shell *shell)
 	else if (!ft_strncmp(*shell->vars->redir, ">", 1))
 		return (ft_output_redir(shell));
 	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 

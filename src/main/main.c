@@ -18,10 +18,11 @@ int	main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	shell.status = GREEN;
+	shell.envp = malloc_envp(&shell, envp);
 	make_linked_list_of_envp(&shell, envp);
 	while (42)
 	{
-		if (ft_prompt(&shell, envp) == MALLOC_FAIL)
+		if (ft_prompt(&shell) == FAILURE)
 			continue ;
 		if (!shell.vars->input_line)
 		{
@@ -31,7 +32,7 @@ int	main(int argc, char **argv, char **envp)
 		ft_signals(CHILD, ON, &shell.status);
 		if (ft_valid_input(shell.vars, &shell) == NO)
 			continue ;
-		if (ft_save_input(&shell) == MALLOC_FAIL)
+		if (ft_save_input(&shell) == FAILURE)
 			continue;
 //		ft_print_vecs(shell.pipes);
 		ft_validate_execute(&shell);

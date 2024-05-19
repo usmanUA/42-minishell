@@ -26,7 +26,7 @@ int	ft_push_fds(t_shell *shell)
 		return (ft_free_redirect_strs_prompt(shell->vars->f_des, shell->vars->redir, shell->vars->file, shell));
 	// NOTE: fd_in is in stack mem of this function, be careful
 	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir, shell->vars->file);
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 // TODO: check if decrementing redir_count with correct logic
@@ -43,7 +43,7 @@ int	ft_get_here_doc(t_shell *shell)
 		ft_filerror(errno, ".here_doc", NO);
 		shell->vars->unlink_here_doc = NO;
 		*(*shell->input)->file_flag = BROWN;
-		return (FILE_FAIL);
+		return (NOFILE);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
 	line = get_next_line(0);
@@ -58,7 +58,7 @@ int	ft_get_here_doc(t_shell *shell)
 		line = get_next_line(0);
 	}
 	close(fd_here_doc);
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 int	ft_open_here_doc(t_input **input, t_vars *vars)
@@ -68,7 +68,7 @@ int	ft_open_here_doc(t_input **input, t_vars *vars)
 	{
 		ft_filerror(errno, ".here_doc", NO);
 		*(*input)->file_flag = BROWN;
-		return (FILE_FAIL);
+		return (NOFILE);
 		//WARN: how to differentiate btw malloc fail and file errors when returning 0 in both cases?
 	}
 	return (1);

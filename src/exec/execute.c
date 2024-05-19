@@ -12,77 +12,12 @@
 
 #include "minishell.h"
 
-int	ft_status(int status)
-{
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	else if (WIFSIGNALED(status))
-		return (WTERMSIG(status) + 128);
-	return (1);
-}
-
-void	ft_wait_childs(t_shell *shell)
-{
-	int	*pids;
-	int	ind;
-
-	ind = -1;
-	pids = (int *)vec_get(shell->pids, 0);
-	while (++ind < shell->pids->len)
-		waitpid(pids[ind], NULL, 0);
-}
-
-void	ft_stderr_redirection(t_pipex *pipex, int orig_fd, int index, int redir_type)
-{
-	int	new_fd;
-
-	new_fd = *(int *)vec_get((*pipex->input)->new_fds, index);
-	dup2(new_fd, orig_fd);
-	if (redir_type == OUTPUT && orig_fd == STDERR_FILENO)
-		pipex->err_to_pipe = NO;
-}
-
-void	ft_stdout_redirection(t_pipex *pipex, int orig_fd, int index, int redir_type)
-{
-	int	new_fd;
-
-	new_fd = *(int *)vec_get((*pipex->input)->new_fds, index);
-	dup2(new_fd, orig_fd);
-	if (redir_type == OUTPUT && orig_fd == STDOUT_FILENO)
-		pipex->output_to_pipe = NO;
-}
-
-void	ft_stdin_redirection(t_pipex *pipex, int orig_fd, int index)
-{
-	int	new_fd;
-
-	new_fd = *(int *)vec_get((*pipex->input)->new_fds, index);
-	dup2(new_fd, orig_fd);
-	if (orig_fd == STDIN_FILENO)
-		pipex->read_from_pipe = NO;
-}
-
-void	ft_io_redirections(t_pipex *pipex, int redir_type)
-{
-	int	ind;
-	int	orig_fd;
-	int	fds_info;
-
-	ind = -1;
-	orig_fd = 42;
-	fds_info = 42;
-	while ((*pipex->input)->new_fds && ++ind < (int)(*pipex->input)->new_fds->len)
-	{
-		fds_info = *(int *)vec_get((*pipex->input)->fds_info, ind);
-		orig_fd = *(int *)vec_get((*pipex->input)->orig_fds, ind);
-		if (fds_info == STDIN_FILENO)
-			ft_stdin_redirection(pipex, orig_fd, ind);
-		else if (fds_info == STDOUT_FILENO)
-			ft_stdout_redirection(pipex, orig_fd, ind, redir_type);
-		else if (fds_info == STDERR_FILENO)
-			ft_stderr_redirection(pipex, orig_fd, ind, redir_type);
-	}
-}
+void	ft_io_redirections(t_pipex *pipex, int redir_type);
+int	ft_status(int status);
+void	ft_wait_childs(t_shell *shell);
+int	ft_push_pid(t_shell *shell, int *pid, int read_end);
+void	ft_free_shell(t_shell *shell);
+int	ft_exec_in_child(int exec_type, int tot_pipes);
 
 static void	ft_child(t_pipex *pipex, t_shell *shell)
 {
@@ -112,17 +47,6 @@ static void	ft_child(t_pipex *pipex, t_shell *shell)
 	exit(EXIT_FAILURE);
 }
 
-int	ft_push_pid(t_shell *shell, int *pid, int read_end)
-{
-	if (!vec_push(shell->pids, pid))
-	{
-		ft_wait_childs(shell);
-		close(read_end);
-		return (ft_free_prompt(shell, NO));
-	}
-	return (MALLOC_SUCCESS);
-}
-
 int	ft_processes(t_pipex *pipex, t_shell *shell)
 {
 	int	pid;
@@ -145,10 +69,10 @@ int	ft_processes(t_pipex *pipex, t_shell *shell)
 	{
 		close(fds[1]);
 		pipex->infile = fds[0];
-		if (ft_push_pid(shell, &pid, fds[0]) == MALLOC_FAIL)
+		if (ft_push_pid(shell, &pid, fds[0]) == FAILURE)
 			return (ft_free_prompt(shell, NO));
 	}
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 static	void	ft_last_chid(t_pipex *pipex, t_shell *shell, char **command)
@@ -191,51 +115,28 @@ static int	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
 		if (pipex->infile != 42)
 			close(pipex->infile);
 	}
-	return (MALLOC_SUCCESS);
-}
-
-void	ft_free_shell(t_shell *shell)
-{
-	free_env_list(shell);
-	free_env_array(shell);
-	ft_free_prompt(shell, NO);
-}
-
-int	ft_exec_in_child(int exec_type, int tot_pipes)
-{
-	if (tot_pipes > 0)
-		return (YES);
-	if (exec_type == EXTERNAL || exec_type == MY_ECHO)
-		return (YES);
-	if (exec_type == CD)
-		return (YES);
-	if (exec_type == UNSET || exec_type == EXPORT)
-		return (YES);
-	return (NO);
+	return (SUCCESS);
 }
 
 int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 {
 	char	**args;
-	int	call_child;
 	int	malloc_flag;
 	
-	call_child = ft_exec_in_child(pipex->exec_type, pipex->tot_pipes);
+	malloc_flag = SUCCESS;
 	// TODO: wait for the prev. childs using their pids (if there are any)
 	args = (char **)vec_get((*pipex->input)->cmd, 0);
-	if (call_child == YES)
+	if (ft_exec_in_child(pipex->exec_type, pipex->tot_pipes) == YES)
 	{
-		if (ft_execute_in_child(pipex, shell, args) == MALLOC_FAIL)
-			return (MALLOC_FAIL);
+		if (ft_execute_in_child(pipex, shell, args) == FAILURE)
+			return (FAILURE);
 	}
 	else if (*(*pipex->input)->file_flag == GREEN && pipex->cmd_flag == GREEN)
-	{
 		malloc_flag = builtin_commands(shell, args, pipex->exec_type);
-	}
 	if (pipex->tot_pipes > 0)
 		ft_wait_childs(shell);
-	if (malloc_flag == MALLOC_FAIL)
-		return (MALLOC_FAIL);
+	if (malloc_flag == FAILURE)
+		return (FAILURE);
 	if (pipex->tot_pipes == 0)
 	{
 		if (pipex->exec_type == EXIT)
@@ -244,5 +145,5 @@ int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 			exit(shell->status);
 		}
 	}
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }

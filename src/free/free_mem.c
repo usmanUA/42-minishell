@@ -112,5 +112,5 @@ int	ft_free_prompt(t_shell *shell, int input_separate)
 	shell->vars->input_line = NULL;
 	free(shell->vars);
 	shell->vars = NULL;
-	return (MALLOC_FAIL);
+	return (FAILURE);
 }

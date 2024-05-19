@@ -31,16 +31,15 @@ int	ft_valid_input(t_vars *vars, t_shell *shell)
 	return (YES);
 }
 
-int	ft_prompt(t_shell *shell, char **envp)
+int	ft_prompt(t_shell *shell)
 {
 	shell->pipes = NULL;
 	shell->pids = NULL;
 	shell->vars = NULL;
-	shell->envp = NULL;
-	if (ft_init_shell(shell, envp) == MALLOC_FAIL)
-		return (MALLOC_FAIL);
+	if (ft_init_shell(shell) == FAILURE)
+		return (FAILURE);
 	ft_init_vars(shell->vars);
 	ft_signals(PARENT, OFF, &shell->status);
 	shell->vars->input_line = readline(PROMPT);
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }

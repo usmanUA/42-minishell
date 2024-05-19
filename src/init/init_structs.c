@@ -12,24 +12,21 @@
 
 #include "minishell.h"
 
-char	**malloc_envp(t_shell *shell, char **envp);
-
-int	ft_init_shell(t_shell *shell, char **envp)
+int	ft_init_shell(t_shell *shell)
 {
 	t_vec	*pipes;
 	t_vars	*vars;
 
 	pipes = (t_vec *)malloc(sizeof(t_vec));
 	if (!pipes)
-		return (MALLOC_FAIL);
+		return (FAILURE);
 	shell->pipes = pipes;
 	vec_new(pipes, 0, sizeof(t_input **));
 	vars = (t_vars *)malloc(sizeof(t_vars));
 	if (!vars)
 		return (ft_free_prompt(shell, YES));
 	shell->vars = vars;
-	shell->envp = malloc_envp(shell, envp);
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 void	ft_init_vars(t_vars *vars)
@@ -99,7 +96,7 @@ int	ft_init_redirect_vecs(t_shell *shell, t_redir_count *redir_count)
 		return (ft_free_prompt(shell, YES));
 	(*shell->input)->fds_info = fds_info;
 	vec_new(fds_info, 0, sizeof(long));
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 void	ft_init_pipex(t_pipex *pipex, int tot_pipes)

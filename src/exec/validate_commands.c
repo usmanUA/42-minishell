@@ -63,7 +63,7 @@ static int	ft_make_command(t_pipex *pipex, char **paths)
 	{
 		cmd_path = ft_join_path(paths[i], pipex->command);
 		if (!cmd_path)
-			return (MALLOC_FAIL);
+			return (FAILURE);
 		if (ft_check_command(cmd_path, pipex, NO) == VALID)
 		{
 			vec_insert((*pipex->input)->cmd, &cmd_path, 0);
@@ -75,13 +75,13 @@ static int	ft_make_command(t_pipex *pipex, char **paths)
 		else
 			free(cmd_path);
 	}
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 void	ft_handle_relative(t_pipex *pipex, t_shell *shell, char **paths)
 {
 	pipex->cmd_flag = RED;
-	if (ft_make_command(pipex, paths) == MALLOC_FAIL)
+	if (ft_make_command(pipex, paths) == FAILURE)
 	{
 		shell->vars->malloc_flag = RED;
 		ft_free_prompt(shell, NO);

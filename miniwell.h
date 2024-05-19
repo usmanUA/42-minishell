@@ -52,9 +52,9 @@ typedef enum e_flags
 	CHILD,
 	VALID,
 	INVALID,
-	FILE_FAIL,
-	MALLOC_FAIL,
-	MALLOC_SUCCESS,
+	NOFILE,
+	FAILURE,
+	SUCCESS,
 }	t_flags;
 
 typedef enum e_consants

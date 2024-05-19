@@ -64,19 +64,19 @@ static int	ft_parsing_action(t_shell *shell)
 			ft_skip_special_expansions(shell);
 		if (ft_redirection(shell->vars) == YES)
 		{
-			if (ft_handle_redirects(shell) == MALLOC_FAIL)
-				return (MALLOC_FAIL);
+			if (ft_handle_redirects(shell) == FAILURE)
+				return (FAILURE);
 		}
 		else if (c != '\0' && c != '|')
 		{
-			if (ft_save_cmd(shell) == MALLOC_FAIL)
-				return (MALLOC_FAIL);
+			if (ft_save_cmd(shell) == FAILURE)
+				return (FAILURE);
 		}
 		ft_index_after_spaces(shell->vars);
 		c = shell->vars->input_line[shell->vars->ind];
 	}
 	ft_skip_pipe(shell);
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 static int	ft_parse_command_line(t_shell *shell)
@@ -99,11 +99,11 @@ static int	ft_parse_command_line(t_shell *shell)
 		return (ft_free_prompt(shell, YES));;
 	*file_flag = GREEN;
 	(*input)->file_flag = file_flag;
-	if (ft_parsing_action(shell) == MALLOC_FAIL)
-		return (MALLOC_FAIL);
+	if (ft_parsing_action(shell) == FAILURE)
+		return (FAILURE);
 	if (!vec_push(cmd, &null))
 		return (ft_free_prompt(shell, YES));;
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 int	ft_save_input(t_shell *shell)
@@ -124,13 +124,13 @@ int	ft_save_input(t_shell *shell)
 		if (!input)
 			return (ft_free_prompt(shell, NO));
 		shell->input = &input;
-		if (ft_init_redirect_vecs(shell, &redir_count) == MALLOC_FAIL) // TODO: FREE vars->input_line if malloc fails
-			return (MALLOC_FAIL);
-		if (ft_parse_command_line(shell) == MALLOC_FAIL)
-			return (MALLOC_FAIL);
+		if (ft_init_redirect_vecs(shell, &redir_count) == FAILURE) // TODO: FREE vars->input_line if malloc fails
+			return (FAILURE);
+		if (ft_parse_command_line(shell) == FAILURE)
+			return (FAILURE);
 		if (!vec_push(shell->pipes, &input))
 			return (ft_free_prompt(shell, YES));
 		ft_zero_redirects(&redir_count);
 	}
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }

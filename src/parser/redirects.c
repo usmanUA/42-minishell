@@ -32,7 +32,7 @@ char	*ft_parse_filename(t_shell *shell)
 	char	*file;
 
 	shell->vars->malloc_flag = GREEN;
-	if (ft_save_cmd_filename(shell, &file, FILENAME) == MALLOC_FAIL)
+	if (ft_save_cmd_filename(shell, &file, FILENAME) == FAILURE)
 	{
 		shell->vars->malloc_flag = RED;
 		return (NULL);
@@ -55,7 +55,7 @@ int	ft_parse_fd(t_shell *shell, char **fd)
 			return (ft_free_prompt(shell, YES));
 	}
 	shell->vars->ind = shell->vars->end;
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 int	ft_handle_redirects(t_shell *shell)
@@ -67,8 +67,8 @@ int	ft_handle_redirects(t_shell *shell)
 	// NOTE: checks the string right after the redirect operator is not an invalid operator and if so returns 1
 	// OTHERWISE tries to open the files and save their file descriptors and moves the pointer to the next string after filename
 	ft_init_strs(&redir, &fd, &file);
-	if (ft_parse_fd(shell, &fd) == MALLOC_FAIL)
-		return (MALLOC_FAIL);
+	if (ft_parse_fd(shell, &fd) == FAILURE)
+		return (FAILURE);
 	shell->vars->f_des = &fd;
 	redir = ft_next_string(shell, REDIRECT);
 	if (redir == NULL)
@@ -82,7 +82,7 @@ int	ft_handle_redirects(t_shell *shell)
 	else if (shell->vars->file_error == BROWN && file == NULL)
 	{
 		ft_free_redirect_strs_prompt(&fd, &redir, &file, shell);
-		return (FILE_FAIL);
+		return (NOFILE);
 	}
 	shell->vars->file = &file;
 	return (ft_parse_redirect_fds(shell));

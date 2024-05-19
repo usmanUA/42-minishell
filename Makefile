@@ -63,6 +63,8 @@ SOURCES 	= 	main.c \
 			utils.c \
 			command_validation_helpers.c \
 			execute.c \
+			redirections.c	\
+			exec_helpers.c	\
 			validate_and_execute.c \
 			validate_commands.c \
 			errors_2.c \
@@ -93,7 +95,7 @@ vpath %.c $(SOURCEDIR)
 
 define cc_cmd
 $1/%.o: %.c | $(BUILDDIR) $(DEPENDDIR)
-	@if ! $(CC) $(INCS) $(RL_INC) $(DEPFLAGS) $$< -o $$@ 2> $(ERRTXT); then \
+	@if ! $(CC) -g $(INCS) $(RL_INC) $(DEPFLAGS) $$< -o $$@ 2> $(ERRTXT); then \
 		printf "$(R)$(B)\nERROR!\n$(F)$(T)\n"; \
 		printf "$(V)Unable to create object file:$(T)\n\n"; \
 		printf "$(R)$(B)$$@$(T)\n"; \
@@ -115,7 +117,7 @@ $(LIBVEC):
 	@make title
 
 $(NAME): $(OBJS)
-	@$(CC) $(INCS) $(RL_INC) $^ $(LIBVEC) $(LIBFT) $(RL_LIB) $(RL_FLG) -o $@
+	@$(CC) -g $(INCS) $(RL_INC) $^ $(LIBVEC) $(LIBFT) $(RL_LIB) $(RL_FLG) -o $@
 	@make finish
 
 debug: CFLAGS += $(DEBUGFLAGS)

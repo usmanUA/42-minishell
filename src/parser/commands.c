@@ -60,7 +60,7 @@ static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 	if (vars->increment == YES)
 		vars->end++;
 	vars->ind = vars->end;
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
@@ -80,10 +80,10 @@ int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
 	shell->vars->ind = shell->vars->end;
 	while (shell->vars->qontinue == YES)
 	{
-		if (ft_cont_parsing(shell, s, op) == MALLOC_FAIL)
-			return (MALLOC_FAIL);
+		if (ft_cont_parsing(shell, s, op) == FAILURE)
+			return (FAILURE);
 	}
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }
 
 int	ft_save_cmd(t_shell *shell)
@@ -91,8 +91,8 @@ int	ft_save_cmd(t_shell *shell)
 	char	*s;
 
 	// NOTE: PARSE command and its options if there are any
-	if (ft_save_cmd_filename(shell, &s, COMMAND) == MALLOC_FAIL)
-		return (MALLOC_FAIL);
+	if (ft_save_cmd_filename(shell, &s, COMMAND) == FAILURE)
+		return (FAILURE);
 	if (s != NULL)
 	{
 		if (!vec_push((*shell->input)->cmd, &s))
@@ -102,5 +102,5 @@ int	ft_save_cmd(t_shell *shell)
 			return (ft_free_prompt(shell, YES));
 		}
 	}
-	return (MALLOC_SUCCESS);
+	return (SUCCESS);
 }

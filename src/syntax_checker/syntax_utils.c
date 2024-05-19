@@ -9,12 +9,13 @@
 /*   Updated: 2024/05/07 17:32:24 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
-static int	ft_special_char(char s, int pipe_flag, int redir_flag)
+static int	ft_special_char(char s, int check_pipe_redirs)
 {
 	// NOTE: checks for prohibited special characters and returns 1 if true
-	if (pipe_flag != NOFLAG && redir_flag != NOFLAG)
+	if (check_pipe_redirs == YES)
 	{
 		if (s == '|')
 			return (YES);
@@ -76,10 +77,10 @@ int	ft_prohibited_chars(t_vars *vars)
 		if (ft_redirect_operator(vars->input_line, &ind) == YES)
 		{
 			ft_skip_spaces(vars->input_line, &ind);
-			if (ft_special_char(vars->input_line[ind], PIPE, REDIR) == YES)
+			if (ft_special_char(vars->input_line[ind], YES) == YES)
 				return (ft_token_error(vars->input_line[ind], 0));
 		}
-		else if (ft_special_char(vars->input_line[ind], NOFLAG, NOFLAG) == YES)
+		else if (ft_special_char(vars->input_line[ind], NO) == YES)
 			return (ft_token_error(vars->input_line[ind], 0));
 		++ind;
 	}
