@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirects_helpers.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/05/22 10:26:39 by uahmed            #+#    #+#             */
+/*   Updated: 2024/05/22 10:26:41 by uahmed           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -20,7 +31,6 @@ int	ft_redirection(t_vars *vars)
 {
 	int	ind;
 
-	// NOTE: checks the operator-first case
 	ind = vars->ind;
 	if (vars->input_line[ind] == '<' || vars->input_line[ind] == '>')
 		return (YES);
@@ -62,4 +72,3 @@ void	ft_zero_redirects(t_redir_count *redir_count)
 	redir_count->out_redir = 0;
 	redir_count->in_redir = 0;
 }
-

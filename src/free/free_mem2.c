@@ -1,42 +1,50 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   free_mem2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/08 12:26:45 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/21 10:10:45 by mkorpela         ###   ########.fr       */
+/*   Created: 2024/05/22 08:05:24 by mkorpela          #+#    #+#             */
+/*   Updated: 2024/05/23 12:42:15 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	echo_command(char **command)
+int	free_failed_2d_array(t_shell *shell, char **envp, int i)
 {
-	int		i;
-	bool	first_word_flag;
-
-	first_word_flag = true;
-	if (command[1] == NULL)
+	i--;
+	while (i >= 0)
 	{
-		printf("\n");
-		return (0);
+		free(envp[i]);
+		i--;
 	}
-	i = 1;
-	if (ft_strcmp(command[1], "-n") == 0)
-		i = 2;
-	while (command[i])
+	free(envp);
+	shell->envp = NULL;
+	return (1);
+}
+
+void	free_env_array(t_shell *shell)
+{
+	int	i;
+
+	if (shell->envp == NULL)
 	{
-		if (first_word_flag == false)
-		{
-			printf(" ");
-		}
-		first_word_flag = false;
-		printf("%s", command[i]);
+		return ;
+	}
+	i = 0;
+	while (shell->envp[i])
+	{
+		free(shell->envp[i]);
 		i++;
 	}
-	if (ft_strcmp(command[1], "-n") != 0)
-		printf("\n");
-	return (0);
+	free(shell->envp);
+	shell->envp = NULL;
+}
+
+void	deallocate_all_envps(t_shell *shell)
+{
+	free_env_list(shell);
+	free_env_array(shell);
 }

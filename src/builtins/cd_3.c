@@ -6,34 +6,19 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/18 10:48:29 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/18 10:56:23 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 11:18:18 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*create_empty_string(t_shell *data, char *directory)
-{
-	char	*string;
-
-	string = (char *)malloc(sizeof(char) * 1);
-	if (string == NULL)
-	{
-		free_env_list(data);
-		free(directory);
-		exit (1);
-	}
-	string[0] = '\0';
-	return (string);
-}
-
-void	change_oldpwd(t_shell *data, char *directory)
+int	change_oldpwd(t_shell *shell)
 {
 	t_envp	*oldpwd;
 	t_envp	*pwd;
 
-	oldpwd = search_for_envp(data, "OLDPWD");
-	pwd = search_for_envp(data, "PWD");
+	oldpwd = search_for_envp(shell, "OLDPWD");
+	pwd = search_for_envp(shell, "PWD");
 	if (oldpwd != NULL)
 	{
 		free(oldpwd->value);
@@ -42,33 +27,49 @@ void	change_oldpwd(t_shell *data, char *directory)
 			oldpwd->value = ft_strdup(pwd->value);
 			if (oldpwd->value == NULL)
 			{
-				free(directory);
-				free_env_list(data);
-				exit (1);
+				return (1);
 			}
 		}
 		else
 		{
-			oldpwd->value = create_empty_string(data, directory);
+			oldpwd->value = create_empty_string();
+			if (oldpwd->value == NULL)
+				return (1);
 		}
 	}
+	return (0);
 }
 
-void	change_oldpwd_and_pwd(t_shell *data, char *directory)
+static char	*get_cwd(void)
+{
+	char	*cwd;
+	char	*buffer;
+
+	buffer = NULL;
+	cwd = getcwd(buffer, sizeof(buffer));
+	return (cwd);
+}
+
+int	change_oldpwd_and_pwd(t_shell *shell)
 {
 	t_envp	*pwd;
+	bool	error;
 
-	change_oldpwd(data, directory);
-	pwd = search_for_envp(data, "PWD");
+	error = false;
+	if (change_oldpwd(shell) == 1)
+		error = true;
+	pwd = search_for_envp(shell, "PWD");
 	if (pwd != NULL)
 	{
 		free(pwd->value);
-		pwd->value = ft_strdup(directory);
-		free(directory);
+		pwd->value = get_cwd();
 		if (pwd->value == NULL)
 		{
-			free_env_list(data);//DEL?
-			exit (1);
+			error = true;
 		}
 	}
+	if (error == true)
+		return (1);
+	else
+		return (0);
 }

@@ -3,13 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/15 14:02:09 by uahmed            #+#    #+#             */
-/*   Updated: 2024/04/15 14:02:11 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/05/23 12:42:12 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
+
+int	g_signal_status;
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -18,8 +21,8 @@ int	main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	shell.status = GREEN;
-	shell.envp = malloc_envp(&shell, envp);
-	make_linked_list_of_envp(&shell, envp);
+	g_signal_status = 0;
+	allocate_all_envps(&shell, envp);
 	while (42)
 	{
 		if (ft_prompt(&shell) == FAILURE)
@@ -27,17 +30,16 @@ int	main(int argc, char **argv, char **envp)
 		if (!shell.vars->input_line)
 		{
 			ft_free_prompt(&shell, NO);
-			break ; // NOTE: readlines malloc fail? error message | code?
+			printf("exit\n");
+			break ;
 		}
-		ft_signals(CHILD, ON, &shell.status);
 		if (ft_valid_input(shell.vars, &shell) == NO)
 			continue ;
 		if (ft_save_input(&shell) == FAILURE)
-			continue;
-//		ft_print_vecs(shell.pipes);
+			continue ;
+		ft_signals(CHILD, ON, &shell.status);
 		ft_validate_execute(&shell);
 	}
-	free_env_list(&shell);
-	free_env_array(&shell);
+	deallocate_all_envps(&shell);
 	return (shell.status);
 }

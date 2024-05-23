@@ -1,21 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vec_pop.c                                         :+:      :+:    :+:   */
+/*   signals_helpers.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/12 16:54:47 by uahmed            #+#    #+#             */
-/*   Updated: 2024/04/12 16:54:49 by uahmed           ###   ########.fr       */
+/*   Created: 2024/05/22 10:09:22 by uahmed            #+#    #+#             */
+/*   Updated: 2024/05/22 10:09:24 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "vec.h"
+#include "minishell.h"
 
-int	vec_pop(void *dst, t_vec *src)
+void	ft_switch_echo(int button)
 {
-	if (!dst || !src)
-		return (-1);
-	memcpy(dst, vec_get(src, src->len - 1), src->size);
-	src->len--;
-	return (1);
+	struct termios	term;
+
+	tcgetattr(STDIN_FILENO, &term);
+	if (button == OFF)
+		term.c_lflag &= ~(ECHOCTL);
+	else if (button == ON)
+		term.c_lflag |= (ECHOCTL);
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }

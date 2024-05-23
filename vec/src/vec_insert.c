@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vec_insert.c                                         :+:      :+:    :+:   */
+/*   vec_insert.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -23,7 +23,7 @@ int	vec_insert(t_vec *dst, void *src, size_t index)
 			return (0);
 	}
 	ft_memmove(vec_get(dst, index + 1), vec_get(dst, index), (dst->len - index)
-			* dst->size);
+		* dst->size);
 	ft_memcpy(vec_get(dst, index), src, dst->size);
 	dst->len++;
 	return (1);

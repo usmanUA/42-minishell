@@ -6,73 +6,56 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/18 10:28:44 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/18 10:55:31 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 11:18:04 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*create_empty_str(t_shell *data)
-{
-	char	*string;
-
-	string = (char *)malloc(sizeof(char) * 1);
-	if (string == NULL)
-	{
-		free_env_list(data);
-		exit (1);
-	}
-	string[0] = '\0';
-	return (string);
-}
-
-char	*make_relative_path(t_shell *data, char *command, char *cwd)
+char	*make_relative_path(char *command, char *cwd)
 {
 	char	*cwd_with_slash;
 	char	*directory;
 
 	cwd_with_slash = ft_strjoin(cwd, "/");
-	// printf("cwd_with_slash: %s\n", cwd_with_slash);
+	free(cwd);
 	if (cwd_with_slash == NULL)
 	{
-		free(cwd);
-		free_env_list(data);
-		exit (1);
+		return (NULL);
 	}
-	free(cwd);
 	directory = ft_strjoin(cwd_with_slash, command);
-	// printf("new_directory: %s\n", directory);
+	free(cwd_with_slash);
 	if (directory == NULL)
 	{
-		free(cwd_with_slash);
-		free_env_list(data);
-		exit (1);
+		return (NULL);
 	}
-	free(cwd_with_slash);
 	return (directory);
 }
 
-char	*relative_path(t_shell *data, char *command)
+void	cleanup_after_getcwd_failed(t_shell *shell)
+{
+	t_envp	*pwd_node;
+
+	error_msg_2(1);
+	change_oldpwd(shell);
+	pwd_node = search_for_envp(shell, "PWD");
+	free(pwd_node->value);
+	pwd_node->value = create_empty_string();
+}
+
+char	*relative_path(t_shell *shell, char *command)
 {
 	char	*cwd;
 	char	*buffer;
 	char	*directory;
-	char	*empty_string;
-	
+
 	buffer = NULL;
 	cwd = getcwd(buffer, sizeof(buffer));
 	if (cwd == NULL)
 	{
-		error_msg_2(1);
-		empty_string = create_empty_str(data);
-		if (empty_string == NULL)
-		{
-			free_env_list(data);//Change this?
-			exit(1);
-		}
-		change_oldpwd_and_pwd(data, empty_string);
+		cleanup_after_getcwd_failed(shell);
 		return (NULL);
 	}
-	directory = make_relative_path(data, command, cwd);	
+	directory = make_relative_path(command, cwd);
 	return (directory);
 }

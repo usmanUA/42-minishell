@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/07 13:09:53 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/02/09 15:09:02 by mkorpela         ###   ########.fr       */
+/*   Created: 2024/05/22 15:45:30 by mkorpela          #+#    #+#             */
+/*   Updated: 2024/05/22 15:45:32 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ static char	*make_string(int fd, char *string)
 
 char	*get_next_line(int fd)
 {
-	static	char *string;
+	static char	*string;
 	char		*line;
 
 	line = NULL;

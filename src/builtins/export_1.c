@@ -6,17 +6,17 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 13:39:59 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/18 10:21:24 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 10:50:14 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	print_in_alphabetical_order(t_shell *data, char *j)
+void	print_in_alphabetical_order(t_shell *shell, char *j)
 {
 	t_envp	*temp;
 
-	temp = data->env_list;
+	temp = shell->env_list;
 	while (temp)
 	{
 		if (temp->key[0] == *j)
@@ -32,32 +32,35 @@ void	print_in_alphabetical_order(t_shell *data, char *j)
 	}
 }
 
-int	just_export(t_shell *data, char **command)
+static int	just_export(t_shell *shell)
 {
 	char	j;
 
 	j = ' ';
 	while (j < 127)
 	{
-		print_in_alphabetical_order(data, &j);
+		print_in_alphabetical_order(shell, &j);
 		j++;
 	}
 	return (0);
 }
 
-int	export_command(t_shell *data, char **command)
+int	export_command(t_shell *shell, char **command)
 {
-	int		i;
 	bool	error_flag;
 
 	if (command[1] == NULL)
 	{
-		return (just_export(data, command));
+		return (just_export(shell));
 	}
 	error_flag = false;
 	if (command[1] != NULL)
 	{
-		error_flag = export_with_arguments(data, command, error_flag);
+		error_flag = export_with_arguments(shell, command, error_flag);
+	}
+	if (update_2d_env_array(shell) == 1)
+	{
+		return (1);
 	}
 	return (ft_return_value(error_flag));
 }

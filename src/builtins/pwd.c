@@ -6,13 +6,13 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 12:47:43 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/09 14:23:43 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 10:51:30 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	pwd_command(t_shell *data)
+int	pwd_command(void)
 {
 	char	*cwd;
 	char	*buffer;
@@ -21,10 +21,9 @@ int	pwd_command(t_shell *data)
 	cwd = getcwd(buffer, sizeof(buffer));
 	if (cwd == NULL)
 	{
-		free_env_list(data);
-		exit (errno);
+		return (errno);
 	}
-	printf("%s\n", cwd);// DO I have to take dup2 into account?
+	printf("%s\n", cwd);
 	free(cwd);
 	return (0);
 }

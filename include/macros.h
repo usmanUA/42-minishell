@@ -1,9 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   macros.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/05/22 15:47:48 by uahmed            #+#    #+#             */
+/*   Updated: 2024/05/22 15:47:55 by uahmed           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef MACROS_H
-#define MACROS_H
+# define MACROS_H
 
+# define MINISHELL "\001\x1b[35m\002MiniWell😎:\001\x1b[0m\002"
+# define VERSION "\001\x1b[34m\002V4.2\001\x1b[0m\002"
+# define DOLLAR "\001\x1b[36m\002$ \001\x1b[0m\002"
 
-#define PROMPT	"\001\x1b[32mMiniWell\002\x1b[0m😎:\001\x1b[31mV0.1\002\x1b[0m$ "
 
 typedef enum e_button
 {
@@ -11,7 +24,7 @@ typedef enum e_button
 	OFF,
 }	t_button;
 
-typedef enum	e_status_flags
+typedef enum e_status_flags
 {
 	GREEN = 0,
 	BROWN = 1,
@@ -55,7 +68,7 @@ typedef enum e_consants
 	FD,
 	FILENAME,
 }	t_constants;
- 
+
 typedef enum e_redir_types
 {
 	INPUT,

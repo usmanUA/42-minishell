@@ -40,6 +40,11 @@ int	ft_prompt(t_shell *shell)
 		return (FAILURE);
 	ft_init_vars(shell->vars);
 	ft_signals(PARENT, OFF, &shell->status);
-	shell->vars->input_line = readline(PROMPT);
+	shell->vars->input_line = readline(MINISHELL VERSION DOLLAR);
+	if (g_signal_status != 0)
+	{
+		shell->status = g_signal_status;
+		g_signal_status = 0;
+	}
 	return (SUCCESS);
 }

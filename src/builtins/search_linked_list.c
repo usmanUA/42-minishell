@@ -1,22 +1,38 @@
- /* ************************************************************************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   search_linkedlist.c                                :+:      :+:    :+:   */
+/*   search_linked_list.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 10:12:16 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/09 10:13:08 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 16:07:21 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	get_name_length(char *envp_string)
+static char	*string_n_copy(char *dest, char *source, int len)
 {
 	int	i;
 
-	if (envp_string == NULL)//This might not be necessary. But adds segfault protection.
+	if (dest == NULL || source == NULL)
+		return (NULL);
+	i = 0;
+	while (i < len)
+	{
+		dest[i] = source[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
+
+static int	get_name_length(char *envp_string)
+{
+	int	i;
+
+	if (envp_string == NULL)
 	{
 		return (0);
 	}
@@ -29,14 +45,10 @@ int	get_name_length(char *envp_string)
 	{
 		i--;
 	}
-	// ft_putendl_fd(envp_string, 2);
-	// ft_putnbr_fd(i, 2);
-	// printf("envp_string: %s\n", envp_string);
-	// printf("name_length: %d\n", i);	
 	return (i);
 }
 
-char	*get_name_of_env_variable(t_shell *data, char *envp_string)
+char	*get_name_of_env_variable(char *envp_string)
 {
 	char	*name;
 	int		name_length;
@@ -45,53 +57,49 @@ char	*get_name_of_env_variable(t_shell *data, char *envp_string)
 	name = (char *)malloc(sizeof(char) * (name_length + 1));
 	if (name == NULL)
 	{
-		free_env_list(data);
-		exit (1);
+		return (NULL);
 	}
 	name = string_n_copy(name, envp_string, name_length);
 	return (name);
 }
 
-char	*get_value_of_env_variable(t_shell *data, char *envp_string)
+char	*get_value_of_env_variable(char *envp_string)
 {
 	char	*value;
 	int		value_length;
 	char	*value_string;
 
-	value = ft_strchr(envp_string, '=');//what if no equals
-	//if null error
+	value = ft_strchr(envp_string, '=');
+	if (value == NULL)
+		return (NULL);
 	value++;
 	value_length = f_strlen(value);
 	value_string = (char *)malloc(sizeof(char) * (value_length + 1));
 	if (value_string == NULL)
 	{
-		free_env_list(data);
-		exit (1);
+		return (NULL);
 	}
 	value_string = string_n_copy(value_string, value, value_length);
 	return (value_string);
 }
 
-t_envp	*search_for_envp(t_shell *data, char *command)
+t_envp	*search_for_envp(t_shell *shell, char *command)
 {
 	int		name_length;
 	t_envp	*temp;
 
 	name_length = get_name_length(command);
-
-	temp = data->env_list;
+	temp = shell->env_list;
 	while (temp && temp->key)
 	{
 		if (ft_strncmp(command, temp->key, name_length) == 0)
 		{
 			if (temp->key[name_length] == '\0' || temp->key[name_length] == '+')
 			{
-				// printf("envp exists: %s\n", command);
 				return (temp);
 			}
 		}
 		temp = temp->next;
 	}
-	// printf("envp does not exist\n");
 	return (NULL);
 }

@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   command_validation_helpers.c                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/05/22 12:33:44 by uahmed            #+#    #+#             */
+/*   Updated: 2024/05/22 15:08:57 by mkorpela         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -58,35 +69,11 @@ int	ft_check_dir(t_pipex *pipex)
 	if (fd != -1)
 	{
 		close(fd);
-		ft_cmd_error(pipex->command, 2, 1); // NOTE: is a directory
+		ft_cmd_error(pipex->command, 2, 1);
 		pipex->cmd_flag = YELLOW;
-		// TODO: return relevant exit status 126
 		close(fd);
 		return (INVALID);
 	}
 	close(fd);
 	return (VALID);
 }
-
-void	ft_check_builtin(t_shell *shell, char *command, t_pipex *pipex)
-{
-	int	executable_info;
-
-	executable_info = EXTERNAL;
-	if (ft_strcmp(command, "cd") == 0)
-		executable_info = CD;
-	if (ft_strcmp(command, "echo") == 0)
-		executable_info = MY_ECHO;
-	if (ft_strcmp(command, "env") == 0)
-		executable_info = ENV;
-	if (ft_strcmp(command, "exit") == 0)
-		executable_info = EXIT;
-	if (ft_strcmp(command, "export") == 0)
-		executable_info = EXPORT;
-	if (ft_strcmp(command, "pwd") == 0)
-		executable_info = PWD;
-	if (ft_strcmp(command, "unset") == 0)
-		executable_info = UNSET;
-	pipex->exec_type = executable_info;
-}
-

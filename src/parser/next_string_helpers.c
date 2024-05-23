@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <stdio.h>
 
 int	ft_valid_char(char next, int check_digits)
 {
@@ -43,4 +44,3 @@ int	ft_status_expansion(t_vars *vars, char c, int *ind)
 	}
 	return (NO);
 }
-

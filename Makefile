@@ -36,9 +36,10 @@ SOURCES 	= 	main.c \
 			main_helpers.c \
 			print_vecs.c \
 			signals.c \
+			signals_helpers.c \
 			init_structs.c \
 			make_linked_list_and_utils.c \
-			parse_envp.c \
+			make_2d_envp.c \
 			syntax_check.c \
 			syntax_utils.c \
 			commands.c \
@@ -51,12 +52,16 @@ SOURCES 	= 	main.c \
 			redirects.c \
 			redirects_helpers.c \
 			vars_expansion.c \
+			update_2d_envp_array.c \
+			builtins.c \
 			cd_1.c \
 			cd_2.c \
 			cd_3.c \
 			echo.c \
 			env.c \
-			exit.c \
+			exit_1.c \
+			exit_2.c \
+			exit_3.c \
 			export_1.c\
 			export_2.c \
 			export_3.c \
@@ -64,7 +69,6 @@ SOURCES 	= 	main.c \
 			search_linked_list.c \
 			unset_1.c\
 			unset_2.c\
-			util_funcs.c \
 			utils.c \
 			command_validation_helpers.c \
 			execute.c \
@@ -75,7 +79,7 @@ SOURCES 	= 	main.c \
 			errors_2.c \
 			errors.c \
 			free_mem.c \
-
+			free_mem2.c \
 
 SOURCEDIR	:=	$(addprefix $(SRCSDIR)/, $(MODULES))
 BUILDDIR	:=	$(addprefix $(OBJSDIR)/, $(MODULES))
@@ -100,7 +104,7 @@ vpath %.c $(SOURCEDIR)
 
 define cc_cmd
 $1/%.o: %.c | $(BUILDDIR) $(DEPENDDIR)
-	@if ! $(CC) -g $(INCS) $(RL_INC) $(DEPFLAGS) $$< -o $$@ 2> $(ERRTXT); then \
+	@if ! $(CC) $(INCS) $(RL_INC) $(DEPFLAGS) $$< -o $$@ 2> $(ERRTXT); then \
 		printf "$(R)$(B)\nERROR!\n$(F)$(T)\n"; \
 		printf "$(V)Unable to create object file:$(T)\n\n"; \
 		printf "$(R)$(B)$$@$(T)\n"; \
@@ -122,7 +126,7 @@ $(LIBVEC):
 	@make title
 
 $(NAME): $(OBJS)
-	@$(CC) -g $(INCS) $(RL_INC) $^ $(LIBVEC) $(LIBFT) $(RL_LIB) $(RL_FLG) -o $@
+	@$(CC) $(INCS) $(RL_INC) $^ $(LIBVEC) $(LIBFT) $(RL_LIB) $(RL_FLG) -o $@
 	@make finish
 
 debug: CFLAGS += $(DEBUGFLAGS)

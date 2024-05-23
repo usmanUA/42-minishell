@@ -11,18 +11,16 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-// TODO: check the cases -> 0;, 0| (cases where fd is followed by special chars other than redirects)
+void		ft_skip_spaces(char *s, int *ind);
+
 int	ft_space_until_end(t_vars *vars)
 {
 	int	ind;
 
-	// NOTE: check if all the characters after in s are spaces
-	// returns 1 if all spaces or 0 when encounters any other character than spaces.
 	ind = -1;
 	while (++ind < vars->len)
 	{
 		if (!ft_isspace(vars->input_line[ind]))
-		//WARN: make sure should it be all whitespace chars or just ' ' (single space)
 			return (NO);
 	}
 	return (YES);
@@ -69,16 +67,40 @@ static int	ft_unclosed_quote(t_vars *vars)
 	return (NO);
 }
 
+int	ft_void_pipes(t_vars *vars)
+{
+	int	ind;
+
+	ind = -1;
+	while (++ind < vars->len)
+	{
+		if (vars->input_line[ind] == '|')
+		{
+			++ind;
+			ft_skip_spaces(vars->input_line, &ind);
+			if (vars->input_line[ind] == '\"' || vars->input_line[ind] == '\'')
+			{
+				while (vars->input_line[ind] == '\"'
+					|| vars->input_line[ind] == '\'')
+				{
+					++ind;
+					ft_skip_spaces(vars->input_line, &ind);
+				}
+				ft_skip_spaces(vars->input_line, &ind);
+			}
+			if (vars->input_line[ind] == '|')
+				return (ft_token_error('|', 0));
+		}
+	}
+	return (NO);
+}
+
 int	ft_syntax_error(t_vars *vars)
 {
 	char	c;
 	char	next;
 	char	null_term;
 
-	// NOTE: writes the errors message and returns 1 when there's error
-	// Errors: 1. if one of the operators come in the beginning or there's an unclosed quotation mark
-	//		    2. OR if all the characters are spaces
-	//		TODO: RETURN EXIT STATUS IF THERE's SYNTAX ERROR
 	null_term = '\0';
 	vars->len = ft_strlen(vars->input_line);
 	c = vars->input_line[0];
@@ -94,6 +116,8 @@ int	ft_syntax_error(t_vars *vars)
 	if (ft_space_until_end(vars) == YES)
 		return (YES);
 	if (ft_unclosed_quote(vars) == YES)
+		return (YES);
+	if (ft_void_pipes(vars) == YES)
 		return (YES);
 	if (ft_prohibited_chars(vars) == YES)
 		return (YES);

@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_helpers.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/05/22 12:32:59 by uahmed            #+#    #+#             */
+/*   Updated: 2024/05/22 12:33:00 by uahmed           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -17,7 +28,7 @@ void	ft_wait_childs(t_shell *shell)
 
 	ind = -1;
 	pids = (int *)vec_get(shell->pids, 0);
-	while (++ind < shell->pids->len)
+	while (++ind < (int)shell->pids->len)
 		waitpid(pids[ind], NULL, 0);
 }
 
@@ -45,10 +56,5 @@ int	ft_exec_in_child(int exec_type, int tot_pipes)
 		return (YES);
 	if (exec_type == EXTERNAL || exec_type == MY_ECHO)
 		return (YES);
-	if (exec_type == CD)
-		return (YES);
-	if (exec_type == UNSET || exec_type == EXPORT)
-		return (YES);
 	return (NO);
 }
-

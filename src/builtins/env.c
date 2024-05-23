@@ -6,17 +6,17 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 12:38:17 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/15 15:03:21 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 10:15:10 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	print_env_list(t_shell *data)
+void	print_env_list(t_shell *shell)
 {
 	t_envp	*temp;
 
-	temp = data->env_list;
+	temp = shell->env_list;
 	while (temp && temp->key)
 	{
 		if (temp->value != NULL)
@@ -29,14 +29,13 @@ void	print_env_list(t_shell *data)
 	}
 }
 
-int	env_command(t_shell *data, char **command)
+int	env_command(t_shell *shell, char **command)
 {
-	if (command[1] != NULL)//perhaps just use 
+	if (command[1] != NULL)
 	{
-		error_msg_hardcode("env", command[1], 3, false);
-		// printf("Write env - just env. No options, arguments or other shenanigans.\n");
+		error_msg("env", command[1], 3, false);
 		return (1);
 	}
-	print_env_list(data);
+	print_env_list(shell);
 	return (0);
 }

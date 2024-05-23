@@ -6,35 +6,14 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 10:54:12 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/13 13:18:35 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 08:19:01 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	error_msg_hardcode(char *command, char *argument, int error_number, bool quotes)
+static void	hardcode_msg(int error_number)
 {
-	ft_putstr_fd("miniwell: ", 2);
-	ft_putstr_fd(command, 2);
-	ft_putstr_fd(": ", 2);
-	if (argument != NULL)
-	{
-		if (quotes == true)
-		{
-			ft_putstr_fd("`", 2);
-		}
-		ft_putstr_fd(argument, 2);
-		if (quotes == true)
-		{
-			ft_putstr_fd("'", 2);
-		}		
-		ft_putstr_fd(": ", 2);
-	}
-	if (error_number == 0)
-	{
-		perror("");
-		return ;
-	}
 	if (error_number == 1)
 	{
 		ft_putstr_fd("numeric argument required", 2);
@@ -56,6 +35,32 @@ void	error_msg_hardcode(char *command, char *argument, int error_number, bool qu
 	{
 		ft_putstr_fd("not a valid identifier", 2);
 	}
+}
+
+void	error_msg(char *command, char *argument, int error_number, bool quotes)
+{
+	ft_putstr_fd("miniwell: ", 2);
+	ft_putstr_fd(command, 2);
+	ft_putstr_fd(": ", 2);
+	if (argument != NULL)
+	{
+		if (quotes == true)
+		{
+			ft_putstr_fd("`", 2);
+		}
+		ft_putstr_fd(argument, 2);
+		if (quotes == true)
+		{
+			ft_putstr_fd("'", 2);
+		}
+		ft_putstr_fd(": ", 2);
+	}
+	if (error_number == 0)
+	{
+		perror("");
+		return ;
+	}
+	hardcode_msg(error_number);
 	ft_putstr_fd("\n", 2);
 }
 

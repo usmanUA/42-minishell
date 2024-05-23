@@ -31,7 +31,6 @@ int	ft_init_shell(t_shell *shell)
 
 void	ft_init_vars(t_vars *vars)
 {
-	// NOTE: Initialize vars struct
 	vars->ind = 0;
 	vars->end = 0;
 	vars->len = 0;

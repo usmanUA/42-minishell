@@ -1,7 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirections.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/05/22 12:31:30 by uahmed            #+#    #+#             */
+/*   Updated: 2024/05/22 12:31:32 by uahmed           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
-static	void	ft_stderr_redirection(t_pipex *pipex, int orig_fd, int index, int redir_type)
+static void	ft_stderr_redirection(t_pipex *pipex, int orig_fd, int index,
+		int redir_type)
 {
 	int	new_fd;
 
@@ -11,7 +23,8 @@ static	void	ft_stderr_redirection(t_pipex *pipex, int orig_fd, int index, int re
 		pipex->err_to_pipe = NO;
 }
 
-static	void	ft_stdout_redirection(t_pipex *pipex, int orig_fd, int index, int redir_type)
+static void	ft_stdout_redirection(t_pipex *pipex, int orig_fd, int index,
+		int redir_type)
 {
 	int	new_fd;
 
@@ -21,7 +34,7 @@ static	void	ft_stdout_redirection(t_pipex *pipex, int orig_fd, int index, int re
 		pipex->output_to_pipe = NO;
 }
 
-static	void	ft_stdin_redirection(t_pipex *pipex, int orig_fd, int index)
+static void	ft_stdin_redirection(t_pipex *pipex, int orig_fd, int index)
 {
 	int	new_fd;
 
@@ -40,7 +53,8 @@ void	ft_io_redirections(t_pipex *pipex, int redir_type)
 	ind = -1;
 	orig_fd = 42;
 	fds_info = 42;
-	while ((*pipex->input)->new_fds && ++ind < (int)(*pipex->input)->new_fds->len)
+	while ((*pipex->input)->new_fds
+		&& ++ind < (int)(*pipex->input)->new_fds->len)
 	{
 		fds_info = *(int *)vec_get((*pipex->input)->fds_info, ind);
 		orig_fd = *(int *)vec_get((*pipex->input)->orig_fds, ind);
@@ -52,5 +66,3 @@ void	ft_io_redirections(t_pipex *pipex, int redir_type)
 			ft_stderr_redirection(pipex, orig_fd, ind, redir_type);
 	}
 }
-
-

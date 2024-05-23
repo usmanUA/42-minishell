@@ -6,22 +6,11 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 09:46:32 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/09 14:24:15 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/23 12:48:51 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-t_envp	*ft_listlast(t_envp *lst)
-{
-	while (lst != NULL)
-	{
-		if (lst->next == NULL)
-			break ;
-		lst = lst->next;
-	}
-	return (lst);
-}
 
 void	ft_listadd_back(t_envp **lst, t_envp *new)
 {
@@ -38,44 +27,62 @@ void	ft_listadd_back(t_envp **lst, t_envp *new)
 	}
 }
 
-t_envp *create_new_node(t_shell *data)
+t_envp	*create_new_node(void)
 {
 	t_envp	*node;
 
 	node = (t_envp *)malloc(sizeof(t_envp));
 	if (node == NULL)
 	{
-		free_env_list(data);
-		exit(1);
-	}	
-	node->key = NULL;;
+		return (NULL);
+	}
+	node->key = NULL;
 	node->value = NULL;
 	node->next = NULL;
 	return (node);
 }
 
-int	make_linked_list_of_envp(t_shell *data, char **envp)
+int	create_node_and_add_to_list(t_shell *shell, char *envp, t_envp **list)
 {
-	t_envp	*list;
 	t_envp	*node;
-	int		i;
 
-	list = NULL;
-	// if (data->envp == NULL)//If env is set to NULL (f.ex. by running "env -i") [this protects against SEGFAULT]
-	// {
-	// 	//error msg???
-	// 	return (0);//Technically it's ok if envp is set to NULL -> so no error number
-	// }
-	i = 0;
-	while (envp[i])
+	(void)shell;
+	node = create_new_node();
+	if (node == NULL)
 	{
-		node = create_new_node(data);
-		node->key = get_name_of_env_variable(data, envp[i]);
-		node->value = get_value_of_env_variable(data, envp[i]);
-		ft_listadd_back(&list, node);
-		i++;
+		return (1);
 	}
-	data->env_list = list;
+	node->key = get_name_of_env_variable(envp);
+	if (node->key == NULL)
+	{
+		free(node);
+		return (1);
+	}
+	node->value = get_value_of_env_variable(envp);
+	ft_listadd_back(list, node);
 	return (0);
 }
 
+static void	make_linked_list_of_envp(t_shell *shell, char **envp)
+{
+	t_envp	*list;
+	int		i;
+
+	list = NULL;
+	i = 0;
+	while (envp[i])
+	{
+		if (create_node_and_add_to_list(shell, envp[i], &list) == 1)
+			break ;
+		i++;
+	}
+	shell->env_list = list;
+	return ;
+}
+
+void	allocate_all_envps(t_shell *shell, char **envp)
+{
+	shell->envp = malloc_envp(shell, envp);
+	increment_2d_shell_level(shell, shell->envp);
+	make_linked_list_of_envp(shell, shell->envp);
+}

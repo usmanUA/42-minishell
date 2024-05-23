@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vec_reduce.c                                         :+:      :+:    :+:   */
+/*   vec_sort.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/12 16:54:47 by uahmed            #+#    #+#             */
-/*   Updated: 2024/04/12 16:54:49 by uahmed           ###   ########.fr       */
+/*   Created: 2024/05/22 15:41:45 by uahmed            #+#    #+#             */
+/*   Updated: 2024/05/22 15:41:47 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "vec.h"
@@ -41,7 +41,7 @@ void	vec_sort(t_vec *src, int (*f)(void *, void *))
 				* src->size]) > 0)
 		{
 			memswap(&src->mem[ind * src->size], &src->mem[(ind + 1)
-					* src->size], src->size);
+				* src->size], src->size);
 			ind = -1;
 		}
 	}

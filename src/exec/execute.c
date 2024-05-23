@@ -12,12 +12,12 @@
 
 #include "minishell.h"
 
-void	ft_io_redirections(t_pipex *pipex, int redir_type);
-int	ft_status(int status);
-void	ft_wait_childs(t_shell *shell);
-int	ft_push_pid(t_shell *shell, int *pid, int read_end);
-void	ft_free_shell(t_shell *shell);
-int	ft_exec_in_child(int exec_type, int tot_pipes);
+void		ft_io_redirections(t_pipex *pipex, int redir_type);
+int			ft_status(int status);
+void		ft_wait_childs(t_shell *shell);
+int			ft_push_pid(t_shell *shell, int *pid, int read_end);
+void		ft_free_shell(t_shell *shell);
+int			ft_exec_in_child(int exec_type, int tot_pipes);
 
 static void	ft_child(t_pipex *pipex, t_shell *shell)
 {
@@ -42,7 +42,7 @@ static void	ft_child(t_pipex *pipex, t_shell *shell)
 		if (pipex->exec_type == EXTERNAL)
 			execve(args[0], args, shell->envp);
 		else
-			exit(builtin_commands(shell, args, pipex->exec_type));	
+			exit(builtin_commands(shell, args, pipex->exec_type));
 	}
 	exit(EXIT_FAILURE);
 }
@@ -75,7 +75,7 @@ int	ft_processes(t_pipex *pipex, t_shell *shell)
 	return (SUCCESS);
 }
 
-static	void	ft_last_chid(t_pipex *pipex, t_shell *shell, char **command)
+static void	ft_last_chid(t_pipex *pipex, t_shell *shell, char **command)
 {
 	ft_io_redirections(pipex, INPUT);
 	if (pipex->infile != 42)
@@ -99,9 +99,6 @@ static int	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
 	int	pid;
 	int	status;
 
-	// NOTE:
-	// 1. If there were pipe/s (> 0) STDIN is the previous pipes read end OR 0< file is new STDIN (if there's input redirection)
-	// 2. If no pipe/s (pipes == 0),STDIN is STDIN OR 0< file is new STDIN (if there's input redirection)
 	pid = fork();
 	if (pid == -1)
 		return (ft_free_prompt(shell, NO));
@@ -121,10 +118,9 @@ static int	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
 int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 {
 	char	**args;
-	int	malloc_flag;
-	
+	int		malloc_flag;
+
 	malloc_flag = SUCCESS;
-	// TODO: wait for the prev. childs using their pids (if there are any)
 	args = (char **)vec_get((*pipex->input)->cmd, 0);
 	if (ft_exec_in_child(pipex->exec_type, pipex->tot_pipes) == YES)
 	{

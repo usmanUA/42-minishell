@@ -11,12 +11,13 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <stdio.h>
 
 void	ft_skip_special_expansions(t_shell *shell)
 {
 	char	next;
 
-	next = shell->vars->input_line[shell->vars->ind+1];
+	next = shell->vars->input_line[shell->vars->ind + 1];
 	if (ft_isdigit(next) || next == '-')
 	{
 		shell->vars->ind += 2;
@@ -28,11 +29,11 @@ void	ft_skip_special_expansions(t_shell *shell)
 		++shell->vars->end;
 	}
 	else
-		return;
+		return ;
 	ft_index_after_spaces(shell->vars);
 }
 
-static	char	*ft_find_value(t_shell *shell, char **key)
+static char	*ft_find_value(t_shell *shell, char **key)
 {
 	char	*value;
 	t_envp	*envp;
@@ -57,7 +58,7 @@ static	char	*ft_find_value(t_shell *shell, char **key)
 	return (value);
 }
 
-static	char	*ft_expand_key(t_shell *shell, char **key, int op)
+static char	*ft_expand_key(t_shell *shell, char **key, int op)
 {
 	char	*str;
 
@@ -65,14 +66,18 @@ static	char	*ft_expand_key(t_shell *shell, char **key, int op)
 	str = ft_find_value(shell, key);
 	free(*key);
 	key = NULL;
-	if (op == FILENAME && shell->vars->expand_it == YES && shell->vars->expanded == NO)
+	if (op == FILENAME && shell->vars->expand_it == YES
+		&& shell->vars->expanded == NO)
 	{
-		*key = ft_substr(shell->vars->input_line, shell->vars->ind, shell->vars->end - shell->vars->ind);
+		printf("str: %s\n", str);
+		write(1, "kia\n", 4);
+		*key = ft_substr(shell->vars->input_line, shell->vars->ind,
+				shell->vars->end - shell->vars->ind);
 		if (!(*key))
 		{
 			if (str)
 				free(str);
-			return (NULL); // NOTE: free str before exit?
+			return (NULL);
 		}
 		ft_filerror(0, *key, YES);
 		free(*key);
@@ -84,7 +89,7 @@ char	*ft_parse_key(t_vars *vars, int *end)
 {
 	char	*key;
 	char	c;
-	int	start;
+	int		start;
 
 	start = *end;
 	c = vars->input_line[*end];
@@ -94,28 +99,28 @@ char	*ft_parse_key(t_vars *vars, int *end)
 		c = vars->input_line[*end];
 	}
 	key = ft_substr(vars->input_line, start, *end);
-	return (key);	
+	return (key);
 }
 
 char	*ft_expand_variable(t_shell *shell, int op)
 {
 	char	*str;
 	char	*key;
-	int	end;
+	int		end;
 
 	end = shell->vars->ind + 1;
 	if (shell->vars->input_line[end] == '?')
 	{
-		str = ft_itoa(shell->vars->exit_status); // NOTE: can itoa return NULL in cases other than malloc fail?
+		str = ft_itoa(shell->vars->exit_status);
 		shell->vars->expanded = YES;
 	}
 	else
 	{
-		key = ft_substr(shell->vars->input_line, shell->vars->ind+1, shell->vars->end - (shell->vars->ind + 1));
+		key = ft_substr(shell->vars->input_line, shell->vars->ind + 1,
+				shell->vars->end - (shell->vars->ind + 1));
 		if (key == NULL)
 			return (NULL);
 		str = ft_expand_key(shell, &key, op);
 	}
 	return (str);
 }
-

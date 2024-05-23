@@ -14,7 +14,6 @@
 
 static int	ft_special_char(char s, int check_pipe_redirs)
 {
-	// NOTE: checks for prohibited special characters and returns 1 if true
 	if (check_pipe_redirs == YES)
 	{
 		if (s == '|')
@@ -44,7 +43,7 @@ static int	ft_redirect_operator(char *s, int *ind)
 	return (NO);
 }
 
-static void	ft_skip_spaces(char *s, int *ind)
+void	ft_skip_spaces(char *s, int *ind)
 {
 	while (s[*ind] != '\0' && ft_isspace(s[*ind]))
 		++(*ind);
@@ -65,7 +64,6 @@ int	ft_prohibited_chars(t_vars *vars)
 {
 	int	ind;
 
-	// NOTE: loops over the user input and checks for prohibited special characters and returns 1 if true
 	ind = 0;
 	ft_skip_spaces(vars->input_line, &ind);
 	if (vars->input_line[ind] == '|')

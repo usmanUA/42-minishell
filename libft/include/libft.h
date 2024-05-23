@@ -6,9 +6,10 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/08 14:05:04 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/03/27 11:37:14 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 15:39:22 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #ifndef LIBFT_H
 # define LIBFT_H
 
@@ -38,7 +39,7 @@ int		ft_isascii(int c);
 int		ft_isdigit(int c);
 int		ft_isprint(int c);
 int		ft_isspace(int c);
-size_t		ft_ispresent(char *str, char c);
+size_t	ft_ispresent(char *str, char c);
 char	*ft_itoa(int n);
 void	*ft_memchr(const void *s, int c, size_t n);
 int		ft_memcmp(const void *s1, const void *s2, size_t n);

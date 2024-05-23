@@ -1,25 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   miniwell.h                                         :+:      :+:    :+:   */
+/*   exit_3.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/08 11:50:48 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/09 14:35:36 by mkorpela         ###   ########.fr       */
+/*   Created: 2024/05/22 06:56:06 by mkorpela          #+#    #+#             */
+/*   Updated: 2024/05/22 08:16:49 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINIWELL_H
-#define MINIWELL_H
+#include "minishell.h"
 
-#include "../../libft/libft.h"
-#include "../../include/minishell.h"
+int	check_if_too_many_arguments(char **command)
+{
+	int	num_of_args;
 
-int		ft_strcmp(char *s1, char *s2);
-// void	print_env_list(t_shell *data);
-char	*string_n_copy(char *dest, char *source, int len);
-
-
-
-#endif
+	num_of_args = 0;
+	while (command[num_of_args])
+	{
+		num_of_args++;
+	}
+	num_of_args -= 1;
+	if (num_of_args > 1)
+	{
+		error_msg("exit", NULL, 2, false);
+		return (1);
+	}
+	return (0);
+}

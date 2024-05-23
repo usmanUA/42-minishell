@@ -6,74 +6,56 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/18 10:06:18 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/18 10:23:16 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 11:18:36 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	if_env_var_does_not_exist(t_shell *data, char *command)
+int	set_key_value(t_shell *shell, char *command, t_envp *node)
+{
+	(void)shell;
+	if (ft_strchr(command, '=') == NULL)
+	{
+		node->value = NULL;
+		return (0);
+	}
+	else
+	{
+		node->value = get_value_of_env_variable(command);
+		if (node->value == NULL)
+		{
+			free(node->value);
+			free(node);
+			return (1);
+		}
+		return (0);
+	}
+}
+
+static int	if_env_var_does_not_exist(t_shell *shell, char *command)
 {
 	t_envp	*node;
 
-	node = search_for_envp(data, command);
+	node = search_for_envp(shell, command);
 	if (node == NULL)
 	{
-		node = create_new_node(data);
-		node->key = get_name_of_env_variable(data, command);
-		if (ft_strchr(command, '=') == NULL)
+		node = create_new_node();
+		if (node == NULL)
 		{
-			node->value = NULL;
+			return (1);
 		}
-		else
+		node->key = get_name_of_env_variable(command);
+		if (node->key == NULL)
 		{
-			node->value = get_value_of_env_variable(data, command);
+			free(node);
+			return (1);
 		}
-		ft_listadd_back(&(data->env_list), node);
+		if (set_key_value(shell, command, node) == 1)
+			return (1);
+		ft_listadd_back(&(shell->env_list), node);
 	}
-}
-
-static bool	append_to_value(t_shell *data, char *command)
-{
-	bool	append;
-	char	*value;
-
-	append = false;
-	value = ft_strchr(command, '=');
-	value--;
-	if (*value == '+')
-	{
-		append = true;
-	}
-	return (append);
-}
-
-static void	if_env_var_exists(t_shell *data, char *command)
-{
-	t_envp	*node;
-	char	*value_append;
-	char	*new_value;
-
-	node = search_for_envp(data, command);
-	if (node != NULL)
-	{
-		if (ft_strchr(command, '=') != NULL)
-		{
-			if (append_to_value(data, command) == false)
-			{
-				free(node->value);
-				node->value = get_value_of_env_variable(data, command);
-			}
-			else
-			{
-				value_append = get_value_of_env_variable(data, command);
-				new_value = ft_strjoin(node->value, value_append);
-				free(value_append);
-				free(node->value);
-				node->value = new_value;
-			}
-		}
-	}
+	return (0);
 }
 
 static bool	check_export_syntax(char *argument)
@@ -83,9 +65,7 @@ static bool	check_export_syntax(char *argument)
 	i = 0;
 	if (ft_isalpha(argument[0]) == 0 && argument[0] != '_')
 	{
-		error_msg_hardcode("export", argument, 5, true);
-		// printf("bash: export: `%s': not a valid identifier\n", argument);
-		// printf("Error in First Character - it should be either an Uppercase, Lowercase Letter or Underscore\n");
+		error_msg("export", argument, 5, true);
 		return (true);
 	}
 	i++;
@@ -97,9 +77,7 @@ static bool	check_export_syntax(char *argument)
 			{
 				break ;
 			}
-			error_msg_hardcode("export", argument, 5, true);
-			// printf("bash: export: `%s': not a valid identifier\n", argument);
-			// printf("Error after first character. Should be alphabet (upper or lower), digit or underscore.\n");
+			error_msg("export", argument, 5, true);
 			return (true);
 		}
 		i++;
@@ -107,7 +85,7 @@ static bool	check_export_syntax(char *argument)
 	return (false);
 }
 
-bool	export_with_arguments(t_shell *data, char **command, bool error_flag)
+bool	export_with_arguments(t_shell *shell, char **command, bool error_flag)
 {
 	bool	arg_error;
 	int		i;
@@ -125,9 +103,10 @@ bool	export_with_arguments(t_shell *data, char **command, bool error_flag)
 				error_flag = true;
 			if (arg_error == false)
 			{
-				if_env_var_exists(data, command[i]);
-				if_env_var_does_not_exist(data, command[i]);
-				update_2d_envp_array(data, command[i]);
+				if (if_env_var_exists(shell, command[i]) == 1)
+					error_flag = true;
+				if (if_env_var_does_not_exist(shell, command[i]) == 1)
+					error_flag = true;
 			}
 			i++;
 		}

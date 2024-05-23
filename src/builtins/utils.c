@@ -6,54 +6,57 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:28:19 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/09 14:30:02 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 16:07:47 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int    ft_return_value(int error_flag)
-{
-    if (error_flag == true)
-    {
-        return (1);
-    }
-    else
-    {
-        return (0);
-    }
-}
-
-char	*string_n_copy(char *dest, char *source, int len)//This is a util in another place
+void	print_envp_2d_array(char **envp)//Del this FUNCTION before eval - this is only for confirming
 {
 	int	i;
 
 	i = 0;
-	while (i < len)
+	while (envp[i])
 	{
-		dest[i] = source[i];
+		ft_printf("%d: %s\n", i, envp[i]);
 		i++;
 	}
-	dest[i] = '\0';
-	return (dest);
+}
+
+char	*create_empty_string(void)
+{
+	char	*string;
+
+	string = (char *)malloc(sizeof(char) * 1);
+	if (string == NULL)
+	{
+		return (NULL);
+	}
+	string[0] = '\0';
+	return (string);
+}
+
+int	ft_return_value(int error_flag)
+{
+	if (error_flag == true)
+	{
+		return (1);
+	}
+	else
+	{
+		return (0);
+	}
 }
 
 int	ft_strcmp(char *s1, char *s2)
 {
 	int	i;
-	
-	// if (s1 == NULL || s2 == NULL)
-	// {
-	// 	return (-1);
-	// }
+
 	i = 0;
 	while (s1[i] != '\0' || s2[i] != '\0')
 	{
-		if (s1[i] - s2[i] > 0)
-		{
-			return (s1[i] - s2[i]);
-		}
-		if (s1[i] - s2[i] < 0)
+		if (s1[i] - s2[i] != 0)
 		{
 			return (s1[i] - s2[i]);
 		}

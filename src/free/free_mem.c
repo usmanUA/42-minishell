@@ -6,18 +6,18 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/25 10:09:00 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/15 15:01:28 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 10:31:39 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	free_env_list(t_shell *data)
+void	free_env_list(t_shell *shell)
 {
 	t_envp	*prev_node;
 	t_envp	*curr_node;
-	
-	curr_node = data->env_list;
+
+	curr_node = shell->env_list;
 	while (curr_node)
 	{
 		prev_node = curr_node;
@@ -26,7 +26,7 @@ void	free_env_list(t_shell *data)
 		free(prev_node->value);
 		free(prev_node);
 	}
-	data->env_list = NULL;
+	shell->env_list = NULL;
 }
 
 static	void	ft_free_redirect(t_vec **redirect)
@@ -86,10 +86,8 @@ void	ft_free_input(void **inpt)
 	}
 }
 
-
 int	ft_free_prompt(t_shell *shell, int input_separate)
 {
-	// TODO: FREE 3 char * coming from handle_redirect function
 	int	ind;
 
 	if (input_separate == YES)

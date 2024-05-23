@@ -6,7 +6,7 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 15:05:37 by mkorpela          #+#    #+#             */
-/*   Updated: 2023/11/20 11:08:03 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 14:27:52 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,8 @@ char	**ft_split(char const *s1, char c)
 	size_t	subs_cnt;
 	char	**arr_of_str;
 
+	if (s1 == NULL)
+		return (NULL);
 	subs_cnt = substring_count(s1, c);
 	arr_of_str = malloc((subs_cnt + 1) * sizeof(char *));
 	if (arr_of_str == NULL)

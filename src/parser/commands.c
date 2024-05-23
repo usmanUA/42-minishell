@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_commands.c                                 :+:      :+:    :+:   */
+/*   commands.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 14:54:20 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/13 16:38:48 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/22 13:35:43 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_skip_quotes(t_vars *vars);
+void		ft_skip_quotes(t_vars *vars);
 
 int	ft_further_join_return(t_shell *shell, char **s, int op)
 {
@@ -35,21 +35,20 @@ int	ft_further_join_return(t_shell *shell, char **s, int op)
 			return (YES);
 	}
 	return (NO);
-	// TODO: check the mem leaks for string new
 }
 
 static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 {
 	t_vars	*vars;
-	int	ind;
+	int		ind;
 	char	*input_line;
 
 	vars = shell->vars;
 	ind = vars->ind;
 	input_line = vars->input_line;
-	if ((!vars->s_quote && !vars->d_quote) && (input_line[ind] == '\"' || input_line[ind] == '\''))
+	if ((!vars->s_quote && !vars->d_quote) && (input_line[ind] == '\"'
+			|| input_line[ind] == '\''))
 		ft_skip_quotes(vars);
-	// WARN: make sure the stop thing (space after quotes end case) works
 	if (vars->stop)
 	{
 		vars->end = vars->ind;
@@ -66,7 +65,7 @@ static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
 {
 	char	*input_line;
-	int	ind;
+	int		ind;
 
 	input_line = shell->vars->input_line;
 	ind = shell->vars->ind;
@@ -75,7 +74,7 @@ int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
 	*s = ft_next_string(shell, op);
 	if (shell->vars->malloc_flag == RED && *s == NULL)
 		return (ft_free_prompt(shell, YES));
-	if (shell->vars->increment == YES) // WARN: adding 1 here works for all cases?
+	if (shell->vars->increment == YES)
 		shell->vars->end++;
 	shell->vars->ind = shell->vars->end;
 	while (shell->vars->qontinue == YES)
@@ -90,7 +89,6 @@ int	ft_save_cmd(t_shell *shell)
 {
 	char	*s;
 
-	// NOTE: PARSE command and its options if there are any
 	if (ft_save_cmd_filename(shell, &s, COMMAND) == FAILURE)
 		return (FAILURE);
 	if (s != NULL)

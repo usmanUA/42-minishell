@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   handle_redirs.c                                    :+:      :+:    :+:   */
+/*   redirects.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 #include "minishell.h"
 
 void	ft_init_strs(char **redir, char **fd, char **file);
-int	ft_parse_redirect_fds(t_shell *shell);
+int		ft_parse_redirect_fds(t_shell *shell);
 
 void	ft_free_redirect_strs(char **fd, char **redir, char **file)
 {
@@ -21,7 +21,8 @@ void	ft_free_redirect_strs(char **fd, char **redir, char **file)
 	free(*file);
 }
 
-int	ft_free_redirect_strs_prompt(char **fd, char **redir, char **file, t_shell *shell)
+int	ft_free_redirect_strs_prompt(char **fd, char **redir, char **file,
+		t_shell *shell)
 {
 	ft_free_redirect_strs(fd, redir, file);
 	return (ft_free_prompt(shell, YES));
@@ -50,7 +51,7 @@ int	ft_parse_fd(t_shell *shell, char **fd)
 {
 	if (shell->vars->fd)
 	{
-		*fd = ft_next_string(shell, FD); // NOTE: str in heap, vars->ind points ->FD)<-vars->end
+		*fd = ft_next_string(shell, FD);
 		if (!*fd)
 			return (ft_free_prompt(shell, YES));
 	}
@@ -64,8 +65,6 @@ int	ft_handle_redirects(t_shell *shell)
 	char	*fd;
 	char	*file;
 
-	// NOTE: checks the string right after the redirect operator is not an invalid operator and if so returns 1
-	// OTHERWISE tries to open the files and save their file descriptors and moves the pointer to the next string after filename
 	ft_init_strs(&redir, &fd, &file);
 	if (ft_parse_fd(shell, &fd) == FAILURE)
 		return (FAILURE);
