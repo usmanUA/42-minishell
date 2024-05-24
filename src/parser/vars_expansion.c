@@ -40,7 +40,7 @@ static char	*ft_find_value(t_shell *shell, char **key)
 
 	value = NULL;
 	envp = shell->env_list;
-	while (envp->next)
+	while (envp)
 	{
 		if (!ft_strcmp(*key, envp->key))
 		{
@@ -61,45 +61,17 @@ static char	*ft_find_value(t_shell *shell, char **key)
 static char	*ft_expand_key(t_shell *shell, char **key, int op)
 {
 	char	*str;
+	char	*temp;
 
 	str = NULL;
-	str = ft_find_value(shell, key);
-	free(*key);
-	key = NULL;
+	temp = &(*key)[1];
+	str = ft_find_value(shell, &temp);
 	if (op == FILENAME && shell->vars->expand_it == YES
 		&& shell->vars->expanded == NO)
-	{
-		printf("str: %s\n", str);
-		write(1, "kia\n", 4);
-		*key = ft_substr(shell->vars->input_line, shell->vars->ind,
-				shell->vars->end - shell->vars->ind);
-		if (!(*key))
-		{
-			if (str)
-				free(str);
-			return (NULL);
-		}
 		ft_filerror(0, *key, YES);
-		free(*key);
-	}
+	free(*key);
+	key = NULL;
 	return (str);
-}
-
-char	*ft_parse_key(t_vars *vars, int *end)
-{
-	char	*key;
-	char	c;
-	int		start;
-
-	start = *end;
-	c = vars->input_line[*end];
-	while (c == '_' || ft_isalnum(c))
-	{
-		++(*end);
-		c = vars->input_line[*end];
-	}
-	key = ft_substr(vars->input_line, start, *end);
-	return (key);
 }
 
 char	*ft_expand_variable(t_shell *shell, int op)
@@ -116,8 +88,8 @@ char	*ft_expand_variable(t_shell *shell, int op)
 	}
 	else
 	{
-		key = ft_substr(shell->vars->input_line, shell->vars->ind + 1,
-				shell->vars->end - (shell->vars->ind + 1));
+		key = ft_substr(shell->vars->input_line, shell->vars->ind,
+				shell->vars->end - shell->vars->ind);
 		if (key == NULL)
 			return (NULL);
 		str = ft_expand_key(shell, &key, op);

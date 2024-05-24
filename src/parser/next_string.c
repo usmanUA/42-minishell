@@ -103,6 +103,5 @@ char	*ft_next_string(t_shell *shell, int op)
 	if ((vars->expand_it == NO && !s) || (vars->expand_it == YES
 			&& vars->expanded == YES && !s))
 		vars->malloc_flag = RED;
-	write(1, "here\n", 5);
 	return (s);
 }

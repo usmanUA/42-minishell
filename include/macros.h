@@ -48,6 +48,7 @@ typedef enum e_process
 {
 	PARENT,
 	CHILD,
+	HEREDOC,
 }	t_process;
 
 typedef enum e_flags

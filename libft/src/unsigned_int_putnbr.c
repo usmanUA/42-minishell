@@ -27,7 +27,7 @@ int	unsigned_int_putnbr(unsigned int n)
 		print_length += return_value;
 		n = n % 10;
 	}
-	if (n >= 0 && n <= 9)
+	if (n <= 9)
 	{
 		n += '0';
 		return_value = write (1, &n, 1);

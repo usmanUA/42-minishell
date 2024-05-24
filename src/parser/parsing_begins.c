@@ -19,9 +19,14 @@ void		ft_skip_special_expansions(t_shell *shell);
 
 void	ft_index_after_spaces(t_vars *vars)
 {
-	while (vars->input_line[vars->end]
-		&& ft_isspace(vars->input_line[vars->end]))
+	char c;
+
+	c = vars->input_line[vars->end];
+	while ( c != '\0' && ft_isspace(c))
+	{
 		vars->end++;
+		c = vars->input_line[vars->end];
+	}
 	vars->ind = vars->end;
 }
 

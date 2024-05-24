@@ -15,6 +15,7 @@
 void	ft_free_redirect_strs(char **fd, char **redir, char **file);
 int		ft_free_redirect_strs_prompt(char **fd, char **redir, char **file,
 			t_shell *shell);
+int	ft_get_line(t_shell *shell, char *eof, int fd);
 
 void	ft_shift_pointer(t_shell *shell)
 {
@@ -58,7 +59,6 @@ int	ft_push_fds(t_shell *shell)
 
 int	ft_get_here_doc(t_shell *shell, char *eof)
 {
-	char	*line;
 	int		fd_here_doc;
 
 	fd_here_doc = open(".here_doc", O_WRONLY | O_TRUNC | O_CREAT, 0666);
@@ -69,19 +69,7 @@ int	ft_get_here_doc(t_shell *shell, char *eof)
 		*(*shell->input)->file_flag = BROWN;
 		return (NOFILE);
 	}
-	line = get_next_line(0);
-	while (42)
-	{
-		if (line == NULL)
-			return (ft_free_prompt(shell, YES));
-		if (((ft_strlen(line) - 1) == ft_strlen(eof) && !strncmp(line, eof,
-					strlen(eof))) || !line)
-			break ;
-		write(fd_here_doc, line, ft_strlen(line));
-		line = get_next_line(0);
-	}
-	close(fd_here_doc);
-	return (SUCCESS);
+	return (ft_get_line(shell, eof, fd_here_doc));
 }
 
 int	ft_open_here_doc(t_input **input, t_vars *vars)
@@ -93,7 +81,7 @@ int	ft_open_here_doc(t_input **input, t_vars *vars)
 		*(*input)->file_flag = BROWN;
 		return (NOFILE);
 	}
-	return (1);
+	return (SUCCESS);
 }
 
 int	ft_push_here_doc(t_shell *shell)

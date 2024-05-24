@@ -53,6 +53,7 @@ static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 	{
 		vars->end = vars->ind;
 		vars->qontinue = NO;
+		return ;
 	}
 	if (ft_further_join_return(shell, s, op) == YES)
 		return (ft_free_prompt(shell, YES));

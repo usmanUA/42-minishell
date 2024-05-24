@@ -39,14 +39,13 @@ static int	ft_validate_exec_last_child(t_pipex *pipex, t_shell *shell)
 	shell->vars->malloc_flag = GREEN;
 	pipex->cmd_flag = GREEN;
 	pipex->command = *(char **)vec_get((*pipex->input)->cmd, 0);
-	if (pipex->command != NULL)
-		ft_check_builtin(pipex->command, pipex);
+	if (pipex->command == NULL)
+		return ;
+	ft_check_builtin(pipex->command, pipex);
 	if (pipex->exec_type == EXTERNAL)
 		ft_validate_commands(pipex, shell);
 	if (shell->vars->malloc_flag == RED)
-	{
 		return (FAILURE);
-	}
 	if (shell->status == GREEN)
 		shell->status = pipex->cmd_flag;
 	if (ft_execute_last_cmd(pipex, shell) == FAILURE)
@@ -72,7 +71,8 @@ static int	ft_validate_exec_childs(t_pipex *pipex, t_shell *shell)
 	shell->vars->malloc_flag = GREEN;
 	pipex->command = *(char **)vec_get((*pipex->input)->cmd, 0);
 	if (pipex->command == NULL)
-		ft_check_builtin(pipex->command, pipex);
+		return ;
+	ft_check_builtin(pipex->command, pipex);
 	if (pipex->exec_type == EXTERNAL)
 		ft_validate_commands(pipex, shell);
 	if (shell->vars->malloc_flag == RED)

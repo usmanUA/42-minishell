@@ -33,11 +33,12 @@ int	main(int argc, char **argv, char **envp)
 			printf("exit\n");
 			break ;
 		}
+		ft_signals(CHILD, ON, &shell.status);
 		if (ft_valid_input(shell.vars, &shell) == NO)
 			continue ;
 		if (ft_save_input(&shell) == FAILURE)
 			continue ;
-		ft_signals(CHILD, ON, &shell.status);
+//		ft_print_vecs(shell.pipes);
 		ft_validate_execute(&shell);
 	}
 	deallocate_all_envps(&shell);

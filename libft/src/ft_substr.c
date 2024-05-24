@@ -39,7 +39,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	max_substr_len = 0;
 	s_len = ft_strlen(s);
 	max_substr_len = s_len - start;
-	if (start < 0 || start >= s_len)
+	if (start >= s_len)
 		max_substr_len = 0;
 	if (len <= max_substr_len)
 		sub_len = len;

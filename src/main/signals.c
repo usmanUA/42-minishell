@@ -24,7 +24,7 @@ static void	ft_ctrl_c_handler_main(int sig)
 {
 	if (sig == SIGINT)
 		g_signal_status = BROWN;
-	ft_putstr_fd("\n", 1);
+	ft_putstr_fd("\n", STDOUT_FILENO);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();

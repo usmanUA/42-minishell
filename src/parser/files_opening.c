@@ -15,7 +15,6 @@
 void	ft_shift_pointer(t_shell *shell);
 int		ft_push_fds(t_shell *shell);
 int		ft_get_here_doc(t_shell *shell, char *eof);
-int		ft_open_here_doc(t_input **input, t_vars *vars);
 void	ft_free_redirect_strs(char **fd, char **redir, char **file);
 int		ft_push_here_doc(t_shell *shell);
 
@@ -23,12 +22,16 @@ static int	ft_here_doc(t_shell *shell)
 {
 	int	flag;
 
+	ft_signals(CHILD, OFF, &shell->status);
 	shell->vars->redirection_type = STDIN_FILENO;
 	flag = ft_get_here_doc(shell, *shell->vars->file);
 	if (flag != SUCCESS)
 	{
-		ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir,
-			shell->vars->file);
+		if (flag == NOFILE)
+		{
+			ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir,
+				shell->vars->file);
+		}
 		return (flag);
 	}
 	if (shell->vars->redir_count->in_redir == 1)

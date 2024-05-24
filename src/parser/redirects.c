@@ -53,7 +53,7 @@ int	ft_parse_fd(t_shell *shell, char **fd)
 	{
 		*fd = ft_next_string(shell, FD);
 		if (!*fd)
-			return (ft_free_prompt(shell, YES));
+			return (FAILURE);
 	}
 	shell->vars->ind = shell->vars->end;
 	return (SUCCESS);
@@ -80,7 +80,7 @@ int	ft_handle_redirects(t_shell *shell)
 		return (ft_free_redirect_strs_prompt(&fd, &redir, &file, shell));
 	else if (shell->vars->file_error == BROWN && file == NULL)
 	{
-		ft_free_redirect_strs_prompt(&fd, &redir, &file, shell);
+		ft_free_redirect_strs(&fd, &redir, &file);
 		return (NOFILE);
 	}
 	shell->vars->file = &file;

@@ -94,11 +94,6 @@ void	ft_validate_commands(t_pipex *pipex, t_shell *shell)
 	char	**paths;
 
 	pipex->command = *(char **)vec_get((*pipex->input)->cmd, 0);
-	if (pipex->command == NULL)
-	{
-		shell->vars->malloc_flag = RED;
-		return ;
-	}
 	if (ft_give_path(shell->envp) == NULL)
 	{
 		ft_handle_absolute(pipex);
