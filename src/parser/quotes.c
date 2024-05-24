@@ -16,12 +16,14 @@ int			ft_valid_char(char next, int check_digits);
 
 static int	ft_quote_skipped(t_vars *vars, char quo)
 {
+	int	len;
+
+	len = vars->len;
 	if (vars->input_line[++vars->ind] != quo)
 		return (NO);
 	++vars->ind;
-	if (ft_isspace(vars->input_line[vars->ind]
-			|| vars->input_line[vars->ind] == '\0'))
-		vars->stop = 1;
+	if (ft_isspace(vars->input_line[vars->ind]) || vars->ind == len)
+		vars->stop = YES;
 	return (YES);
 }
 
@@ -75,7 +77,7 @@ void	ft_unquoted_str_end(t_vars *vars, int *ind)
 
 static	void	ft_set_flags(t_vars *vars, char next)
 {
-	if (!ft_isspace(next))
+	if (!ft_isspace(next) && next != '\0')
 		vars->qontinue = YES;
 	vars->s_quote = 0;
 	vars->d_quote = 0;

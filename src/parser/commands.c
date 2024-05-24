@@ -24,8 +24,7 @@ int	ft_further_join_return(t_shell *shell, char **s, int op)
 	new = ft_next_string(shell, op);
 	if (shell->vars->malloc_flag == RED && new == NULL)
 		return (YES);
-	if (vars->expand_it == NO || (vars->expand_it == YES
-			&& vars->expanded == YES))
+	if (vars->expand_it == NO || (vars->expand_it == YES && vars->expanded == YES))
 	{
 		temp = *s;
 		*s = ft_strjoin(*s, new);
@@ -49,11 +48,12 @@ static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 	if ((!vars->s_quote && !vars->d_quote) && (input_line[ind] == '\"'
 			|| input_line[ind] == '\''))
 		ft_skip_quotes(vars);
-	if (vars->stop)
+	if (vars->stop == YES)
 	{
+		vars->stop = NO;
 		vars->end = vars->ind;
 		vars->qontinue = NO;
-		return ;
+		return (SUCCESS);
 	}
 	if (ft_further_join_return(shell, s, op) == YES)
 		return (ft_free_prompt(shell, YES));
@@ -72,6 +72,13 @@ int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
 	ind = shell->vars->ind;
 	if (input_line[ind] == '\"' || input_line[ind] == '\'')
 		ft_skip_quotes(shell->vars);
+	if (shell->vars->stop == YES)
+	{
+		*s = NULL;
+		shell->vars->stop = NO;
+		shell->vars->end = shell->vars->ind;
+		return (SUCCESS);
+	}
 	*s = ft_next_string(shell, op);
 	if (shell->vars->malloc_flag == RED && *s == NULL)
 		return (ft_free_prompt(shell, YES));
