@@ -6,9 +6,10 @@
 /*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 15:45:59 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/06 15:46:01 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/05/24 14:02:22 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
 void	ft_switch_echo(int button);
@@ -53,7 +54,7 @@ void	ft_sigquit(int place)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-void	ft_signals(int place, int button, int *status)
+void	ft_signals(int place, int button)
 {
 	struct sigaction	sa;
 

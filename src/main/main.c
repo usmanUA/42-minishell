@@ -12,17 +12,11 @@
 
 #include "minishell.h"
 
-int	g_signal_status;
-
 int	main(int argc, char **argv, char **envp)
 {
 	t_shell	shell;
 
-	(void)argc;
-	(void)argv;
-	shell.status = GREEN;
-	g_signal_status = 0;
-	allocate_all_envps(&shell, envp);
+	allocate_all_envps(&shell, envp, argc, argv);
 	while (42)
 	{
 		if (ft_prompt(&shell) == FAILURE)
@@ -33,12 +27,11 @@ int	main(int argc, char **argv, char **envp)
 			printf("exit\n");
 			break ;
 		}
-		ft_signals(CHILD, ON, &shell.status);
+		ft_signals(CHILD, ON);
 		if (ft_valid_input(shell.vars, &shell) == NO)
 			continue ;
 		if (ft_save_input(&shell) == FAILURE)
 			continue ;
-//		ft_print_vecs(shell.pipes);
 		ft_validate_execute(&shell);
 	}
 	deallocate_all_envps(&shell);

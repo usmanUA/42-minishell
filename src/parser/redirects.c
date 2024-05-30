@@ -33,6 +33,8 @@ char	*ft_parse_filename(t_shell *shell)
 	char	*file;
 
 	shell->vars->malloc_flag = GREEN;
+	if (!ft_strncmp(*shell->vars->redir, "<<", 2))
+		shell->vars->heredoc = YES;
 	if (ft_save_cmd_filename(shell, &file, FILENAME) == FAILURE)
 	{
 		shell->vars->malloc_flag = RED;
@@ -44,6 +46,7 @@ char	*ft_parse_filename(t_shell *shell)
 		shell->vars->file_error = BROWN;
 		return (NULL);
 	}
+	shell->vars->heredoc = NO;
 	return (file);
 }
 

@@ -25,6 +25,7 @@ int	ft_init_shell(t_shell *shell)
 	vars = (t_vars *)malloc(sizeof(t_vars));
 	if (!vars)
 		return (ft_free_prompt(shell, YES));
+	shell->exit = YES;
 	shell->vars = vars;
 	return (SUCCESS);
 }
@@ -35,6 +36,7 @@ void	ft_init_vars(t_vars *vars)
 	vars->end = 0;
 	vars->len = 0;
 	vars->exit_status = GREEN;
+	vars->heredoc = NO;
 	vars->fd = 0;
 	vars->file_fd = 0;
 	vars->redirection_type = -42;

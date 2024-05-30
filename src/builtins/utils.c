@@ -6,23 +6,11 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:28:19 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/22 16:07:47 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/24 12:07:12 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	print_envp_2d_array(char **envp)//Del this FUNCTION before eval - this is only for confirming
-{
-	int	i;
-
-	i = 0;
-	while (envp[i])
-	{
-		ft_printf("%d: %s\n", i, envp[i]);
-		i++;
-	}
-}
 
 char	*create_empty_string(void)
 {

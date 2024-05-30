@@ -58,8 +58,10 @@ void	ft_unquoted_str_end(t_vars *vars, int *ind)
 	char	c;
 
 	c = vars->input_line[vars->ind + *ind];
-	while (c != '\0' && c != '$' && c != '|')
+	while (c != '\0' && c != '|')
 	{
+		if (vars->heredoc == NO && c == '$')
+			break ;
 		if (c == '\'' || c == '\"')
 		{
 			vars->qontinue = YES;
@@ -71,12 +73,14 @@ void	ft_unquoted_str_end(t_vars *vars, int *ind)
 	}
 	if (c != '\0')
 		next = vars->input_line[vars->ind + (*ind + 1)];
-	if (c == '$' && ft_valid_char(next, YES) == VALID)
+	if (c == '$')
 		vars->qontinue = YES;
 }
 
-static	void	ft_set_flags(t_vars *vars, char next)
+static	void	ft_set_flags(t_vars *vars, char next, int *dollar)
 {
+	if (*dollar == YES)
+		return ;
 	if (!ft_isspace(next) && next != '\0')
 		vars->qontinue = YES;
 	vars->s_quote = 0;
@@ -93,7 +97,8 @@ void	ft_quoted_str_end(t_vars *vars, int quote, int *ind, int *dollar)
 	next = vars->input_line[vars->ind + *ind + 1];
 	while (c && c != quote)
 	{
-		if (c == '$' && ft_valid_char(next, YES) == VALID && vars->s_quote == 0)
+		if (vars->heredoc == NO && c == '$' && ft_valid_char(next, YES) == VALID
+			&& vars->s_quote == 0)
 		{
 			vars->qontinue = YES;
 			*dollar = YES;
@@ -109,6 +114,5 @@ void	ft_quoted_str_end(t_vars *vars, int quote, int *ind, int *dollar)
 		c = next;
 		next = vars->input_line[vars->ind + (*ind + 1)];
 	}
-	if (*dollar == NO)
-		ft_set_flags(vars, next);
+	ft_set_flags(vars, next, dollar);
 }

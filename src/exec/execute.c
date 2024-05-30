@@ -33,8 +33,6 @@ static void	ft_child(t_pipex *pipex, t_shell *shell)
 	close(pipex->read_end);
 	if (pipex->output_to_pipe == YES)
 		dup2(pipex->write_end, STDOUT_FILENO);
-	if (pipex->err_to_pipe == YES)
-		dup2(pipex->write_end, STDERR_FILENO);
 	close(pipex->write_end);
 	if (*(*pipex->input)->file_flag == GREEN && pipex->cmd_flag == GREEN)
 	{
@@ -135,7 +133,7 @@ int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 		return (FAILURE);
 	if (pipex->tot_pipes == 0)
 	{
-		if (pipex->exec_type == EXIT)
+		if (pipex->exec_type == EXIT && shell->exit == YES)
 		{
 			ft_free_shell(shell);
 			exit(shell->status);

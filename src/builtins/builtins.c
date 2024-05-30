@@ -24,7 +24,7 @@ int	builtin_commands(t_shell *shell, char **command, int exec_type)
 	else if (exec_type == ENV)
 		status = env_command(shell, command);
 	else if (exec_type == EXIT)
-		status = exit_command(command);
+		status = exit_command(shell, command);
 	else if (exec_type == EXPORT)
 		status = export_command(shell, command);
 	else if (exec_type == PWD)

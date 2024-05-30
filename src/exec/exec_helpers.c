@@ -45,6 +45,7 @@ int	ft_push_pid(t_shell *shell, int *pid, int read_end)
 
 void	ft_free_shell(t_shell *shell)
 {
+	printf("exit\n");
 	free_env_list(shell);
 	free_env_array(shell);
 	ft_free_prompt(shell, NO);

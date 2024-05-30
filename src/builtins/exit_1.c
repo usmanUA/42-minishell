@@ -74,7 +74,8 @@ static int	check_number_of_signs_and_sign_at_start(char *exit_argument)
 	return (0);
 }
 
-static int	error_handle_exit_argument(char **command, char	*argument)
+static int	error_handle_exit_argument(t_shell *shell, char **command,
+		char *argument)
 {
 	int	exit_number;
 
@@ -96,25 +97,24 @@ static int	error_handle_exit_argument(char **command, char	*argument)
 	exit_number = check_if_number_smaller_than_long_min(argument);
 	if (exit_number != 0)
 		return (exit_number);
-	exit_number = check_if_too_many_arguments(command);
+	exit_number = check_if_too_many_arguments(shell, command);
 	if (exit_number != 0)
 		return (exit_number);
 	return (0);
 }
 
-int	exit_command(char **command)
+int	exit_command(t_shell *shell, char **command)
 {
 	int		exit_number;
 	char	*argument;
 
-	printf("exit\n");
 	exit_number = 0;
 	if (command[1] != NULL)
 	{
 		argument = ft_strtrim(command[1], " \t");
 		if (argument == NULL)
 			return (1);
-		exit_number = error_handle_exit_argument(command, argument);
+		exit_number = error_handle_exit_argument(shell, command, argument);
 		free(argument);
 		if (exit_number == 0)
 		{

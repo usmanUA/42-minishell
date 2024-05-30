@@ -6,7 +6,7 @@
 /*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 10:34:32 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/22 10:34:34 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/05/24 13:49:40 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	ft_free_redirect_strs(char **fd, char **redir, char **file);
 int		ft_free_redirect_strs_prompt(char **fd, char **redir, char **file,
 			t_shell *shell);
-int	ft_get_line(t_shell *shell, char *eof, int fd);
+int		ft_get_line(t_shell *shell, char *eof, int fd);
 
 void	ft_shift_pointer(t_shell *shell)
 {

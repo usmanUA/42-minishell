@@ -6,7 +6,7 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 13:55:03 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/22 13:29:05 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/24 13:50:23 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@ void		ft_skip_special_expansions(t_shell *shell);
 
 void	ft_index_after_spaces(t_vars *vars)
 {
-	char c;
+	char	c;
 
 	c = vars->input_line[vars->end];
-	while ( c != '\0' && ft_isspace(c))
+	while (c != '\0' && ft_isspace(c))
 	{
 		vars->end++;
 		c = vars->input_line[vars->end];

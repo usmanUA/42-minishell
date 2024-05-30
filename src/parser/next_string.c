@@ -6,7 +6,7 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 09:40:12 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/22 13:33:31 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/30 03:12:46 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,14 @@ int			ft_valid_char(char next, int check_digits);
 void		ft_quoted_str_end(t_vars *vars, int quote, int *ind, int *dollar);
 void		ft_unquoted_str_end(t_vars *vars, int *ind);
 
-static void	ft_verify_expansions(t_vars *vars, char next, int *ind)
+static void	ft_verify_expansions(t_vars *vars, int *ind)
 {
+	char	next;
+
 	++(*ind);
+	if ((vars->ind + *ind) >= vars->len)
+		return ;
+	next = vars->input_line[vars->ind + *ind];
 	if (ft_valid_char(next, YES) == VALID && !vars->s_quote)
 		vars->expand_it = YES;
 	else if ((next == '\"' || next == '\'') && (vars->d_quote || vars->s_quote))
@@ -31,6 +36,7 @@ static void	ft_verify_expansions(t_vars *vars, char next, int *ind)
 			vars->qontinue = YES;
 			vars->s_quote = 0;
 			vars->d_quote = 0;
+			vars->increment = YES;
 		}
 	}
 }
@@ -43,11 +49,14 @@ static void	ft_commands_end(t_vars *vars, int quote, int *ind)
 
 	dollar = NO;
 	c = vars->input_line[vars->ind];
-	next = vars->input_line[vars->ind + 1];
-	if (c == '$')
-		ft_verify_expansions(vars, next, ind);
+	if (c == '$' && vars->heredoc == NO)
+		ft_verify_expansions(vars, ind);
+	if ((vars->ind + *ind) >= vars->len)
+		return ;
 	c = vars->input_line[vars->ind + *ind];
 	if (ft_status_expansion(vars, c, ind) == YES)
+		return ;
+	if (vars->increment == YES)
 		return ;
 	if (vars->d_quote || vars->s_quote)
 	{

@@ -6,7 +6,7 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/15 13:07:37 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/23 12:42:45 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/24 13:57:13 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ typedef struct s_vars
 	int					len;
 	int					end;
 	int					exit_status;
+	int					heredoc;
 	int					fd;
 	int					file_fd;
 	int					redirection_type;
@@ -105,6 +106,7 @@ typedef struct envp_list
 
 typedef struct s_shell
 {
+	int					exit;
 	int					status;
 	char				**envp;
 	t_input				**input;
@@ -126,13 +128,14 @@ int						check_if_number_greater_than_long_max(
 							char *exit_argument);
 int						check_if_number_smaller_than_long_min(
 							char *exit_argument);
-int						check_if_too_many_arguments(char **command);
+int						check_if_too_many_arguments(t_shell *shell,
+							char **command);
 char					*create_empty_string(void);
 void					delete_environmental_variable(t_shell *shell,
 							char *command);
 int						echo_command(char **command);
 int						env_command(t_shell *shell, char **command);
-int						exit_command(char **command);
+int						exit_command(t_shell *shell, char **command);
 int						export_command(t_shell *shell, char **command);
 bool					export_with_arguments(t_shell *shell, char **command,
 							bool error_flag);
@@ -176,7 +179,8 @@ int						ft_free_prompt(t_shell *shell, int input_separate);
 
 /*********************	init *********************************/
 
-void					allocate_all_envps(t_shell *shell, char **envp);
+void					allocate_all_envps(t_shell *shell, char **envp,
+							int argc, char **argv);
 t_envp					*create_new_node(void);
 void					increment_2d_shell_level(t_shell *shell, char **envp);
 void					ft_init_pipex(t_pipex *pipex, int tot_pipes);
@@ -191,7 +195,7 @@ char					**malloc_envp(t_shell *shell, char **envp);
 /*********************	main *********************************/
 
 int						ft_prompt(t_shell *shell);
-void					ft_signals(int place, int button, int *status);
+void					ft_signals(int place, int button);
 int						ft_valid_input(t_vars *vars, t_shell *shell);
 
 /*********************	parser *********************************/

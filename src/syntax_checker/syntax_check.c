@@ -12,6 +12,7 @@
 #include "minishell.h"
 
 void		ft_skip_spaces(char *s, int *ind);
+void		ft_skip_enclosed(t_vars *vars, int *ind);
 
 int	ft_space_until_end(t_vars *vars)
 {
@@ -67,13 +68,12 @@ static int	ft_unclosed_quote(t_vars *vars)
 	return (NO);
 }
 
-int	ft_void_pipes(t_vars *vars)
+static	int	ft_void_pipes(t_vars *vars, int ind)
 {
-	int	ind;
-
-	ind = -1;
 	while (++ind < vars->len)
 	{
+		if (vars->input_line[ind] == '\'' || vars->input_line[ind] == '\"')
+			ft_skip_enclosed(vars, &ind);
 		if (vars->input_line[ind] == '|')
 		{
 			++ind;
@@ -117,7 +117,7 @@ int	ft_syntax_error(t_vars *vars)
 		return (YES);
 	if (ft_unclosed_quote(vars) == YES)
 		return (YES);
-	if (ft_void_pipes(vars) == YES)
+	if (ft_void_pipes(vars, -1) == YES)
 		return (YES);
 	if (ft_prohibited_chars(vars) == YES)
 		return (YES);

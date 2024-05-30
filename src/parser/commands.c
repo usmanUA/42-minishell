@@ -14,6 +14,32 @@
 
 void		ft_skip_quotes(t_vars *vars);
 
+void	ft_skip_quotes_dollars(t_shell *shell, int inside_quotes)
+{
+	char	*input_line;
+	int		ind;
+	t_vars	*vars;
+
+	input_line = shell->vars->input_line;
+	ind = shell->vars->ind;
+	vars = shell->vars;
+	if (inside_quotes == YES)
+	{
+		if ((!vars->s_quote && !vars->d_quote) && (input_line[ind] == '\"'
+				|| input_line[ind] == '\''))
+			ft_skip_quotes(vars);
+	}
+	else if (inside_quotes == NO)
+	{
+		if (input_line[ind] == '\"' || input_line[ind] == '\'')
+			ft_skip_quotes(shell->vars);
+	}
+	ind = shell->vars->ind;
+	while (input_line[ind] == '$' && input_line[ind + 1] == '$')
+		ind += 2;
+	shell->vars->ind = ind;
+}
+
 int	ft_further_join_return(t_shell *shell, char **s, int op)
 {
 	char	*temp;
@@ -24,7 +50,13 @@ int	ft_further_join_return(t_shell *shell, char **s, int op)
 	new = ft_next_string(shell, op);
 	if (shell->vars->malloc_flag == RED && new == NULL)
 		return (YES);
-	if (vars->expand_it == NO || (vars->expand_it == YES && vars->expanded == YES))
+	if (*s == NULL && new != NULL)
+	{
+		*s = ft_strdup(new);
+		free(new);
+	}
+	else if (vars->expand_it == NO || (vars->expand_it == YES
+			&& vars->expanded == YES))
 	{
 		temp = *s;
 		*s = ft_strjoin(*s, new);
@@ -45,9 +77,7 @@ static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 	vars = shell->vars;
 	ind = vars->ind;
 	input_line = vars->input_line;
-	if ((!vars->s_quote && !vars->d_quote) && (input_line[ind] == '\"'
-			|| input_line[ind] == '\''))
-		ft_skip_quotes(vars);
+	ft_skip_quotes_dollars(shell, YES);
 	if (vars->stop == YES)
 	{
 		vars->stop = NO;
@@ -70,11 +100,9 @@ int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
 
 	input_line = shell->vars->input_line;
 	ind = shell->vars->ind;
-	if (input_line[ind] == '\"' || input_line[ind] == '\'')
-		ft_skip_quotes(shell->vars);
+	ft_skip_quotes_dollars(shell, NO);
 	if (shell->vars->stop == YES)
 	{
-		*s = NULL;
 		shell->vars->stop = NO;
 		shell->vars->end = shell->vars->ind;
 		return (SUCCESS);
@@ -97,6 +125,7 @@ int	ft_save_cmd(t_shell *shell)
 {
 	char	*s;
 
+	s = NULL;
 	if (ft_save_cmd_filename(shell, &s, COMMAND) == FAILURE)
 		return (FAILURE);
 	if (s != NULL)

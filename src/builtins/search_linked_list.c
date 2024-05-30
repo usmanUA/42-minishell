@@ -6,7 +6,7 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 10:12:16 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/22 16:07:21 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/05/29 16:01:33 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static int	get_name_length(char *envp_string)
 	{
 		i++;
 	}
-	if (envp_string[i] == '+')
+	if (envp_string[i - 1] == '+')
 	{
 		i--;
 	}

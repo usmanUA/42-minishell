@@ -17,22 +17,21 @@
 # define VERSION "\001\x1b[34m\002V4.2\001\x1b[0m\002"
 # define DOLLAR "\001\x1b[36m\002$ \001\x1b[0m\002"
 
-
-typedef enum e_button
+enum e_button
 {
 	ON,
 	OFF,
-}	t_button;
+};
 
-typedef enum e_status_flags
+enum e_status_flags
 {
 	GREEN = 0,
 	BROWN = 1,
 	YELLOW = 126,
 	RED = 127,
-}	t_status_flags;
+};
 
-typedef enum e_builtins
+enum e_builtins
 {
 	EXTERNAL,
 	CD,
@@ -42,16 +41,16 @@ typedef enum e_builtins
 	EXIT,
 	PWD,
 	UNSET,
-}	t_builtins;
+};
 
-typedef enum e_process
+enum e_process
 {
 	PARENT,
 	CHILD,
 	HEREDOC,
-}	t_process;
+};
 
-typedef enum e_flags
+enum e_flags
 {
 	YES,
 	NO,
@@ -60,20 +59,20 @@ typedef enum e_flags
 	NOFILE,
 	FAILURE,
 	SUCCESS,
-}	t_flags;
+};
 
-typedef enum e_consants
+enum e_consants
 {
 	COMMAND,
 	REDIRECT,
 	FD,
 	FILENAME,
-}	t_constants;
+};
 
-typedef enum e_redir_types
+enum e_redir_types
 {
 	INPUT,
 	OUTPUT,
-}	t_redir_types;
+};
 
 #endif

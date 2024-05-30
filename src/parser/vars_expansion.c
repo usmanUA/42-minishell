@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <stdio.h>
 
 void	ft_skip_special_expansions(t_shell *shell)
 {
@@ -67,7 +66,8 @@ static char	*ft_expand_key(t_shell *shell, char **key, int op)
 	temp = &(*key)[1];
 	str = ft_find_value(shell, &temp);
 	if (op == FILENAME && shell->vars->expand_it == YES
-		&& shell->vars->expanded == NO)
+		&& shell->vars->expanded == NO
+		&& shell->vars->qontinue == NO)
 		ft_filerror(0, *key, YES);
 	free(*key);
 	key = NULL;

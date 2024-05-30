@@ -12,6 +12,8 @@
 
 #include "minishell.h"
 
+int	g_signal_status;
+
 void	ft_listadd_back(t_envp **lst, t_envp *new)
 {
 	t_envp	*last_node;
@@ -80,8 +82,12 @@ static void	make_linked_list_of_envp(t_shell *shell, char **envp)
 	return ;
 }
 
-void	allocate_all_envps(t_shell *shell, char **envp)
+void	allocate_all_envps(t_shell *shell, char **envp, int argc, char **argv)
 {
+	(void)argc;
+	(void)argv;
+	shell->status = GREEN;
+	g_signal_status = 0;
 	shell->envp = malloc_envp(shell, envp);
 	increment_2d_shell_level(shell, shell->envp);
 	make_linked_list_of_envp(shell, shell->envp);

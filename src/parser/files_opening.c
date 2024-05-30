@@ -22,7 +22,7 @@ static int	ft_here_doc(t_shell *shell)
 {
 	int	flag;
 
-	ft_signals(CHILD, OFF, &shell->status);
+	ft_signals(CHILD, OFF);
 	shell->vars->redirection_type = STDIN_FILENO;
 	flag = ft_get_here_doc(shell, *shell->vars->file);
 	if (flag != SUCCESS)

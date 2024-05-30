@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
-#include <stdio.h>
 
 int	ft_valid_char(char next, int check_digits)
 {
@@ -34,12 +33,16 @@ int	ft_status_expansion(t_vars *vars, char c, int *ind)
 {
 	char	next;
 
-	next = vars->input_line[vars->ind + 1];
+	next = '\0';
 	if (c == '?')
 	{
 		++(*ind);
-		if (ft_valid_char(next, NO) == VALID)
-			vars->qontinue = YES;
+		if ((vars->ind + *ind) < vars->len)
+		{
+			next = vars->input_line[vars->ind + 1];
+			if (!ft_isspace(next))
+				vars->qontinue = YES;
+		}
 		return (YES);
 	}
 	return (NO);

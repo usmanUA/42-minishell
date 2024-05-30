@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-int	check_if_too_many_arguments(char **command)
+int	check_if_too_many_arguments(t_shell *shell, char **command)
 {
 	int	num_of_args;
 
@@ -24,6 +24,7 @@ int	check_if_too_many_arguments(char **command)
 	num_of_args -= 1;
 	if (num_of_args > 1)
 	{
+		shell->exit = NO;
 		error_msg("exit", NULL, 2, false);
 		return (1);
 	}

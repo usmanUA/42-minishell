@@ -34,7 +34,6 @@ MODULES		:=	main \
 
 SOURCES 	= 	main.c \
 			main_helpers.c \
-			print_vecs.c \
 			signals.c \
 			signals_helpers.c \
 			init_structs.c \
@@ -105,7 +104,7 @@ vpath %.c $(SOURCEDIR)
 
 define cc_cmd
 $1/%.o: %.c | $(BUILDDIR) $(DEPENDDIR)
-	@if ! $(CC) -g $(INCS) $(RL_INC) $(DEPFLAGS) $$< -o $$@ 2> $(ERRTXT); then \
+	@if ! $(CC) $(INCS) $(RL_INC) $(DEPFLAGS) $$< -o $$@ 2> $(ERRTXT); then \
 		printf "$(R)$(B)\nERROR!\n$(F)$(T)\n"; \
 		printf "$(V)Unable to create object file:$(T)\n\n"; \
 		printf "$(R)$(B)$$@$(T)\n"; \
@@ -116,7 +115,7 @@ $1/%.o: %.c | $(BUILDDIR) $(DEPENDDIR)
 	fi
 endef
 
-all: $(LIBFT) $(LIBVEC) $(NAME)
+all: $(NAME)
 
 $(LIBFT):
 	@make --quiet -C $(LIBFTDIR) all
@@ -126,8 +125,8 @@ $(LIBVEC):
 	@make --quiet -C $(LIBVECDIR) all
 	@make title
 
-$(NAME): $(OBJS)
-	@$(CC) -g $(INCS) $(RL_INC) $^ $(LIBVEC) $(LIBFT) $(RL_LIB) $(RL_FLG) -o $@
+$(NAME): $(LIBFT) $(LIBVEC) $(OBJS)
+	@$(CC) $(INCS) $(RL_INC) $^ $(LIBVEC) $(LIBFT) $(RL_LIB) $(RL_FLG) -o $@
 	@make finish
 
 debug: CFLAGS += $(DEBUGFLAGS)
