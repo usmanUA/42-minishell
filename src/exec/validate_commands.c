@@ -43,9 +43,6 @@ static int	ft_check_command(char *command, t_pipex *pipex, int check_dir)
 
 static void	ft_handle_absolute(t_pipex *pipex)
 {
-	int	fd;
-
-	fd = -2;
 	ft_check_command(pipex->command, pipex, YES);
 	if (pipex->cmd_flag == RED)
 		ft_cmd_error(pipex->command, 0, 0);

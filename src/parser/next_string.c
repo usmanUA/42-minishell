@@ -44,7 +44,6 @@ static void	ft_verify_expansions(t_vars *vars, int *ind)
 static void	ft_commands_end(t_vars *vars, int quote, int *ind)
 {
 	char	c;
-	char	next;
 	int		dollar;
 
 	dollar = NO;

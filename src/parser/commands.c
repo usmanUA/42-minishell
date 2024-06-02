@@ -71,12 +71,8 @@ int	ft_further_join_return(t_shell *shell, char **s, int op)
 static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 {
 	t_vars	*vars;
-	int		ind;
-	char	*input_line;
 
 	vars = shell->vars;
-	ind = vars->ind;
-	input_line = vars->input_line;
 	ft_skip_quotes_dollars(shell, YES);
 	if (vars->stop == YES)
 	{
@@ -95,11 +91,6 @@ static int	ft_cont_parsing(t_shell *shell, char **s, int op)
 
 int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
 {
-	char	*input_line;
-	int		ind;
-
-	input_line = shell->vars->input_line;
-	ind = shell->vars->ind;
 	ft_skip_quotes_dollars(shell, NO);
 	if (shell->vars->stop == YES)
 	{

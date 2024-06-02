@@ -68,7 +68,7 @@ int	ft_prohibited_chars(t_vars *vars)
 	ind = 0;
 	ft_skip_spaces(vars->input_line, &ind);
 	if (vars->input_line[ind] == '|')
-		return (YES);
+		return (ft_token_error(vars->input_line[ind], 0));
 	while (ind < vars->len)
 	{
 		if (vars->input_line[ind] == '\'' || vars->input_line[ind] == '\"')

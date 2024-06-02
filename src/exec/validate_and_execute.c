@@ -100,6 +100,7 @@ void	ft_validate_execute(t_shell *shell)
 	}
 	pipex.input = (t_input **)vec_get(shell->pipes, pipex.idx);
 	shell->status = *(*pipex.input)->file_flag;
+	write(1, "fuck\n", 5);
 	ft_validate_exec_last_child(&pipex, shell);
 	ft_free_prompt(shell, NO);
 }

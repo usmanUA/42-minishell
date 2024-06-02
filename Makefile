@@ -1,4 +1,3 @@
-
 NAME 		:=	minishell
 ERRTXT		:=	error.txt
 OBJSDIR		:=	build
@@ -104,7 +103,7 @@ vpath %.c $(SOURCEDIR)
 
 define cc_cmd
 $1/%.o: %.c | $(BUILDDIR) $(DEPENDDIR)
-	@if ! $(CC) $(INCS) $(RL_INC) $(DEPFLAGS) $$< -o $$@ 2> $(ERRTXT); then \
+	@if ! $(CC) $(CFLAGS) $(INCS) $(RL_INC) $(DEPFLAGS) $$< -o $$@ 2> $(ERRTXT); then \
 		printf "$(R)$(B)\nERROR!\n$(F)$(T)\n"; \
 		printf "$(V)Unable to create object file:$(T)\n\n"; \
 		printf "$(R)$(B)$$@$(T)\n"; \
@@ -126,7 +125,7 @@ $(LIBVEC):
 	@make title
 
 $(NAME): $(LIBFT) $(LIBVEC) $(OBJS)
-	@$(CC) $(INCS) $(RL_INC) $^ $(LIBVEC) $(LIBFT) $(RL_LIB) $(RL_FLG) -o $@
+	@$(CC) $(CFLAGS) $(INCS) $(RL_INC) $^ $(LIBVEC) $(LIBFT) $(RL_LIB) $(RL_FLG) -o $@
 	@make finish
 
 debug: CFLAGS += $(DEBUGFLAGS)

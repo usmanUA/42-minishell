@@ -41,7 +41,7 @@ static char	*ft_find_value(t_shell *shell, char **key)
 	envp = shell->env_list;
 	while (envp)
 	{
-		if (!ft_strcmp(*key, envp->key))
+		if (!ft_strcmp(*key, envp->key) && envp->value != NULL)
 		{
 			shell->vars->expanded = YES;
 			value = ft_strdup(envp->value);

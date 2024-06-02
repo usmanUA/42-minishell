@@ -78,6 +78,8 @@ static	int	ft_void_pipes(t_vars *vars, int ind)
 		{
 			++ind;
 			ft_skip_spaces(vars->input_line, &ind);
+			if (ind <= vars->len && vars->input_line[ind] == '\0')
+				return (ft_token_error('|', 0));
 			if (vars->input_line[ind] == '\"' || vars->input_line[ind] == '\'')
 			{
 				while (vars->input_line[ind] == '\"'

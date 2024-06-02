@@ -36,8 +36,6 @@ void	ft_skip_pipe(t_shell *shell)
 	{
 		shell->vars->end++;
 		ft_index_after_spaces(shell->vars);
-		if (shell->vars->input_line[shell->vars->ind] == '\0')
-			ft_token_error('|', 0);
 	}
 }
 

@@ -54,7 +54,6 @@ void	ft_skip_quotes(t_vars *vars)
 
 void	ft_unquoted_str_end(t_vars *vars, int *ind)
 {
-	char	next;
 	char	c;
 
 	c = vars->input_line[vars->ind + *ind];
@@ -71,8 +70,6 @@ void	ft_unquoted_str_end(t_vars *vars, int *ind)
 			break ;
 		c = vars->input_line[vars->ind + ++(*ind)];
 	}
-	if (c != '\0')
-		next = vars->input_line[vars->ind + (*ind + 1)];
 	if (c == '$')
 		vars->qontinue = YES;
 }

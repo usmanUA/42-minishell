@@ -21,9 +21,7 @@ void	ft_init_strs(char **redir, char **fd, char **file)
 
 static void	ft_update_index(int redirect, int *ind, int count)
 {
-	int	no_use;
-
-	no_use = redirect;
+	(void)redirect;
 	*ind += count;
 }
 
