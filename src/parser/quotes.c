@@ -13,6 +13,7 @@
 #include "minishell.h"
 
 int			ft_valid_char(char next, int check_digits);
+int			expandable_char(int expand_it, char c);
 
 static int	ft_quote_skipped(t_vars *vars, char quo)
 {
@@ -61,7 +62,7 @@ void	ft_unquoted_str_end(t_vars *vars, int *ind)
 	{
 		if (vars->heredoc == NO && c == '$')
 			break ;
-		if (c == '\'' || c == '\"')
+		if (c == '\'' || c == '\"' || expandable_char(vars->expand_it, c) == NO)
 		{
 			vars->qontinue = YES;
 			break ;

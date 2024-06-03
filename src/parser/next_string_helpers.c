@@ -47,3 +47,21 @@ int	ft_status_expansion(t_vars *vars, char c, int *ind)
 	}
 	return (NO);
 }
+
+int	expandable_char(int expand_it, char c)
+{
+	if (expand_it == YES)
+	{
+		if (c == ':' || c == '-' || c == ',')
+			return (NO);
+		if (c == '.' || c == '+' || c == '=' || c == '~')
+			return (NO);
+		if (c == '!' || c == '/' || c == '@' || c == '?')
+			return (NO);
+		if (c == '#' || c == '^' || c == '{' || c == '}')
+			return (NO);
+		if (c == '[' || c == ']' || c == '%')
+			return (NO);
+	}
+	return (YES);
+}

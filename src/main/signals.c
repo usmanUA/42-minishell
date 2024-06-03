@@ -35,7 +35,7 @@ void	ft_ctrl_slash_handler(int sig)
 {
 	if (sig == SIGQUIT)
 		g_signal_status = SIGQUIT + 128;
-	ft_putendl_fd("Quit", 1);
+	ft_putendl_fd("Quit: 3", 1);
 }
 
 void	ft_sigquit(int place)

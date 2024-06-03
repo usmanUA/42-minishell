@@ -19,8 +19,8 @@ SCREENCLR	:=	printf "\033c"
 SLEEP		:=	sleep .1
 
 RL_FLG		:=	-lreadline
-RL_LIB		:=	-L ~/.brew/Cellar/readline/8.2.10/lib
-RL_INC		:=	-I ~/.brew/Cellar/readline/8.2.10/include
+RL_LIB		:=	-L ~/homebrew/Cellar/readline/8.2.10/lib
+RL_INC		:=	-I ~/homebrew/Cellar/readline/8.2.10/include
 
 MODULES		:=	main \
 				builtins \
