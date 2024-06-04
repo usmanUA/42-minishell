@@ -66,6 +66,7 @@ int	ft_processes(t_pipex *pipex, t_shell *shell)
 	else
 	{
 		close(fds[1]);
+		close(pipex->infile);
 		pipex->infile = fds[0];
 		if (ft_push_pid(shell, &pid, fds[0]) == FAILURE)
 			return (ft_free_prompt(shell, NO));

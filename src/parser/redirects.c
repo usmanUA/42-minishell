@@ -32,6 +32,7 @@ char	*ft_parse_filename(t_shell *shell)
 {
 	char	*file;
 
+	file = NULL;
 	shell->vars->malloc_flag = GREEN;
 	if (!ft_strncmp(*shell->vars->redir, "<<", 2))
 		shell->vars->heredoc = YES;

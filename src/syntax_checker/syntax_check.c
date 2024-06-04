@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <stdio.h>
 
 void		ft_skip_spaces(char *s, int *ind);
 void		ft_skip_enclosed(t_vars *vars, int *ind);
@@ -99,22 +100,7 @@ static	int	ft_void_pipes(t_vars *vars, int ind)
 
 int	ft_syntax_error(t_vars *vars)
 {
-	char	c;
-	char	next;
-	char	null_term;
-
-	null_term = '\0';
 	vars->len = ft_strlen(vars->input_line);
-	c = vars->input_line[0];
-	if (vars->len > 1)
-	{
-		next = vars->input_line[1];
-		if ((c == '\'' && next == '\'') || (c == '\"' && next == '\"'))
-		{
-			ft_cmd_error(&null_term, 1, 1);
-			return (YES);
-		}
-	}
 	if (ft_space_until_end(vars) == YES)
 		return (YES);
 	if (ft_unclosed_quote(vars) == YES)

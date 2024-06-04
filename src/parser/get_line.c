@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <stdio.h>
 
 int		ft_free_redirect_strs_prompt(char **fd, char **redir, char **file,
 			t_shell *shell);
@@ -19,7 +20,11 @@ int	ft_get_line(t_shell *shell, char *eof, int fd)
 {
 	char	*line;
 
+	line = NULL;
 	line = get_next_line(STDIN_FILENO);
+	write(1, "here\n", 5);
+	if (line == NULL)
+		printf("here\n");
 	while (42)
 	{
 		if (line == NULL)

@@ -79,6 +79,7 @@ SOURCES 	= 	main.c \
 			errors.c \
 			free_mem.c \
 			free_mem2.c \
+			print_vecs.c \ 
 
 SOURCEDIR	:=	$(addprefix $(SRCSDIR)/, $(MODULES))
 BUILDDIR	:=	$(addprefix $(OBJSDIR)/, $(MODULES))
