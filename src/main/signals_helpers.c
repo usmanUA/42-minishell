@@ -15,6 +15,7 @@ void	ft_switch_echo(int button)
 {
 	struct termios	term;
 
+	ft_memset(&term, 0, sizeof(struct termios));
 	tcgetattr(STDIN_FILENO, &term);
 	if (button == OFF)
 		term.c_lflag &= ~(ECHOCTL);

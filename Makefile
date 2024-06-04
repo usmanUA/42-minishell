@@ -1,3 +1,15 @@
+#******************************************************************************#
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/06/03 11:53:22 by uahmed            #+#    #+#              #
+#    Updated: 2024/06/03 11:53:23 by uahmed           ###   ########.fr        #
+#                                                                              #
+#******************************************************************************#
+
 NAME 		:=	minishell
 ERRTXT		:=	error.txt
 OBJSDIR		:=	build
@@ -19,8 +31,8 @@ SCREENCLR	:=	printf "\033c"
 SLEEP		:=	sleep .1
 
 RL_FLG		:=	-lreadline
-RL_LIB		:=	-L ~/homebrew/Cellar/readline/8.2.10/lib
-RL_INC		:=	-I ~/homebrew/Cellar/readline/8.2.10/include
+RL_LIB		:=	-L ~/.brew/Cellar/readline/8.2.10/lib
+RL_INC		:=	-I ~/.brew/Cellar/readline/8.2.10/include
 
 MODULES		:=	main \
 				builtins \
@@ -39,6 +51,7 @@ SOURCES 	= 	main.c \
 			make_linked_list_and_utils.c \
 			make_2d_envp.c \
 			syntax_check.c \
+			syntax_helpers.c \
 			syntax_utils.c \
 			commands.c \
 			files_opening.c \

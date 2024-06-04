@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 void		ft_skip_spaces(char *s, int *ind);
-void		ft_skip_enclosed(t_vars *vars, int *ind);
+int	ft_void_redirects(t_vars *vars);
 
 int	ft_space_until_end(t_vars *vars)
 {
@@ -73,8 +73,6 @@ static	int	ft_void_pipes(t_vars *vars, int ind)
 {
 	while (++ind < vars->len)
 	{
-		if (vars->input_line[ind] == '\'' || vars->input_line[ind] == '\"')
-			ft_skip_enclosed(vars, &ind);
 		if (vars->input_line[ind] == '|')
 		{
 			++ind;
@@ -90,6 +88,7 @@ static	int	ft_void_pipes(t_vars *vars, int ind)
 					ft_skip_spaces(vars->input_line, &ind);
 				}
 				ft_skip_spaces(vars->input_line, &ind);
+				continue ;
 			}
 			if (vars->input_line[ind] == '|')
 				return (ft_token_error('|', 0));
@@ -101,6 +100,8 @@ static	int	ft_void_pipes(t_vars *vars, int ind)
 int	ft_syntax_error(t_vars *vars)
 {
 	vars->len = ft_strlen(vars->input_line);
+	if (ft_void_redirects(vars) == YES)
+		return (YES);
 	if (ft_space_until_end(vars) == YES)
 		return (YES);
 	if (ft_unclosed_quote(vars) == YES)
