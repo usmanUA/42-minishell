@@ -63,18 +63,6 @@ int	ft_token_error(char c, int sgle)
 {
 	if (sgle)
 		c = '\'';
-	printf("miniwell: syntax error near unexpected token  '%c'\n", c);
+	printf("miniwell: syntax error near unexpected token  `%c'\n", c);
 	return (YES);
 }
-
-// void	ft_exit_error(t_pipex *pipex, int free, int status, int wait_index)
-// {
-// 	if (wait_index)
-// 		ft_wait_pids(pipex, wait_index);
-// 	if (free)
-// 	{
-// 		perror("pipex: ");
-// 		ft_free_pipex(pipex);
-// 	}
-// 	exit(status);
-// }

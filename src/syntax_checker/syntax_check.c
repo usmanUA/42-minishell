@@ -12,7 +12,7 @@
 #include "minishell.h"
 
 void		ft_skip_spaces(char *s, int *ind);
-void		ft_skip_enclosed(t_vars *vars, int *ind);
+int	ft_void_redirects(t_vars *vars);
 
 int	ft_space_until_end(t_vars *vars)
 {
@@ -72,8 +72,6 @@ static	int	ft_void_pipes(t_vars *vars, int ind)
 {
 	while (++ind < vars->len)
 	{
-		if (vars->input_line[ind] == '\'' || vars->input_line[ind] == '\"')
-			ft_skip_enclosed(vars, &ind);
 		if (vars->input_line[ind] == '|')
 		{
 			++ind;
@@ -89,6 +87,7 @@ static	int	ft_void_pipes(t_vars *vars, int ind)
 					ft_skip_spaces(vars->input_line, &ind);
 				}
 				ft_skip_spaces(vars->input_line, &ind);
+				continue ;
 			}
 			if (vars->input_line[ind] == '|')
 				return (ft_token_error('|', 0));
@@ -99,22 +98,9 @@ static	int	ft_void_pipes(t_vars *vars, int ind)
 
 int	ft_syntax_error(t_vars *vars)
 {
-	char	c;
-	char	next;
-	char	null_term;
-
-	null_term = '\0';
 	vars->len = ft_strlen(vars->input_line);
-	c = vars->input_line[0];
-	if (vars->len > 1)
-	{
-		next = vars->input_line[1];
-		if ((c == '\'' && next == '\'') || (c == '\"' && next == '\"'))
-		{
-			ft_cmd_error(&null_term, 1, 1);
-			return (YES);
-		}
-	}
+	if (ft_void_redirects(vars) == YES)
+		return (YES);
 	if (ft_space_until_end(vars) == YES)
 		return (YES);
 	if (ft_unclosed_quote(vars) == YES)

@@ -22,7 +22,7 @@ int	change_oldpwd(t_shell *shell)
 	if (oldpwd != NULL)
 	{
 		free(oldpwd->value);
-		if (pwd != NULL)
+		if (pwd != NULL && pwd->value != NULL)
 		{
 			oldpwd->value = ft_strdup(pwd->value);
 			if (oldpwd->value == NULL)
