@@ -23,9 +23,10 @@ void	ft_switch_echo(int button)
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
-void	ft_restore_terminal_settings(void)
+void	ft_ctrl_c_handler_heredoc(int sig)
 {
-	struct termios	term;
-
-	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+	if (sig == SIGINT)
+		g_signal_status = BROWN;
+	write(1, "\n", 1);
+	close(0);
 }

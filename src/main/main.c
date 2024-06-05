@@ -21,12 +21,6 @@ int	main(int argc, char **argv, char **envp)
 	{
 		if (ft_prompt(&shell) == FAILURE)
 			continue ;
-		if (!shell.vars->input_line)
-		{
-			ft_free_prompt(&shell, NO);
-			printf("exit\n");
-			break ;
-		}
 		ft_signals(CHILD, ON);
 		if (ft_valid_input(shell.vars, &shell) == NO)
 			continue ;

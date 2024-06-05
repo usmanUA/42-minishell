@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <stdio.h>
 
 void	ft_shift_pointer(t_shell *shell);
 int		ft_push_fds(t_shell *shell);
@@ -44,7 +43,6 @@ static int	ft_here_doc(t_shell *shell)
 	}
 	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir,
 		shell->vars->file);
-	ft_signals(CHILD, ON);
 	return (SUCCESS);
 }
 

@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
+#include <stdio.h>
 
 int	ft_valid_input(t_vars *vars, t_shell *shell)
 {
@@ -41,6 +42,16 @@ int	ft_prompt(t_shell *shell)
 	ft_init_vars(shell->vars);
 	ft_signals(PARENT, OFF);
 	shell->vars->input_line = readline(MINISHELL VERSION DOLLAR);
+	if (shell->vars->input_line == NULL)
+	{
+		deallocate_all_envps(shell);
+		ft_free_prompt(shell, NO);
+		close(STDIN_FILENO);
+		printf("\x1B[A");
+		readline(MINISHELL VERSION DOLLAR);
+		printf("exit\n");
+		exit(0);
+	}
 	if (g_signal_status != 0)
 	{
 		shell->status = g_signal_status;
