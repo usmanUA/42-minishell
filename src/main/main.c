@@ -6,14 +6,14 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/15 14:02:09 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/23 12:42:12 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 14:45:14 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_print_vecs(t_vec *pipes);
-void	ft_restore_terminal_settings(void);
+void	ft_print_vecs(t_vec *pipes);//Delete this before Eval
+void	ft_restore_terminal_settings(void);//Delete this before Eval
 
 int	main(int argc, char **argv, char **envp)
 {

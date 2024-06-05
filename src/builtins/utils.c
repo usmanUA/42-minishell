@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:28:19 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/06/05 13:07:30 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/06/05 14:42:36 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,8 @@ int	ft_strcmp(char *s1, char *s2)
 	return (0);
 }
 
-int malloc_status_failure(t_shell *shell)
+int	malloc_status_failure(t_shell *shell)
 {
-    shell->malloc_status = FAILURE;
-    return (1);
+	shell->malloc_status = FAILURE;
+	return (1);
 }

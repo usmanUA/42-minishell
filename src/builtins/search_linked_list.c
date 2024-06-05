@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   search_linked_list.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 10:12:16 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/06/05 13:48:06 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/06/05 14:41:27 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,13 +63,13 @@ char	*get_name_of_env_variable(char *envp_string)
 	return (name);
 }
 
-char	*get_value_of_env_variable(t_shell *shell, char *envp_string)
+char	*get_value_of_env_var(t_shell *shell, char *env_string)
 {
 	char	*value;
 	int		value_length;
 	char	*value_string;
 
-	value = ft_strchr(envp_string, '=');
+	value = ft_strchr(env_string, '=');
 	if (value == NULL)
 		return (NULL);
 	value++;
