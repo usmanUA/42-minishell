@@ -6,14 +6,14 @@
 /*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 14:54:20 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/22 13:35:43 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 14:45:48 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 void		ft_skip_quotes(t_vars *vars);
-int	ft_push_env_var(t_shell *shell, char ***env_var);
+int			ft_push_env_var(t_shell *shell, char ***env_var);
 
 void	ft_skip_quotes_dollars(t_shell *shell, int inside_quotes)
 {

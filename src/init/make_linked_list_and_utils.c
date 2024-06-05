@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   make_linked_list_and_utils.c                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 09:46:32 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/06/05 13:48:27 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/06/05 14:38:24 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int	create_node_and_add_to_list(t_shell *shell, char *envp, t_envp **list)
 		free(node);
 		return (1);
 	}
-	node->value = get_value_of_env_variable(shell, envp);
+	node->value = get_value_of_env_var(shell, envp);
 	ft_listadd_back(list, node);
 	return (0);
 }

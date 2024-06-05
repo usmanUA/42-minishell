@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   syntax_helpers.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:40:04 by uahmed            #+#    #+#             */
-/*   Updated: 2024/06/04 15:40:05 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/06/05 14:48:19 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <stdio.h>
 
 void		ft_skip_spaces(char *s, int *ind);
 
@@ -33,9 +32,9 @@ int	ft_newline_token_error(t_vars *vars, int ind)
 
 int	ft_void_redirects(t_vars *vars)
 {
-	int	ind;
+	int		ind;
 	char	c;
-	int	flag;
+	int		flag;
 
 	ind = -1;
 	flag = NO;

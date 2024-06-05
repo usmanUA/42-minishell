@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   syntax_check.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 13:50:16 by uahmed            #+#    #+#             */
-/*   Updated: 2024/04/16 13:50:18 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/06/05 14:47:26 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
-#include <stdio.h>
 
 void		ft_skip_spaces(char *s, int *ind);
-int	ft_void_redirects(t_vars *vars);
+int			ft_void_redirects(t_vars *vars);
 
 int	ft_space_until_end(t_vars *vars)
 {

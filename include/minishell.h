@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/15 13:07:37 by uahmed            #+#    #+#             */
-/*   Updated: 2024/06/05 13:49:00 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/06/05 14:41:23 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ typedef struct s_shell
 {
 	int					exit;
 	int					status;
-	int                 malloc_status;		
+	int					malloc_status;
 	char				**envp;
 	t_input				**input;
 	t_envp				*env_list;
@@ -143,9 +143,9 @@ bool					export_with_arguments(t_shell *shell, char **command,
 int						ft_return_value(int error_flag);
 int						ft_strcmp(char *s1, char *s2);
 char					*get_name_of_env_variable(char *envp_string);
-char					*get_value_of_env_variable(t_shell *shell, char *envp_string);
+char					*get_value_of_env_var(t_shell *shell, char *env_string);
 int						if_env_var_exists(t_shell *shell, char *command);
-int                     malloc_status_failure(t_shell *shell);
+int						malloc_status_failure(t_shell *shell);
 int						pwd_command(void);
 char					*relative_path(t_shell *shell, char *command);
 int						return_index_of_node_above_unset_node(t_shell *shell,

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export_2.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/18 10:06:18 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/06/05 13:49:05 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/06/05 14:38:09 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	set_key_value(t_shell *shell, char *command, t_envp *node)
 	}
 	else
 	{
-		node->value = get_value_of_env_variable(shell, command);
+		node->value = get_value_of_env_var(shell, command);
 		if (node->value == NULL)
 		{
 			free(node->value);

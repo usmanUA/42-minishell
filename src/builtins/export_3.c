@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export_3.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 07:41:39 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/06/05 13:48:46 by uahmed           ###   ########.fr       */
+/*   Updated: 2024/06/05 14:38:18 by mkorpela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static char	*append_value(t_shell *shell, char *command, t_envp *node)
 	char	*new_value;	
 
 	(void)shell;
-	value_append = get_value_of_env_variable(shell, command);
+	value_append = get_value_of_env_var(shell, command);
 	if (value_append == NULL)
 	{
 		return (NULL);
@@ -69,7 +69,7 @@ int	if_env_var_exists(t_shell *shell, char *command)
 			if (append_to_value(command) == false)
 			{
 				free(node->value);
-				node->value = get_value_of_env_variable(shell, command);
+				node->value = get_value_of_env_var(shell, command);
 				return (ft_returnvalue(node->value));
 			}
 			else
