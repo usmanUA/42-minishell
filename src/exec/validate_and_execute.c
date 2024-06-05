@@ -37,16 +37,16 @@ static void	ft_check_builtin(char *command, t_pipex *pipex)
 
 static int	ft_validate_exec_last_child(t_pipex *pipex, t_shell *shell)
 {
-	char	null_term;
-
-	null_term = '\0';
 	shell->vars->malloc_flag = GREEN;
 	pipex->cmd_flag = GREEN;
 	pipex->command = *(char **)vec_get((*pipex->input)->cmd, 0);
-	if (pipex->command == NULL)
+	if (pipex->command == NULL || pipex->command[0] == '\0')
 	{
-		if (*(*pipex->input)->file_flag == GREEN)
-			ft_cmd_error(&null_term, 1, 1);
+		if (pipex->command != NULL && pipex->command[0] == '\0')
+		{
+			if (*(*pipex->input)->file_flag == GREEN)
+				ft_cmd_error(pipex->command, 1, 1);
+		}
 		return (SUCCESS);
 	}
 	ft_check_builtin(pipex->command, pipex);
@@ -75,16 +75,16 @@ int	ft_init_pids(t_shell *shell)
 
 static int	ft_validate_exec_childs(t_pipex *pipex, t_shell *shell)
 {
-	char	null_term;
-
-	null_term = '\0';
 	pipex->cmd_flag = GREEN;
 	shell->vars->malloc_flag = GREEN;
 	pipex->command = *(char **)vec_get((*pipex->input)->cmd, 0);
-	if (pipex->command == NULL)
+	if (pipex->command == NULL || pipex->command[0] == '\0')
 	{
-		if (*(*pipex->input)->file_flag == BROWN)
-			ft_cmd_error(&null_term, 1, 1);
+		if (pipex->command != NULL && pipex->command[0] == '\0')
+		{
+			if (*(*pipex->input)->file_flag == GREEN)
+				ft_cmd_error(pipex->command, 1, 1);
+		}
 		return (SUCCESS);
 	}
 	ft_check_builtin(pipex->command, pipex);

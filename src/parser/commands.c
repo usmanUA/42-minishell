@@ -13,6 +13,7 @@
 #include "minishell.h"
 
 void		ft_skip_quotes(t_vars *vars);
+int	ft_push_env_var(t_shell *shell, char ***env_var);
 
 void	ft_skip_quotes_dollars(t_shell *shell, int inside_quotes)
 {
@@ -115,12 +116,27 @@ int	ft_save_cmd_filename(t_shell *shell, char **s, int op)
 int	ft_save_cmd(t_shell *shell)
 {
 	char	*s;
+	char	**env_var;
 
 	s = NULL;
+	env_var = NULL;
 	if (ft_save_cmd_filename(shell, &s, COMMAND) == FAILURE)
 		return (FAILURE);
-	if (s != NULL)
+	// if (s != NULL)
+	// {
+	if (shell->vars->expand_it == YES && shell->vars->expanded == YES)
 	{
+		env_var = ft_split(s, ' ');
+		free(s);
+		return (ft_push_env_var(shell, &env_var));
+	}
+	else
+	{
+		if (shell->vars->expand_it == NO && s == NULL)
+		{
+			s = (char *)malloc(sizeof(char));
+			s[0] = '\0';
+		}
 		if (!vec_push((*shell->input)->cmd, &s))
 		{
 			if (s)

@@ -42,7 +42,7 @@ void	ft_sigquit(int place)
 {
 	struct sigaction	sa;
 
-	if (place == PARENT)
+	if (place == PARENT || place == HEREDOC)
 	{
 		signal(SIGQUIT, SIG_IGN);
 		return ;
@@ -61,7 +61,7 @@ void	ft_signals(int place, int button)
 	ft_switch_echo(button);
 	if (place == PARENT)
 		sa.sa_handler = ft_ctrl_c_handler_main;
-	else if (place == CHILD)
+	else if (place == CHILD || HEREDOC)
 		sa.sa_handler = ft_ctrl_c_handler_exec;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;

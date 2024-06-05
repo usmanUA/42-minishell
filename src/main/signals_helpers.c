@@ -23,3 +23,11 @@ void	ft_switch_echo(int button)
 		term.c_lflag |= (ECHOCTL);
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
+
+void	ft_restore_terminal_settings(void)
+{
+	struct termios	term;
+
+	ft_memset(&term, 0, sizeof(struct termios));
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+}

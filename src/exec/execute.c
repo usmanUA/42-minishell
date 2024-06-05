@@ -98,6 +98,7 @@ static int	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
 	int	pid;
 	int	status;
 
+	status = 0;
 	pid = fork();
 	if (pid == -1)
 		return (ft_free_prompt(shell, NO));

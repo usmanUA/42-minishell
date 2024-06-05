@@ -23,7 +23,7 @@ static int	ft_here_doc(t_shell *shell)
 {
 	int	flag;
 
-	ft_signals(CHILD, OFF);
+	ft_signals(HEREDOC, OFF);
 	shell->vars->redirection_type = STDIN_FILENO;
 	flag = ft_get_here_doc(shell, *shell->vars->file);
 	if (flag != SUCCESS)
@@ -44,6 +44,7 @@ static int	ft_here_doc(t_shell *shell)
 	}
 	ft_free_redirect_strs(shell->vars->f_des, shell->vars->redir,
 		shell->vars->file);
+	ft_signals(CHILD, ON);
 	return (SUCCESS);
 }
 
