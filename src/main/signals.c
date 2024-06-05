@@ -40,18 +40,12 @@ void	ft_ctrl_slash_handler(int sig)
 
 void	ft_sigquit(int place)
 {
-	struct sigaction	sa;
-
 	if (place == PARENT || place == HEREDOC)
 	{
 		signal(SIGQUIT, SIG_IGN);
 		return ;
 	}
-	else if (place == CHILD)
-		sa.sa_handler = ft_ctrl_slash_handler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction(SIGQUIT, &sa, NULL);
+	signal(SIGQUIT, ft_ctrl_slash_handler);
 }
 
 void	ft_signals(int place, int button)

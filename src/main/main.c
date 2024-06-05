@@ -12,9 +12,6 @@
 
 #include "minishell.h"
 
-void	ft_print_vecs(t_vec *pipes);
-void	ft_restore_terminal_settings(void);
-
 int	main(int argc, char **argv, char **envp)
 {
 	t_shell	shell;
@@ -35,8 +32,8 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		if (ft_save_input(&shell) == FAILURE)
 			continue ;
-//		ft_print_vecs(shell.pipes);
 		ft_validate_execute(&shell);
+		system("leaks -q minishell | grep -w total >> leaks.txt");
 	}
 	deallocate_all_envps(&shell);
 	return (shell.status);
