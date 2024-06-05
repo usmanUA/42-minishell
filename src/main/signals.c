@@ -35,7 +35,7 @@ void	ft_ctrl_slash_handler(int sig)
 {
 	if (sig == SIGQUIT)
 		g_signal_status = SIGQUIT + 128;
-	ft_putendl_fd("Quit: 3", 1);
+	ft_putendl_fd("Quit: 3", STDOUT_FILENO);
 }
 
 void	ft_sigquit(int place)
@@ -56,15 +56,10 @@ void	ft_sigquit(int place)
 
 void	ft_signals(int place, int button)
 {
-	struct sigaction	sa;
-
 	ft_switch_echo(button);
 	if (place == PARENT)
-		sa.sa_handler = ft_ctrl_c_handler_main;
-	else if (place == CHILD || HEREDOC)
-		sa.sa_handler = ft_ctrl_c_handler_exec;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction(SIGINT, &sa, NULL);
+		signal(SIGINT, ft_ctrl_c_handler_main);
+	else if (place == CHILD || place == HEREDOC)
+		signal(SIGINT, ft_ctrl_c_handler_exec);
 	ft_sigquit(place);
 }

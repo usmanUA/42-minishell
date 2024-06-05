@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   search_linked_list.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 10:12:16 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/29 16:01:33 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 13:48:06 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ char	*get_name_of_env_variable(char *envp_string)
 	return (name);
 }
 
-char	*get_value_of_env_variable(char *envp_string)
+char	*get_value_of_env_variable(t_shell *shell, char *envp_string)
 {
 	char	*value;
 	int		value_length;
@@ -77,6 +77,7 @@ char	*get_value_of_env_variable(char *envp_string)
 	value_string = (char *)malloc(sizeof(char) * (value_length + 1));
 	if (value_string == NULL)
 	{
+		shell->malloc_status = FAILURE;
 		return (NULL);
 	}
 	value_string = string_n_copy(value_string, value, value_length);

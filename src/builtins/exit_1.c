@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit_1.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 12:51:39 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/22 10:48:38 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 13:08:55 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ int	exit_command(t_shell *shell, char **command)
 	{
 		argument = ft_strtrim(command[1], " \t");
 		if (argument == NULL)
-			return (1);
+			return (malloc_status_failure(shell));
 		exit_number = error_handle_exit_argument(shell, command, argument);
 		free(argument);
 		if (exit_number == 0)

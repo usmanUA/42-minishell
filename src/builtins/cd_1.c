@@ -3,22 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   cd_1.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 13:37:56 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/22 10:38:31 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 13:12:46 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*absolute_path(char *command)
+char	*absolute_path(t_shell *shell, char *command)
 {
 	char	*directory;
 
 	directory = ft_strdup(command);
 	if (directory == NULL)
 	{
+		shell->malloc_status = FAILURE;
 		return (NULL);
 	}
 	return (directory);
@@ -38,6 +39,7 @@ char	*only_cd(t_shell *shell)
 	directory = ft_strdup(node->value);
 	if (directory == NULL)
 	{
+		shell->status = FAILURE;
 		return (NULL);
 	}
 	return (directory);
@@ -76,7 +78,7 @@ char	*find_directory(t_shell *shell, char *command)
 	}
 	else if (command[0] == '/')
 	{
-		directory = absolute_path(command);
+		directory = absolute_path(shell, command);
 	}
 	else
 	{

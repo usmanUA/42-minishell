@@ -118,9 +118,7 @@ static int	ft_execute_in_child(t_pipex *pipex, t_shell *shell, char **command)
 int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 {
 	char	**args;
-	int		malloc_flag;
 
-	malloc_flag = SUCCESS;
 	args = (char **)vec_get((*pipex->input)->cmd, 0);
 	if (ft_exec_in_child(pipex->exec_type, pipex->tot_pipes) == YES)
 	{
@@ -128,10 +126,10 @@ int	ft_execute_last_cmd(t_pipex *pipex, t_shell *shell)
 			return (FAILURE);
 	}
 	else if (*(*pipex->input)->file_flag == GREEN && pipex->cmd_flag == GREEN)
-		malloc_flag = builtin_commands(shell, args, pipex->exec_type);
+		builtin_commands(shell, args, pipex->exec_type);
 	if (pipex->tot_pipes > 0)
 		ft_wait_childs(shell);
-	if (malloc_flag == FAILURE)
+	if (shell->malloc_status == FAILURE)
 		return (FAILURE);
 	if (pipex->tot_pipes == 0)
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export_2.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/18 10:06:18 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/29 15:44:36 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 13:49:05 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int	set_key_value(t_shell *shell, char *command, t_envp *node)
 {
-	(void)shell;
 	if (ft_strchr(command, '=') == NULL)
 	{
 		node->value = NULL;
@@ -22,7 +21,7 @@ int	set_key_value(t_shell *shell, char *command, t_envp *node)
 	}
 	else
 	{
-		node->value = get_value_of_env_variable(command);
+		node->value = get_value_of_env_variable(shell, command);
 		if (node->value == NULL)
 		{
 			free(node->value);
@@ -43,13 +42,13 @@ static int	if_env_var_does_not_exist(t_shell *shell, char *command)
 		node = create_new_node();
 		if (node == NULL)
 		{
-			return (1);
+			return (malloc_status_failure(shell));
 		}
 		node->key = get_name_of_env_variable(command);
 		if (node->key == NULL)
 		{
 			free(node);
-			return (1);
+			return (malloc_status_failure(shell));
 		}
 		if (set_key_value(shell, command, node) == 1)
 			return (1);

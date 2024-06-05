@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export_3.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 07:41:39 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/29 15:36:04 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 13:48:46 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,15 +41,19 @@ static char	*append_value(t_shell *shell, char *command, t_envp *node)
 	char	*new_value;	
 
 	(void)shell;
-	value_append = get_value_of_env_variable(command);
+	value_append = get_value_of_env_variable(shell, command);
 	if (value_append == NULL)
 	{
-		free(node->value);
 		return (NULL);
 	}
 	new_value = ft_strjoin(node->value, value_append);
 	free(value_append);
 	free(node->value);
+	if (new_value == NULL)
+	{
+		shell->malloc_status = FAILURE;
+		return (NULL);
+	}
 	return (new_value);
 }
 
@@ -65,7 +69,7 @@ int	if_env_var_exists(t_shell *shell, char *command)
 			if (append_to_value(command) == false)
 			{
 				free(node->value);
-				node->value = get_value_of_env_variable(command);
+				node->value = get_value_of_env_variable(shell, command);
 				return (ft_returnvalue(node->value));
 			}
 			else

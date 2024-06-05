@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   cd_2.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/18 10:28:44 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/22 11:18:04 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 13:16:20 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*make_relative_path(char *command, char *cwd)
+char	*make_relative_path(t_shell *shell, char *command, char *cwd)
 {
 	char	*cwd_with_slash;
 	char	*directory;
@@ -21,12 +21,14 @@ char	*make_relative_path(char *command, char *cwd)
 	free(cwd);
 	if (cwd_with_slash == NULL)
 	{
+		shell->malloc_status = FAILURE;
 		return (NULL);
 	}
 	directory = ft_strjoin(cwd_with_slash, command);
 	free(cwd_with_slash);
 	if (directory == NULL)
 	{
+		shell->malloc_status = FAILURE;
 		return (NULL);
 	}
 	return (directory);
@@ -56,6 +58,6 @@ char	*relative_path(t_shell *shell, char *command)
 		cleanup_after_getcwd_failed(shell);
 		return (NULL);
 	}
-	directory = make_relative_path(command, cwd);
+	directory = make_relative_path(shell, command, cwd);
 	return (directory);
 }

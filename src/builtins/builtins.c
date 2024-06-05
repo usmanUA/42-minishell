@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 10:26:15 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/22 10:51:27 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 13:08:32 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,7 @@ int	builtin_commands(t_shell *shell, char **command, int exec_type)
 	else if (exec_type == PWD)
 		status = pwd_command();
 	else if (exec_type == UNSET)
-	{
 		status = unset_command(shell, command);
-	}
 	shell->status = status;
 	return (status);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_structs.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/02 13:15:30 by uahmed            #+#    #+#             */
-/*   Updated: 2024/05/15 14:58:21 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 13:06:54 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ int	ft_init_shell(t_shell *shell)
 		return (ft_free_prompt(shell, YES));
 	shell->exit = YES;
 	shell->vars = vars;
+ 	shell->malloc_status = SUCCESS;	
 	return (SUCCESS);
 }
 

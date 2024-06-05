@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd_3.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkorpela <mkorpela@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: uahmed <uahmed@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/18 10:48:29 by mkorpela          #+#    #+#             */
-/*   Updated: 2024/05/22 11:18:18 by mkorpela         ###   ########.fr       */
+/*   Updated: 2024/06/05 13:24:12 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,14 @@ int	change_oldpwd(t_shell *shell)
 			oldpwd->value = ft_strdup(pwd->value);
 			if (oldpwd->value == NULL)
 			{
-				return (1);
+				return (malloc_status_failure(shell));
 			}
 		}
 		else
 		{
 			oldpwd->value = create_empty_string();
 			if (oldpwd->value == NULL)
-				return (1);
+				return (malloc_status_failure(shell));
 		}
 	}
 	return (0);
