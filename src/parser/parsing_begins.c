@@ -95,9 +95,7 @@ int	ft_save_input(t_shell *shell)
 {
 	t_input			*input;
 	t_redir_count	redir_count;
-	// int	temp_stdin;
-	//
-	// temp_stdin = dup(STDIN_FILENO);
+
 	ft_zero_redirects(&redir_count);
 	ft_index_after_spaces(shell->vars);
 	while (shell->vars->input_line[shell->vars->ind] != '\0')
@@ -116,7 +114,5 @@ int	ft_save_input(t_shell *shell)
 			return (ft_free_prompt(shell, YES));
 		ft_zero_redirects(&redir_count);
 	}
-	// dup2(temp_stdin, STDIN_FILENO);
-	// close(temp_stdin);
 	return (SUCCESS);
 }

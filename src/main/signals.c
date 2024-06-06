@@ -44,6 +44,8 @@ void	ft_sigquit(int place)
 	if (place == PARENT || place == HEREDOC)
 	{
 		signal(SIGQUIT, SIG_IGN);
+		if (place == HEREDOC)
+			ft_switch_echo(OFF);
 		return ;
 	}
 	signal(SIGQUIT, ft_ctrl_slash_handler);

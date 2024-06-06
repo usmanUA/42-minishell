@@ -74,3 +74,12 @@ void	error_msg_2(int error_number)
 		perror("");
 	}
 }
+
+void	ft_is_a_dir(char *cmd)
+{
+	ft_putstr_fd(cmd, 2);
+	ft_putstr_fd(T, 2);
+	ft_putstr_fd(G, 2);
+	ft_putendl_fd(": is a directory", 2);
+	ft_putstr_fd(T, 2);
+}
