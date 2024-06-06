@@ -21,13 +21,13 @@ int	main(int argc, char **argv, char **envp)
 	{
 		if (ft_prompt(&shell) == FAILURE)
 			continue ;
-		ft_signals(CHILD, ON);
 		if (ft_valid_input(shell.vars, &shell) == NO)
 			continue ;
 		if (ft_save_input(&shell) == FAILURE)
 			continue ;
+		ft_signals(CHILD, ON);
 		ft_validate_execute(&shell);
-		system("leaks -q minishell | grep -w total >> leaks.txt");
+//		system("leaks -q minishell | grep -w total >> leaks.txt");
 	}
 	deallocate_all_envps(&shell);
 	return (shell.status);

@@ -17,6 +17,12 @@
 # define VERSION "\001\x1b[34m\002V4.2\001\x1b[0m\002"
 # define DOLLAR "\001\x1b[36m\002$ \001\x1b[0m\002"
 
+# define BR		"\001\033[1;31m\002"
+# define Y		"\001\033[0;33m\002"
+# define T		"\001\033[0m\002"
+# define V		"\001\033[35m\002"
+# define G		"\001\033[32m\002"
+
 enum e_button
 {
 	ON,

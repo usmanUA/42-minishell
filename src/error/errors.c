@@ -15,16 +15,28 @@ static void	ft_write_error(int errnu, char *filename)
 {
 	if (errnu == 0)
 	{
+		ft_putstr_fd(Y, 2);
 		ft_putstr_fd("miniwell: ", 2);
+		ft_putstr_fd(T, 2);
+		ft_putstr_fd(BR, 2);
 		ft_putstr_fd(filename, 2);
+		ft_putstr_fd(T, 2);
 		ft_putstr_fd(": ", 2);
+		ft_putstr_fd(G, 2);
 		ft_putendl_fd("ambiguous redirect", 2);
+		ft_putstr_fd(T, 2);
 		return ;
 	}
+	ft_putstr_fd(Y, 2);
 	ft_putstr_fd("miniwell: ", 2);
+	ft_putstr_fd(T, 2);
+	ft_putstr_fd(BR, 2);
 	ft_putstr_fd(filename, 2);
+	ft_putstr_fd(T, 2);
 	ft_putstr_fd(": ", 2);
+	ft_putstr_fd(G, 2);
 	ft_putendl_fd(strerror(errnu), 2);
+	ft_putstr_fd(T, 2);
 }
 
 void	ft_filerror(int errnu, char *filename, int write)
@@ -42,18 +54,28 @@ void	ft_cmd_error(char *cmd, int permission, int file_exist)
 		ft_write_error(errno, cmd);
 		return ;
 	}
+	ft_putstr_fd(Y, 2);
 	ft_putstr_fd("miniwell: ", 2);
+	ft_putstr_fd(T, 2);
 	if (permission == 1)
 	{
+		ft_putstr_fd(BR, 2);
 		if (cmd[0])
 			ft_putstr_fd(cmd, 2);
+		ft_putstr_fd(T, 2);
+		ft_putstr_fd(G, 2);
 		ft_putendl_fd(": command not found", 2);
+		ft_putstr_fd(T, 2);
 		return ;
 	}
 	if (permission == 2)
 	{
+		ft_putstr_fd(BR, 2);
 		ft_putstr_fd(cmd, 2);
+		ft_putstr_fd(T, 2);
+		ft_putstr_fd(G, 2);
 		ft_putendl_fd(": is a directory", 2);
+		ft_putstr_fd(T, 2);
 		return ;
 	}
 	perror(cmd);
@@ -63,6 +85,11 @@ int	ft_token_error(char c, int sgle)
 {
 	if (sgle)
 		c = '\'';
-	printf("miniwell: syntax error near unexpected token  `%c'\n", c);
+	ft_putstr_fd(Y, 2);
+	ft_putstr_fd("miniwell: ", 2);
+	ft_putstr_fd(T, 2);
+	ft_putstr_fd(V, 2);
+	printf("syntax error near unexpected token  `%c'\n", c);
+	ft_putstr_fd(T, 2);
 	return (YES);
 }

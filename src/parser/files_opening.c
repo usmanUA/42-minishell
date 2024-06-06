@@ -22,7 +22,7 @@ static int	ft_here_doc(t_shell *shell)
 {
 	int	flag;
 
-	ft_signals(HEREDOC, OFF);
+	ft_signals(HEREDOC, ON);
 	shell->vars->redirection_type = STDIN_FILENO;
 	flag = ft_get_here_doc(shell, *shell->vars->file);
 	if (flag != SUCCESS)
@@ -128,8 +128,18 @@ static int	ft_output_append(t_shell *shell)
 
 int	ft_parse_redirect_fds(t_shell *shell)
 {
+	int	stdin_savior;
+	int	status;
+
+	stdin_savior = -42;
 	if (!ft_strncmp(*shell->vars->redir, "<<", 2))
-		return (ft_here_doc(shell));
+	{
+		stdin_savior = dup(STDIN_FILENO);
+		status = ft_here_doc(shell);
+		dup2(stdin_savior, STDIN_FILENO);
+		close(stdin_savior);
+		return (status);
+	}
 	else if (!ft_strncmp(*shell->vars->redir, ">>", 2))
 		return (ft_output_append(shell));
 	else if (!ft_strncmp(*shell->vars->redir, "<", 1))

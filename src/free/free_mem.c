@@ -62,6 +62,7 @@ static void	ft_free_cmd(t_vec *cmd)
 			str = *(char **)vec_get(cmd, ind);
 			if (str)
 				free(str);
+			str = NULL;
 		}
 		vec_free(cmd);
 		free(cmd);

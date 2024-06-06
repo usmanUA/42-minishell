@@ -27,6 +27,9 @@ static	void	write_line(char **line, int fd)
 	write(fd, *line, ft_strlen(*line));
 	free(*line);
 	*line = NULL;
+	ft_putstr_fd(G, STDOUT_FILENO);
+	ft_putstr_fd("> ", STDOUT_FILENO);
+	ft_putstr_fd(T, STDOUT_FILENO);
 	*line = get_next_line(0);
 }
 
@@ -35,6 +38,9 @@ int	ft_get_line(t_shell *shell, char *eof, int fd)
 	char	*line;
 
 	line = NULL;
+	ft_putstr_fd(G, STDOUT_FILENO);
+	ft_putstr_fd("> ", STDOUT_FILENO);
+	ft_putstr_fd(T, STDOUT_FILENO);
 	line = get_next_line(STDIN_FILENO);
 	while (42)
 	{
