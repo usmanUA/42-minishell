@@ -129,7 +129,7 @@ int	ft_save_cmd(t_shell *shell)
 			s = (char *)malloc(sizeof(char));
 			s[0] = '\0';
 		}
-		else if (shell->vars->expand_it == YES && shell->vars->expanded == NO)
+		else if (s == NULL)
 			return (SUCCESS);
 		if (!vec_push((*shell->input)->cmd, &s))
 		{

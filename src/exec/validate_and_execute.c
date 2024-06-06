@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <stdio.h>
 
 static void	ft_check_builtin(char *command, t_pipex *pipex)
 {

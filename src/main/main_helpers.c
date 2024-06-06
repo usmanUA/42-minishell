@@ -9,8 +9,8 @@
 /*   Updated: 2024/05/06 16:07:38 by uahmed           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
-#include <stdio.h>
 
 int	ft_valid_input(t_vars *vars, t_shell *shell)
 {
@@ -50,7 +50,7 @@ int	ft_prompt(t_shell *shell)
 		printf("\x1B[A");
 		readline(MINISHELL VERSION DOLLAR);
 		printf("exit\n");
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	if (g_signal_status != 0)
 	{
