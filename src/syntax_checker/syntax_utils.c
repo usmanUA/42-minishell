@@ -54,6 +54,8 @@ void	ft_skip_enclosed(t_vars *vars, int *ind)
 	char	c;
 
 	c = vars->input_line[*ind];
+	if (c != '\'' && c != '\"')
+		return ;
 	++(*ind);
 	while (vars->input_line[*ind] && vars->input_line[*ind] != c)
 		++(*ind);
@@ -71,8 +73,7 @@ int	ft_prohibited_chars(t_vars *vars)
 		return (ft_token_error(vars->input_line[ind], 0));
 	while (ind < vars->len)
 	{
-		if (vars->input_line[ind] == '\'' || vars->input_line[ind] == '\"')
-			ft_skip_enclosed(vars, &ind);
+		ft_skip_enclosed(vars, &ind);
 		if (ft_redirect_operator(vars->input_line, &ind) == YES)
 		{
 			ft_skip_spaces(vars->input_line, &ind);

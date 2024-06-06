@@ -13,6 +13,7 @@
 #include "minishell.h"
 
 void		ft_skip_spaces(char *s, int *ind);
+void		ft_skip_enclosed(t_vars *vars, int *ind);
 int			ft_void_redirects(t_vars *vars);
 
 int	ft_space_until_end(t_vars *vars)
@@ -73,6 +74,7 @@ static	int	ft_void_pipes(t_vars *vars, int ind)
 {
 	while (++ind < vars->len)
 	{
+		ft_skip_enclosed(vars, &ind);
 		if (vars->input_line[ind] == '|')
 		{
 			++ind;
