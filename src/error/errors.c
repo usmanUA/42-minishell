@@ -84,6 +84,7 @@ int	ft_token_error(char c, int sgle)
 {
 	if (sgle)
 		c = '\'';
+	ft_write_progname();
 	ft_putstr_fd(V, 2);
 	printf("syntax error near unexpected token  `%c'\n", c);
 	ft_putstr_fd(T, 2);
