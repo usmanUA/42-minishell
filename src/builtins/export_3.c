@@ -72,7 +72,7 @@ int	if_env_var_exists(t_shell *shell, char *command)
 				node->value = get_value_of_env_var(shell, command);
 				return (ft_returnvalue(node->value));
 			}
-			else
+			else if (node->value != NULL)
 			{
 				node->value = append_value(shell, command, node);
 				return (ft_returnvalue(node->value));
